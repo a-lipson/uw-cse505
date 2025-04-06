@@ -1,0 +1,7 @@
+# make build files
+**/*.aux
+**/*.vo
+**/*.vok
+**/*.vos
+**/*.glob
+
