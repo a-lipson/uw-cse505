@@ -232,8 +232,11 @@ Lemma le_mono:
     le a b -> le (add a c) (add b c).
 Proof.
   intros.
-  induction a.
-  -  
+  induction H.
+  - constructor.
+  - simpl. constructor. assumption.
+Qed.   
+
 
 End Homework1_TimeTravel. (* return to the present *)
 
@@ -280,8 +283,11 @@ Lemma and_comm :
     A /\ B ->
     B /\ A.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros. 
+  split.
+  
+    
+   (* Change to Qed when done *)
 
 (*
  * PROBLEM 6 [4 points, ~7 tactics]
