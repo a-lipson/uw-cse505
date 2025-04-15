@@ -237,7 +237,6 @@ Proof.
   - simpl. constructor. assumption.
 Qed.   
 
-
 End Homework1_TimeTravel. (* return to the present *)
 
 (*
@@ -347,9 +346,9 @@ Inductive even : nat -> Prop :=
  * three quantities expressed in terms of n.
  *)
 (*
- * (a) YOUR ANSWER HERE
- * (b) YOUR ANSWER HERE
- * (c) YOUR ANSWER HERE
+ * (a) For a nat n, there are n+1 constructors total, 1 is O and n are S.
+ * (b) For a proof of even n, there are ?? constructors total, ?? are even_O and ?? are even_SS. 
+ * (c) n will have an odd number of S constructors?
  *)
 
 (* Here is a function that returns twice its argument. *)
@@ -370,11 +369,10 @@ Lemma double_even :
   forall n,
     even (double n).
 Proof.
-  intros.
   induction n.
-  - constructor.
-  - simpl. constructor. apply IHn.
-Qed. 
+  - constructor. 
+  - simpl. constructor. assumption.
+Qed.
 
 (*
  * PROBLEM 9 [4 points, ~2 sentences]
@@ -395,7 +393,11 @@ Lemma even_double :
 Proof.
   (* YOUR PROOF ATTEMPT HERE (no need to turn in) *)
 Abort.
-(* YOUR ANSWER HERE *)
+(* 
+ * First of all, we are using a new quantifier 
+ * (NOTE: this might get introduced in lecture later this week!)
+ *)
+
 
 (*
  * PROBLEM 10 [5 points, ~9 tactics]
@@ -427,7 +429,7 @@ Lemma plus_even :
     even y ->
     even (x + y).
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 (*
@@ -440,7 +442,7 @@ Admitted. (* Change to Qed when done *)
 Lemma three_not_even :
   even 3 -> False.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 Module Data_Structures.
@@ -490,7 +492,7 @@ Lemma length_rev :
   forall A (l : list A),
     length (rev l) = length l.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 (*
@@ -556,7 +558,7 @@ Abort.
 Theorem sum_list_tailrec_ok : forall l,
   sum_list_tailrec l = sum_list l.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 (* --- Binary Tree practice --- *)
@@ -578,7 +580,7 @@ Fixpoint reverse {A} (t : tree A) : tree A :=
  * Define a function that adds up all the elements of a tree of nats.
  *)
 Fixpoint sum_tree (t : tree nat) : nat :=
-  0. (* YOUR CODE HERE *)
+  0. (* TODO: your code here! *)
 
 (*
  * PROBLEM 17 [5 points, ~5 tactics]
@@ -589,7 +591,7 @@ Lemma sum_tree_reverse :
   forall t,
     sum_tree (reverse t) = sum_tree t.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 (*
@@ -605,7 +607,7 @@ Lemma sum_list_rev :
   forall l,
     sum_list (rev l) = sum_list l.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 End Data_Structures.
@@ -622,7 +624,7 @@ Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
 (*
@@ -640,7 +642,7 @@ Admitted. (* Change to Qed when done *)
 Lemma lem_implies_peirce :
   (forall P : Prop, P \/ ~P) -> forall P Q : Prop, ((P -> Q) -> P) -> P.
 Proof.
-  (* YOUR CODE HERE *)
+  (* TODO: your code here! *)
   Admitted. (* Change to Qed when done *)
 
 (*
