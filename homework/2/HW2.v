@@ -237,7 +237,6 @@ Proof.
   - simpl. constructor. assumption.
 Qed.   
 
-
 End Homework1_TimeTravel. (* return to the present *)
 
 (*
@@ -285,9 +284,8 @@ Lemma and_comm :
 Proof.
   intros. 
   split.
-  
-    
-   (* Change to Qed when done *)
+Admitted. 
+(* Change to Qed when done *)
 
 (*
  * PROBLEM 6 [4 points, ~7 tactics]
@@ -343,9 +341,9 @@ Inductive even : nat -> Prop :=
  * three quantities expressed in terms of n.
  *)
 (*
- * (a) YOUR ANSWER HERE
- * (b) YOUR ANSWER HERE
- * (c) YOUR ANSWER HERE
+ * (a) For a nat n, there are n+1 constructors total, 1 is O and n are S.
+ * (b) For a proof of even n, there are ?? constructors total, ?? are even_O and ?? are even_SS. 
+ * (c) n will have an odd number of S constructors?
  *)
 
 (* Here is a function that returns twice its argument. *)
