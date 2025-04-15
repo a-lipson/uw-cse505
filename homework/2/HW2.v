@@ -282,10 +282,7 @@ Lemma and_comm :
     A /\ B ->
     B /\ A.
 Proof.
-  intros. 
-  split.
-  - apply H.
-  - apply H.
+  split; apply H.
 Qed.  
     
 
