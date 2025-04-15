@@ -282,10 +282,7 @@ Lemma and_comm :
     A /\ B ->
     B /\ A.
 Proof.
-  intros. 
-  split.
-  - apply H.
-  - apply H.
+  split; apply H.
 Qed.  
     
 
@@ -306,6 +303,7 @@ Lemma or_comm :
     A \/ B ->
     B \/ A.
 Proof.
+  (* tauto. *)
   intros A B H.
   destruct H.
   - right. apply H. 
@@ -663,7 +661,14 @@ Proof.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(* TODO: Your feedback here! *)
+(*
+ * 1.
+ *
+ * 2.
+ *
+ * 3.
+ *)
 
 
 (*
