@@ -429,8 +429,11 @@ Lemma plus_even :
     even y ->
     even (x + y).
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  induction H.
+  - apply H0.
+  - simpl. constructor. assumption.
+Qed.  
 
 (*
  * PROBLEM 12 [5 points, ~4 tactics]
@@ -442,9 +445,11 @@ Admitted. (* Change to Qed when done *)
 Lemma three_not_even :
   even 3 -> False.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
-
+  intro n.
+  inversion n. 
+  inversion H0.
+Qed.
+  
 Module Data_Structures.
 Set Implicit Arguments.
 
