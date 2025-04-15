@@ -364,8 +364,10 @@ Lemma double_even :
   forall n,
     even (double n).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  induction n.
+  - constructor. 
+  - simpl. constructor. assumption.
+Qed.
 
 (*
  * PROBLEM 9 [4 points, ~2 sentences]
