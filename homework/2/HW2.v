@@ -303,6 +303,7 @@ Lemma or_comm :
     A \/ B ->
     B \/ A.
 Proof.
+  (* tauto. *)
   intros A B H.
   destruct H.
   - right. apply H. 
