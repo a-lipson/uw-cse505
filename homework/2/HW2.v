@@ -378,8 +378,14 @@ Lemma even_double :
     exists k,
       n = double k.
 Proof.
-  (* YOUR PROOF ATTEMPT HERE (no need to turn in) *)
+  intro n.
+  induction n.
+  - exists 0. reflexivity.
+  - exists (S n). simpl.
 Abort.
+(* Becuase we can't be sure that n is even, we can't get anywhere in the proof.*)
+(* We get stuck proving a false proposition or can't progress no matter how much we try to change things.*)
+  
 (* 
  * First of all, we are using a new quantifier 
  * (NOTE: this might get introduced in lecture later this week!)
@@ -419,7 +425,7 @@ Proof.
   intros.
   induction H.
   - apply H0.
-  - simpl. constructor. assumption.
+  - constructor. assumption.
 Qed.  
 
 (*
@@ -480,12 +486,28 @@ Fixpoint rev {A} (ls : list A) : list A :=
  *
  * Hint: You'll need a helper lemma!
  *)
+Lemma length_app: 
+  forall A (l: list A) t,
+    length (l ++ [t]) = S (length l).
+Proof.
+  intros.
+  induction l.
+  - reflexivity.
+  - simpl. rewrite IHl. reflexivity.
+Qed. 
+
 Lemma length_rev :
   forall A (l : list A),
     length (rev l) = length l.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+intros.
+induction l.
+- reflexivity.
+- simpl. 
+  rewrite length_app. 
+  rewrite IHl. 
+  reflexivity.
+Qed. 
 
 (*
  * Here is a function that adds up all the elements of a list of nats.
@@ -531,8 +553,13 @@ Definition sum_list_tailrec (l : list nat) : nat :=
 Theorem sum_list_tailrec_ok : forall l,
   sum_list_tailrec l = sum_list l.
 Proof.
+  intro l.
+  induction l.
+  - reflexivity.
+  - unfold sum_list_tailrec. simpl. 
 Abort.
-  (* YOUR EXPLANATION HERE (no need to prove it yet!) *)
+(* We need a way of eliminating the accumulator that comes out of unfolding the tail recursion. *)
+(* Otherwise, we have an irreducible operation of "hd + 0". *)
 
 (*
  * PROBLEM 15 [8 points, ~15 tactics]
@@ -547,11 +574,28 @@ Abort.
  *
  * Hint: Your fixed proof of `sum_list_tailrec_ok` should *not* use induction.
  *)
+
+Lemma sum_acc_tr : 
+  forall l acc, 
+    sum_list_tr l acc = sum_list l + acc.
+Proof.
+  intro l.
+  induction l.
+  - auto.
+  - intro acc. simpl. rewrite IHl. lia.  
+Qed.
+
 Theorem sum_list_tailrec_ok : forall l,
   sum_list_tailrec l = sum_list l.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+  intro l.
+  destruct l.
+  - reflexivity.
+  - unfold sum_list_tailrec. 
+    rewrite sum_acc_tr. 
+    lia.
+Qed. 
+
 
 (* --- Binary Tree practice --- *)
 
@@ -572,7 +616,10 @@ Fixpoint reverse {A} (t : tree A) : tree A :=
  * Define a function that adds up all the elements of a tree of nats.
  *)
 Fixpoint sum_tree (t : tree nat) : nat :=
-  0. (* TODO: your code here! *)
+  match t with
+  | Leaf => 0
+  | Node l d r => d + sum_tree l + sum_tree r
+  end.
 
 (*
  * PROBLEM 17 [5 points, ~5 tactics]
@@ -583,8 +630,10 @@ Lemma sum_tree_reverse :
   forall t,
     sum_tree (reverse t) = sum_tree t.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+  induction t.
+  - reflexivity.
+  - simpl. lia.
+Qed.  
 
 (*
  * PROBLEM 18 [12 points, ~20 tactics]
@@ -595,14 +644,34 @@ Admitted. (* Change to Qed when done *)
  *
  * Hint: You'll need a helper lemma about sum_list.
  *)
+Lemma sum_acc: 
+  forall l acc, 
+    sum_list (l ++ [acc]) = acc + sum_list l.
+Proof.
+  induction l.
+  - simpl. lia.
+  - simpl. intros acc. rewrite IHl. lia.
+Qed.
+
 Lemma sum_list_rev :
   forall l,
     sum_list (rev l) = sum_list l.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+  induction l.
+  - reflexivity.
+  - simpl.
+   rewrite sum_acc. 
+   rewrite <- IHl.
+   reflexivity.
+Qed.
+
 
 End Data_Structures.
+Lemma alex: 
+  forall n0,
+    S (S n0) = 2 + n0.
+Proof.
+Admitted.
 
 (*
  * CHALLENGE 19 [10 points, ~20 tactics]
@@ -612,12 +681,20 @@ End Data_Structures.
  * Note: This problem could be harder than some others! We recommend trying
  * the other problems first.
  *)
+Print even.
+
 Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
 Proof.
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+  induction n; repeat constructor.
+  - exists 0. lia. 
+  - intro even_S_n. destruct IHn as [even_exists IHn].
+    + destruct even_S_n.
+      * exists 0. reflexivity.
+      * rewrite alex. 
+Abort.
+
 
 (*
  * CHALLENGE 20 [20 points, ~8 tactics]
@@ -634,8 +711,9 @@ Admitted. (* Change to Qed when done *)
 Lemma lem_implies_peirce :
   (forall P : Prop, P \/ ~P) -> forall P Q : Prop, ((P -> Q) -> P) -> P.
 Proof.
+  intros lem P. 
   (* TODO: your code here! *)
-  Admitted. (* Change to Qed when done *)
+Admitted. (* Change to Qed when done *)
 
 (*
  * PROBLEM 21 [5 points, ~3 sentences]
@@ -652,12 +730,16 @@ Proof.
 
 (* TODO: Your feedback here! *)
 (*
- * 1.
+ * 1. The homework took us about 8 hours.
  *
- * 2.
+ * 2. We loved the realization that oftentimes only reflexivity is needed for base cases.
+ *    This made our inductive proofs a lot of fun since we only had to focus on the inductive case.
  *
- * 3.
- *)
+ * 3. The challenge problems have provided quite the challenge... 
+ *    Also, early on, when prvoing one of the addition theorems, we couldn't trivially use
+*     associativity and commutativity - so we proved a really dumb lemma called "swap lemma"
+*     that took us like 3 days to take out. 
+ *)  
 
 
 (*
