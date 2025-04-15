@@ -285,9 +285,10 @@ Lemma and_comm :
 Proof.
   intros. 
   split.
-  
+  - apply H.
+  - apply H.
+Qed.  
     
-   (* Change to Qed when done *)
 
 (*
  * PROBLEM 6 [4 points, ~7 tactics]
@@ -306,8 +307,11 @@ Lemma or_comm :
     A \/ B ->
     B \/ A.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros A B H.
+  destruct H.
+  - right. apply H. 
+  - left. apply H.
+Qed.
 
 (* Here is an inductive definition of evenness for natural numbers. *)
 Inductive even : nat -> Prop :=
@@ -366,8 +370,11 @@ Lemma double_even :
   forall n,
     even (double n).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  induction n.
+  - constructor.
+  - simpl. constructor. apply IHn.
+Qed. 
 
 (*
  * PROBLEM 9 [4 points, ~2 sentences]
@@ -401,9 +408,12 @@ Lemma even_double :
     exists k,
       n = double k.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
+intros.
+induction H.
+- exists 0. reflexivity.
+- destruct IHeven.
+  exists (S x). simpl. rewrite H0. reflexivity.
+Qed. 
 (*
  * PROBLEM 11 [5 points, ~6 tactics]
  *
