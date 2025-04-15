@@ -145,30 +145,19 @@ Proof.
   - simpl. assumption. 
 Qed.
 
-Lemma add_swap:
-  forall n1 n2 n3,
-    add n1 (add n2 n3) = add n2 (add n1 n3).
-Proof.
-  (* TODO: unfuckulate this *)
-  intros.
-  rewrite add_assoc. 
-  rewrite add_comm.
-  symmetry.
-  rewrite add_assoc. 
-  rewrite add_comm.
-  f_equal.
-  rewrite add_comm.
-  reflexivity.
-Qed.
-
 Lemma mult_n_S :
   forall n1 n2,
     mult n1 (S n2) = add n1 (mult n1 n2).
 Proof.
-  induction n1; simpl. 
+ induction n1; simpl.
   - reflexivity.
-  - intro n2. rewrite IHn1. 
-    f_equal. rewrite add_swap. reflexivity.
+  - intro n2. f_equal. 
+    rewrite IHn1.
+    rewrite add_assoc.
+    rewrite add_assoc.
+    f_equal.
+    rewrite <- add_comm.
+    reflexivity.
 Qed.
 
 Lemma mult_comm :
