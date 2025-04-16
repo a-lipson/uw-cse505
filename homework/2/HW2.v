@@ -700,12 +700,16 @@ Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
 Proof.
-  induction n; repeat constructor.
-  - exists 0. lia. 
-  - intro even_S_n. destruct IHn as [even_exists IHn].
-    + destruct even_S_n.
-      * exists 0. reflexivity.
-      * rewrite alex. 
+  split.
+  - intros. induction H.
+    + exists 0. reflexivity.
+    + destruct IHeven.
+      * exists (S x). lia.
+  - intros. destruct H as [k Hk].
+    + induction k.
+      * rewrite Hk. constructor.
+      * (* stuck here *)
+
 Abort.
 
 
