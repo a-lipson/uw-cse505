@@ -333,6 +333,7 @@ Inductive even : nat -> Prop :=
  * three quantities expressed in terms of n.
  *)
 (*
+ * TODO: complete this part!
  * (a) For a nat n, there are n+1 constructors total, 1 is O and n are S.
  * (b) For a proof of even n, there are ?? constructors total, ?? are even_O and ?? are even_SS. 
  * (c) n will have an odd number of S constructors?
@@ -387,8 +388,7 @@ Abort.
 (* We get stuck proving a false proposition or can't progress no matter how much we try to change things.*)
   
 (* 
- * First of all, we are using a new quantifier 
- * (NOTE: this might get introduced in lecture later this week!)
+ * TODO: explain how we got stuck here!
  *)
 
 
@@ -407,7 +407,10 @@ intros.
 induction H.
 - exists 0. reflexivity.
 - destruct IHeven.
-  exists (S x). simpl. rewrite H0. reflexivity.
+  exists (S x). 
+  simpl. 
+  rewrite H0. 
+  reflexivity.
 Qed. 
 (*
  * PROBLEM 11 [5 points, ~6 tactics]
@@ -493,7 +496,9 @@ Proof.
   intros.
   induction l.
   - reflexivity.
-  - simpl. rewrite IHl. reflexivity.
+  - simpl. 
+    rewrite IHl. 
+    reflexivity.
 Qed. 
 
 Lemma length_rev :
@@ -553,13 +558,17 @@ Definition sum_list_tailrec (l : list nat) : nat :=
 Theorem sum_list_tailrec_ok : forall l,
   sum_list_tailrec l = sum_list l.
 Proof.
-  intro l.
   induction l.
   - reflexivity.
-  - unfold sum_list_tailrec. simpl. 
+  - unfold sum_list_tailrec. 
+    simpl. 
 Abort.
-(* We need a way of eliminating the accumulator that comes out of unfolding the tail recursion. *)
-(* Otherwise, we have an irreducible operation of "hd + 0". *)
+(* 
+ * We need a way of eliminating the accumulator that we get from 
+ * unfolding the tail recursive form of sum list.
+ * Otherwise, we have no way of working with the accumulator inside 
+   of the tail recursive sum list. 
+ *)
 
 (*
  * PROBLEM 15 [8 points, ~15 tactics]
@@ -579,10 +588,12 @@ Lemma sum_acc_tr :
   forall l acc, 
     sum_list_tr l acc = sum_list l + acc.
 Proof.
-  intro l.
   induction l.
   - auto.
-  - intro acc. simpl. rewrite IHl. lia.  
+  - intro acc. 
+    simpl. 
+    rewrite IHl. 
+    lia.  
 Qed.
 
 Theorem sum_list_tailrec_ok : forall l,
@@ -648,9 +659,11 @@ Lemma sum_acc:
   forall l acc, 
     sum_list (l ++ [acc]) = acc + sum_list l.
 Proof.
-  induction l.
-  - simpl. lia.
-  - simpl. intros acc. rewrite IHl. lia.
+  induction l; simpl.
+  - lia.
+  - intros acc. 
+    rewrite IHl. 
+    lia.
 Qed.
 
 Lemma sum_list_rev :
