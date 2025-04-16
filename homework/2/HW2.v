@@ -705,18 +705,20 @@ Proof.
     + exists 0. reflexivity.
     + destruct IHeven.
       * exists (S x). lia.
-  - intros. destruct H as [k Hk].
-    + induction k.
-      * rewrite Hk. constructor.
-      * (* stuck here *)
-
+  - intros. destruct H.
+    + induction x.
+      * rewrite H. constructor.
+      * rewrite H. 
+        simpl. (* STILL STUCK *) 
+        
+        
 Abort.
 
 
 (*
  * CHALLENGE 20 [20 points, ~8 tactics]
  *
- * In class we saw a proof that Peirce's law implies the law of excluded middle.
+ * In class we saw a proof that Peirce's law impl ies the law of excluded middle.
  * Now prove the reverse direction.
  *
  * Hint: This way should be easier than the proof from lecture.
