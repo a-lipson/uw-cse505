@@ -680,11 +680,6 @@ Qed.
 
 
 End Data_Structures.
-Lemma alex: 
-  forall n0,
-    S (S n0) = 2 + n0.
-Proof.
-Admitted.
 
 (*
  * CHALLENGE 19 [10 points, ~20 tactics]
@@ -696,6 +691,7 @@ Admitted.
  *)
 Print even.
 (* need lemma since lia won't work *)
+(* TODO: i think we should be able to make lia work on something? *)
 Lemma add_identity : 
   forall x, 
     x + 0 = x.
@@ -703,6 +699,7 @@ Proof.
   auto.
 Qed.
 
+(* TODO: inline this lemma if it can be solved with auto? *)
 Lemma add_assoc : 
   forall x, 
     S (x + S x) = S (S (x + x)).
@@ -713,36 +710,28 @@ Qed.
 Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
-Proof.
+ Proof.
   split.
   - intros. induction H.
     + exists 0. reflexivity.
-    + destruct IHeven.
-      * exists (S x). lia.
-  - intros. destruct H. revert n H.
-    + induction x. 
-      * intros. rewrite H. constructor.   
-      * intros. rewrite H.         
-        simpl.     
+    + destruct IHeven. 
+      exists (S x). lia.
+  - intros. 
+    destruct H. revert n H.
+    + induction x; intros; rewrite H.
+      * constructor.
+      * simpl.
         rewrite add_identity.
-        rewrite add_assoc.      
-        apply even_SS.     
-        apply IHx.  
-        lia.  
+        rewrite add_assoc.
+        apply even_SS.
+        apply IHx.
+        lia.
 Qed.
-    
-      
-        
-      
-        
-        
-Abort.
-
 
 (*
  * CHALLENGE 20 [20 points, ~8 tactics]
  *
- * In class we saw a proof that Peirce's law impl ies the law of excluded middle.
+ * In class we saw a proof that Peirce's law implies the law of excluded middle.
  * Now prove the reverse direction.
  *
  * Hint: This way should be easier than the proof from lecture.
@@ -754,22 +743,15 @@ Abort.
 Lemma lem_implies_peirce :
   (forall P : Prop, P \/ ~P) -> forall P Q : Prop, ((P -> Q) -> P) -> P.
 Proof.
-  intros lem P. 
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
+intros LEM P Q Peirce.
+  destruct (LEM P) as [HP | HnotP].
+  - exact HP.
+  - apply Peirce.
+    intro HP.
+    contradiction.
+Qed.
 
-(*
- * PROBLEM 21 [5 points, ~3 sentences]
- *
- * Please take a moment to let us know how the homework went for you by
- * answering the following three questions:
- *    1. How long did the homework take you?
- *    2. Which parts were most interesting or helpful for you?
- *    3. Which parts were especially frustrating, confusing, or tedious?
- *       What should we do better next time?
- *
- * It's fine if your answers are short if you don't have much to say!
- *)
+
 
 (* TODO: Your feedback here! *)
 (*
