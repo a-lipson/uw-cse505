@@ -695,6 +695,20 @@ Admitted.
  * the other problems first.
  *)
 Print even.
+(* need lemma since lia won't work *)
+Lemma add_identity : 
+  forall x, 
+    x + 0 = x.
+Proof.
+  auto.
+Qed.
+
+Lemma add_assoc : 
+  forall x, 
+    S (x + S x) = S (S (x + x)).
+Proof.
+  auto.
+Qed.
 
 Lemma even_iff_exists_half :
   forall n,
@@ -705,11 +719,21 @@ Proof.
     + exists 0. reflexivity.
     + destruct IHeven.
       * exists (S x). lia.
-  - intros. destruct H.
-    + induction x.
-      * rewrite H. constructor.
-      * rewrite H. 
-        simpl. (* STILL STUCK *) 
+  - intros. destruct H. revert n H.
+    + induction x. 
+      * intros. rewrite H. constructor.   
+      * intros. rewrite H.         
+        simpl.     
+        rewrite add_identity.
+        rewrite add_assoc.      
+        apply even_SS.     
+        apply IHx.  
+        lia.  
+Qed.
+    
+      
+        
+      
         
         
 Abort.
