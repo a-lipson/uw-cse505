@@ -731,13 +731,6 @@ Proof.
         lia.  
 Qed.
     
-      
-        
-      
-        
-        
-Abort.
-
 
 (*
  * CHALLENGE 20 [20 points, ~8 tactics]
@@ -754,7 +747,8 @@ Abort.
 Lemma lem_implies_peirce :
   (forall P : Prop, P \/ ~P) -> forall P Q : Prop, ((P -> Q) -> P) -> P.
 Proof.
-  intros lem P. 
+
+   
   (* TODO: your code here! *)
 Admitted. (* Change to Qed when done *)
 
