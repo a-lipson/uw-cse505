@@ -694,7 +694,6 @@ End Data_Structures.
  * Note: This problem could be harder than some others! We recommend trying
  * the other problems first.
  *)
-Print even.
 Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
@@ -739,8 +738,6 @@ intros LEM P Q Peirce.
     contradiction.
 Qed.
 
-
-
 (* TODO: Your feedback here! *)
 (*
  * 1. The homework took us about 8 hours.
@@ -754,12 +751,12 @@ Qed.
 *     that took us like 3 days to take out. 
  *)  
 
-
-(*
- *
- * To submit your homework, please follow the instructions at the end of the
- * README.md file in this directory.
- *
- * Please also see the README.md file to read about how we will grade this
- * homework assignment.
- *)
+Lemma comm_notes: 
+  forall x y, 
+    x * (y + 1) + x <= 2 * x * y + 2 * x.
+Proof.
+  intros.
+  ring_simplify.
+  lia.
+Qed.
+  
