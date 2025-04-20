@@ -335,8 +335,13 @@ Inductive even : nat -> Prop :=
 (*
  * TODO: complete this part!
  * (a) For a nat n, there are n+1 constructors total, 1 is O and n are S.
- * (b) For a proof of even n, there are ?? constructors total, ?? are even_O and ?? are even_SS. 
- * (c) n will have an odd number of S constructors?
+ * (b) For a proof of even n, there are 1 + n / 2  constructors total, 1 are even_O and n/2 are even_SS.
+ * (c) By definition of an odd number, an odd number cannot be evenly divided in two.
+       Therefore, we can't get n/2 constructors for any odd number. Additionally, since 
+       the inductive definition starts at even 0 and goes on from the S (S 0), and there is no natural number
+       x such that 1 = S (S x) (since 1 = S 0), there is no path to follow from the constructors to even(1) and thus no path
+       forward for even(3) and so on and so forth. 
+      
  *)
 
 (* Here is a function that returns twice its argument. *)
@@ -563,11 +568,11 @@ Proof.
   - unfold sum_list_tailrec. 
     simpl. 
 Abort.
-(* 
- * We need a way of eliminating the accumulator that we get from 
+(*  
+ *  We need a way of eliminating the accumulator that we get from 
  * unfolding the tail recursive form of sum list.
  * Otherwise, we have no way of working with the accumulator inside 
-   of the tail recursive sum list. 
+ *  of the tail recursive sum list. 
  *)
 
 (*
@@ -727,10 +732,6 @@ Lemma even_iff_exists_half :
         apply IHx.
         lia.
 Qed.
-<<<<<<< HEAD
-    
-=======
->>>>>>> f55558c27a123e5cc41bd3bec4456092025b8ba7
 
 (*
  * CHALLENGE 20 [20 points, ~8 tactics]
@@ -747,12 +748,6 @@ Qed.
 Lemma lem_implies_peirce :
   (forall P : Prop, P \/ ~P) -> forall P Q : Prop, ((P -> Q) -> P) -> P.
 Proof.
-<<<<<<< HEAD
-
-   
-  (* TODO: your code here! *)
-Admitted. (* Change to Qed when done *)
-=======
 intros LEM P Q Peirce.
   destruct (LEM P) as [HP | HnotP].
   - exact HP.
@@ -761,7 +756,6 @@ intros LEM P Q Peirce.
     contradiction.
 Qed.
 
->>>>>>> f55558c27a123e5cc41bd3bec4456092025b8ba7
 
 
 (* TODO: Your feedback here! *)
