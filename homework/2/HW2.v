@@ -695,23 +695,6 @@ End Data_Structures.
  * the other problems first.
  *)
 Print even.
-(* need lemma since lia won't work *)
-(* TODO: i think we should be able to make lia work on something? *)
-Lemma add_identity : 
-  forall x, 
-    x + 0 = x.
-Proof.
-  auto.
-Qed.
-
-(* TODO: inline this lemma if it can be solved with auto? *)
-Lemma add_assoc : 
-  forall x, 
-    S (x + S x) = S (S (x + x)).
-Proof.
-  auto.
-Qed.
-
 Lemma even_iff_exists_half :
   forall n,
     even n <-> exists k, n = 2 * k.
@@ -726,8 +709,8 @@ Lemma even_iff_exists_half :
     + induction x; intros; rewrite H.
       * constructor.
       * simpl.
-        rewrite add_identity.
-        rewrite add_assoc.
+        replace (S (x + S (x + 0))) with (S (x + S x)) by lia.
+        replace ((S (x + S x))) with (S (S (x + x))) by lia.
         apply even_SS.
         apply IHx.
         lia.
