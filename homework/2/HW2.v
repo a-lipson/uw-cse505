@@ -750,13 +750,3 @@ Qed.
 *     associativity and commutativity - so we proved a really dumb lemma called "swap lemma"
 *     that took us like 3 days to take out. 
  *)  
-
-Lemma comm_notes: 
-  forall x y, 
-    x * (y + 1) + x <= 2 * x * y + 2 * x.
-Proof.
-  intros.
-  ring_simplify.
-  lia.
-Qed.
-  
