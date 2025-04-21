@@ -333,7 +333,6 @@ Inductive even : nat -> Prop :=
  * three quantities expressed in terms of n.
  *)
 (*
- * TODO: complete this part!
  * (a) For a nat n, there are n+1 constructors total, 1 is O and n are S.
  * (b) For a proof of even n, there are 1 + n / 2  constructors total, 1 are even_O and n/2 are even_SS.
  * (c) By definition of an odd number, an odd number cannot be evenly divided in two.
@@ -389,12 +388,11 @@ Proof.
   - exists 0. reflexivity.
   - exists (S n). simpl.
 Abort.
-(* Becuase we can't be sure that n is even, we can't get anywhere in the proof.*)
-(* We get stuck proving a false proposition or can't progress no matter how much we try to change things.*)
-  
-(* 
- * TODO: explain how we got stuck here!
+(*
+ * Because we can't be sure that n is even, we can't get anywhere in the proof.
+ * We get stuck proving a false proposition or can't progress no matter how much we try to change things.
  *)
+  
 
 
 (*
@@ -738,7 +736,6 @@ intros LEM P Q Peirce.
     contradiction.
 Qed.
 
-(* TODO: Your feedback here! *)
 (*
  * 1. The homework took us about 8 hours.
  *
