@@ -112,8 +112,12 @@ end.
 Lemma kinda_sum_commuter :
   forall e, kinda_sum e = kinda_sum (commuter e).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  induction e.    
+    - reflexivity.
+    - simpl. rewrite IHe1. rewrite IHe2. lia.
+    - simpl. rewrite IHe1. rewrite IHe2. lia.
+Qed.
 
 (*
  * The next problem is a bit more challenging, but you will get to continue to
