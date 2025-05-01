@@ -171,11 +171,6 @@ end.
  * undebuggable line.
  *)
 
-Lemma test:
-  forall e1 e2,
-   kinda_sum e1 +  kinda_sum e2 = kinda_sum(Plus e1 e2). 
-Proof.
-Admitted.
 
 Lemma kinda_sum_constant_fold :
   forall e,
@@ -183,11 +178,63 @@ Lemma kinda_sum_constant_fold :
 Proof.
 induction e.
 - reflexivity.
-- destruct e1. destruct e2. destruct n. destruct n0. 
-  + reflexivity.  
-  + reflexivity.
-  + reflexivity.
-  + cbn [kinda_sum]. rewrite test. rewrite <- IHe2. 
+- simpl. destruct (constant_fold e1). 
+  + cbn [kinda_sum] in *.
+    destruct n.
+    * destruct (constant_fold e2).
+      -- rewrite <- IHe2. rewrite IHe1. reflexivity.
+      -- rewrite IHe2, <- IHe1. reflexivity.
+      -- rewrite IHe2. rewrite <- IHe1. reflexivity.
+    * destruct (constant_fold e2).
+      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
+      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
+      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
+  + destruct (constant_fold e2).
+    * destruct n.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+  + destruct (constant_fold e2).
+    * destruct n.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+    * rewrite <- IHe1, <- IHe2. reflexivity. 
+    * rewrite <- IHe1, <- IHe2. reflexivity. 
+- simpl. destruct (constant_fold e1).
+  + destruct n.
+    * destruct (constant_fold e2).
+      -- rewrite <- IHe1, <- IHe2. reflexivity.
+      -- rewrite <- IHe1, <- IHe2. reflexivity.
+      -- rewrite <- IHe1, <- IHe2. reflexivity.
+    * destruct n.
+    all: destruct (constant_fold e2).
+      repeat rewrite <- IHe2, <- IHe1. simpl. lia.
+        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+  + destruct (constant_fold e2).
+    * destruct n.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+      -- destruct n.
+        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+    * rewrite <- IHe1, <- IHe2. reflexivity.
+    * rewrite <- IHe1, <- IHe2. reflexivity.
+  + destruct (constant_fold e2).
+    * destruct n.
+      -- rewrite <- IHe1, <- IHe2. simpl. lia.
+      -- destruct n.
+        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
+        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
+    * rewrite <- IHe1, <- IHe2. reflexivity.  
+    * rewrite <- IHe1, <- IHe2. reflexivity.  
+Qed.
+
+
+
 
 
        
