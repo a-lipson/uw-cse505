@@ -112,11 +112,10 @@ end.
 Lemma kinda_sum_commuter :
   forall e, kinda_sum e = kinda_sum (commuter e).
 Proof.
-  intros.
   induction e.    
     - reflexivity.
-    - simpl. rewrite IHe1. rewrite IHe2. lia.
-    - simpl. rewrite IHe1. rewrite IHe2. lia.
+    - simpl. rewrite IHe1, IHe2. lia.
+    - simpl. rewrite IHe1, IHe2. lia.
 Qed.
 
 (*
@@ -171,11 +170,34 @@ end.
  * spending a million hours reducing the proof into one magical
  * undebuggable line.
  *)
+
+Lemma test:
+  forall e1 e2,
+   kinda_sum e1 +  kinda_sum e2 = kinda_sum(Plus e1 e2). 
+Proof.
+Admitted.
+
 Lemma kinda_sum_constant_fold :
   forall e,
     kinda_sum (constant_fold e) = kinda_sum e.
 Proof.
-  (* YOUR CODE HERE *)
+induction e.
+- reflexivity.
+- destruct e1. destruct e2. destruct n. destruct n0. 
+  + reflexivity.  
+  + reflexivity.
+  + reflexivity.
+  + cbn [kinda_sum]. rewrite test. rewrite <- IHe2. 
+
+
+       
+
+  
+
+
+  
+
+
 Admitted. (* Change to Qed when done. *)
 
 End AST.
@@ -197,7 +219,10 @@ Module Interpreters.
  * Define a function that sums the natural numbers up to (and including) n.
  *)
 Fixpoint sum_upto (n : nat) : nat :=
-  0. (* YOUR CODE HERE *)
+  match n with 
+  | 0 => 0 
+  | S n => S n + sum_upto n 
+  end.
 
 Compute sum_upto 4.  (* should print 10 because 0 + 1 + 2 + 3 + 4 = 10 *)
 
@@ -292,6 +317,20 @@ Definition sum_n : cmd :=
     "input" <- "input" - 1
   done.
 
+Definition sum_n_body : cmd := 
+    "output" <- "output" + "input";
+    "input" <- "input" - 1.
+
+Lemma sum_n_body_ok: 
+   forall n n0 v, 
+    lookup "input" v = Some n -> 
+    lookup "output" v = Some n0 -> 
+    map_equiv 
+      (do_n_times (eval_cmd sum_n_body) n v) 
+      (("input", 0) :: ("output", sum_upto n) :: v).
+Proof.
+Admitted.
+
 (* PROBLEM 5 [20 points, ~35 tactics]
  *
  * Prove this lemma that states that our `sum_n` command
@@ -305,8 +344,14 @@ Theorem sum_n_ok :
     lookup "input" v = Some input ->
     lookup "output" (eval_cmd sum_n v) = Some (sum_upto input).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done. *)
+  intros.
+  unfold sum_n.
+  fold sum_n_body.
+  cbn -[sum_n_body].
+  rewrite H.
+  rewrite sum_n_body_ok with (n0 := 0); solve_map_cases.
+Qed.
+
 
 End Interpreters.
 
@@ -491,6 +536,7 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
+  unfold initially_holds. intros. 
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
