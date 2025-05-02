@@ -113,7 +113,7 @@ Lemma kinda_sum_commuter :
   forall e, kinda_sum e = kinda_sum (commuter e).
 Proof.
   induction e.    
-    - reflexivity.
+  - reflexivity. 
     - simpl. rewrite IHe1, IHe2. lia.
     - simpl. rewrite IHe1, IHe2. lia.
 Qed.
@@ -171,6 +171,22 @@ end.
  * undebuggable line.
  *)
 
+(* match the inductive hypotheses with expressions that contain at least on kinda_sum on one side, using rewrite in the direction of the side that contains the kinda_sum. *)
+Ltac apply_ih :=
+  match goal with
+  | [ IHe1: _ = kinda_sum _, 
+      IHe2: _ = kinda_sum _ |- _ ] =>
+    rewrite <- IHe1, <- IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: kinda_sum _ = _, 
+      IHe2: _ = kinda_sum _ |- _ ] =>
+    rewrite IHe1, <- IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: _ = kinda_sum _, 
+      IHe2: kinda_sum _ = _ |- _ ] =>
+    rewrite <- IHe1, IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: kinda_sum _ = _, 
+      IHe2: kinda_sum _ = _ |- _ ] =>
+    rewrite IHe1, IHe2; simpl; try reflexivity; try lia
+  end.
 
 Lemma kinda_sum_constant_fold :
   forall e,
@@ -179,73 +195,36 @@ Proof.
 induction e.
 - reflexivity.
 - simpl. destruct (constant_fold e1). 
-  + cbn [kinda_sum] in *.
-    destruct n.
-    * destruct (constant_fold e2).
-      -- rewrite <- IHe2. rewrite IHe1. reflexivity.
-      -- rewrite IHe2, <- IHe1. reflexivity.
-      -- rewrite IHe2. rewrite <- IHe1. reflexivity.
-    * destruct (constant_fold e2).
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
+  + destruct n.
+    * destruct (constant_fold e2). all: apply_ih.
+    * destruct (constant_fold e2). all: apply_ih.
   + destruct (constant_fold e2).
-    * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+    * destruct n. all: apply_ih. 
+    * apply_ih. 
+    * apply_ih.
   + destruct (constant_fold e2).
-    * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity. 
-    * rewrite <- IHe1, <- IHe2. reflexivity. 
+    * destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
 - simpl. destruct (constant_fold e1).
   + destruct n.
-    * destruct (constant_fold e2).
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-    * destruct n.
-    all: destruct (constant_fold e2).
-      repeat rewrite <- IHe2, <- IHe1. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+    * destruct (constant_fold e2). all: apply_ih.
+    * destruct n. 
+      all: destruct (constant_fold e2).
+      all: apply_ih.
   + destruct (constant_fold e2).
     * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- destruct n.
-        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity.
-    * rewrite <- IHe1, <- IHe2. reflexivity.
+      -- apply_ih.
+      -- destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
   + destruct (constant_fold e2).
     * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- destruct n.
-        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
-        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity.  
-    * rewrite <- IHe1, <- IHe2. reflexivity.  
+      -- apply_ih.
+      -- destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
 Qed.
-
-
-
-
-
-       
-
-  
-
-
-  
-
-
-Admitted. (* Change to Qed when done. *)
 
 End AST.
 
