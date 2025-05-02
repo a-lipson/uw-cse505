@@ -232,21 +232,6 @@ induction e.
     * rewrite <- IHe1, <- IHe2. reflexivity.  
     * rewrite <- IHe1, <- IHe2. reflexivity.  
 Qed.
-
-
-
-
-
-       
-
-  
-
-
-  
-
-
-Admitted. (* Change to Qed when done. *)
-
 End AST.
 
 (*
@@ -583,7 +568,9 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
-  unfold initially_holds. intros. 
+  intros.
+  apply invariant_induction.
+
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
