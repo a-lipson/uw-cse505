@@ -571,8 +571,14 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
-  unfold initially_holds. intros. 
-  (* YOUR CODE HERE *)
+  intros A R x y trcRxy z Ryz.
+apply trc_transitive with (y := y).
+  (* want to get prove trcRyz with Ryz *)
+  
+
+  (* induction trcRxy. *)
+  (* induction Hxy; auto. *)
+  (* econstructor; eauto. *)
 Admitted. (* Change to Qed when done *)
 
 (*
