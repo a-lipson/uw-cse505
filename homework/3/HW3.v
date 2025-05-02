@@ -113,7 +113,7 @@ Lemma kinda_sum_commuter :
   forall e, kinda_sum e = kinda_sum (commuter e).
 Proof.
   induction e.    
-    - reflexivity.
+  - reflexivity. 
     - simpl. rewrite IHe1, IHe2. lia.
     - simpl. rewrite IHe1, IHe2. lia.
 Qed.
@@ -171,6 +171,22 @@ end.
  * undebuggable line.
  *)
 
+(* match the inductive hypotheses with expressions that contain at least on kinda_sum on one side, using rewrite in the direction of the side that contains the kinda_sum. *)
+Ltac apply_ih :=
+  match goal with
+  | [ IHe1: _ = kinda_sum _, 
+      IHe2: _ = kinda_sum _ |- _ ] =>
+    rewrite <- IHe1, <- IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: kinda_sum _ = _, 
+      IHe2: _ = kinda_sum _ |- _ ] =>
+    rewrite IHe1, <- IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: _ = kinda_sum _, 
+      IHe2: kinda_sum _ = _ |- _ ] =>
+    rewrite <- IHe1, IHe2; simpl; try reflexivity; try lia
+  | [ IHe1: kinda_sum _ = _, 
+      IHe2: kinda_sum _ = _ |- _ ] =>
+    rewrite IHe1, IHe2; simpl; try reflexivity; try lia
+  end.
 
 Lemma kinda_sum_constant_fold :
   forall e,
@@ -179,59 +195,40 @@ Proof.
 induction e.
 - reflexivity.
 - simpl. destruct (constant_fold e1). 
-  + cbn [kinda_sum] in *.
-    destruct n.
-    * destruct (constant_fold e2).
-      -- rewrite <- IHe2. rewrite IHe1. reflexivity.
-      -- rewrite IHe2, <- IHe1. reflexivity.
-      -- rewrite IHe2. rewrite <- IHe1. reflexivity.
-    * destruct (constant_fold e2).
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
-      -- simpl. rewrite <- IHe2, <- IHe1.  reflexivity.
+  + destruct n.
+    * destruct (constant_fold e2). all: apply_ih.
+    * destruct (constant_fold e2). all: apply_ih.
   + destruct (constant_fold e2).
-    * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-    * simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
+    * destruct n. all: apply_ih. 
+    * apply_ih. 
+    * apply_ih.
   + destruct (constant_fold e2).
-    * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity. 
-    * rewrite <- IHe1, <- IHe2. reflexivity. 
+    * destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
 - simpl. destruct (constant_fold e1).
   + destruct n.
-    * destruct (constant_fold e2).
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-      -- rewrite <- IHe1, <- IHe2. reflexivity.
-    * destruct n.
-    all: destruct (constant_fold e2).
-      repeat rewrite <- IHe2, <- IHe1. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
-        -- rewrite <- IHe1, <- IHe2. simpl. lia.
+    * destruct (constant_fold e2). all: apply_ih.
+    * destruct n. 
+      all: destruct (constant_fold e2).
+      all: apply_ih.
   + destruct (constant_fold e2).
     * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- destruct n.
-        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-        ** simpl. rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity.
-    * rewrite <- IHe1, <- IHe2. reflexivity.
+      -- apply_ih.
+      -- destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
   + destruct (constant_fold e2).
     * destruct n.
-      -- rewrite <- IHe1, <- IHe2. simpl. lia.
-      -- destruct n.
-        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
-        ++ rewrite <- IHe1, <- IHe2. simpl. lia.
-    * rewrite <- IHe1, <- IHe2. reflexivity.  
-    * rewrite <- IHe1, <- IHe2. reflexivity.  
+      -- apply_ih.
+      -- destruct n. all: apply_ih.
+    * apply_ih.
+    * apply_ih.
 Qed.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8553bebe048a21b45b5277fe2afb26be82db6a21
 End AST.
 
 (*
@@ -251,9 +248,9 @@ Module Interpreters.
  * Define a function that sums the natural numbers up to (and including) n.
  *)
 Fixpoint sum_upto (n : nat) : nat :=
-  match n with 
-  | 0 => 0 
-  | S n => S n + sum_upto n 
+  match n with
+  | 0 => 0
+  | S n => S n + sum_upto n
   end.
 
 Compute sum_upto 4.  (* should print 10 because 0 + 1 + 2 + 3 + 4 = 10 *)
@@ -297,10 +294,10 @@ Fixpoint eval_arith (e : arith) (v : valuation) : nat :=
   match e with
   | Const n => n
   | Var x =>
-      match lookup x v with
-        | None => 0
-        | Some n => n
-      end
+    match lookup x v with
+    | None => 0
+    | Some n => n
+    end
   | Plus  e1 e2 => eval_arith e1 v + eval_arith e2 v
   | Minus e1 e2 => eval_arith e1 v - eval_arith e2 v
   | Times e1 e2 => eval_arith e1 v * eval_arith e2 v
@@ -350,18 +347,27 @@ Definition sum_n : cmd :=
   done.
 
 Definition sum_n_body : cmd := 
-    "output" <- "output" + "input";
-    "input" <- "input" - 1.
+  "output" <- "output" + "input";
+  "input" <- "input" - 1.
 
 Lemma sum_n_body_ok: 
-   forall n n0 v, 
+  forall n acc v, 
     lookup "input" v = Some n -> 
-    lookup "output" v = Some n0 -> 
+    lookup "output" v = Some acc -> 
     map_equiv 
       (do_n_times (eval_cmd sum_n_body) n v) 
-      (("input", 0) :: ("output", sum_upto n) :: v).
+      (("input", 0) :: ("output", acc + sum_upto n ) :: v).
 Proof.
-Admitted.
+  induction n; intros acc v Hinput Houtput x. 
+  - simpl. solve_map_cases. rewrite e, Houtput. f_equal. lia.
+  - cbn [do_n_times sum_upto].
+    unfold map_equiv in *.
+    rewrite IHn with (acc := acc + S n);
+    solve_map_cases.
+    + f_equal. lia.
+    + rewrite Hinput. f_equal. lia.
+    + rewrite Hinput, Houtput. f_equal.
+Qed.
 
 (* PROBLEM 5 [20 points, ~35 tactics]
  *
@@ -379,9 +385,9 @@ Proof.
   intros.
   unfold sum_n.
   fold sum_n_body.
-  cbn -[sum_n_body].
+  cbn -[sum_n_body]. (* avoid expanding sum_n_body *)
   rewrite H.
-  rewrite sum_n_body_ok with (n0 := 0); solve_map_cases.
+  rewrite sum_n_body_ok with (acc := 0); solve_map_cases.
 Qed.
 
 
@@ -568,11 +574,22 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
+<<<<<<< HEAD
   intros.
   apply invariant_induction.
 
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
+=======
+  intros A R x y trcRxy z Ryz.
+  apply trc_transitive with (y := y).
+  - assumption.
+  - apply trc_front with (y := z).
+    + assumption.
+    + apply trc_refl.
+Qed.
+
+>>>>>>> 8553bebe048a21b45b5277fe2afb26be82db6a21
 
 (*
  * Here is a definition of a transition system that is similar to the "counter"
@@ -609,7 +626,10 @@ Definition counter2_safe (s : counter2_state) : Prop :=
  * Since a state of this system is just a single number, you are looking for two
  * numbers.
  *)
-(* YOUR ANSWER HERE *)
+ (*
+    Let s1 = 1. This is a safe state according to the given definition because 1!=3. 
+    Then, s1 = 1 steps to s2 = 1+2=3, which is not a safe state. Hence this is a CTI.
+ *)
 
 (*
  * PROBLEM 8 [8 points, ~25 tactics]
