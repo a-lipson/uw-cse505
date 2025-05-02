@@ -572,14 +572,13 @@ Lemma trc_back :
       trc R x z.
 Proof.
   intros A R x y trcRxy z Ryz.
-apply trc_transitive with (y := y).
-  (* want to get prove trcRyz with Ryz *)
-  
+  apply trc_transitive with (y := y).
+  - assumption.
+  - apply trc_front with (y := z).
+    + assumption.
+    + apply trc_refl.
+Qed.
 
-  (* induction trcRxy. *)
-  (* induction Hxy; auto. *)
-  (* econstructor; eauto. *)
-Admitted. (* Change to Qed when done *)
 
 (*
  * Here is a definition of a transition system that is similar to the "counter"
@@ -616,7 +615,10 @@ Definition counter2_safe (s : counter2_state) : Prop :=
  * Since a state of this system is just a single number, you are looking for two
  * numbers.
  *)
-(* YOUR ANSWER HERE *)
+ (*
+    Let s1 = 1. This is a safe state according to the given definition because 1!=3. 
+    Then, s1 = 1 steps to s2 = 1+2=3, which is not a safe state. Hence this is a CTI.
+ *)
 
 (*
  * PROBLEM 8 [8 points, ~25 tactics]
