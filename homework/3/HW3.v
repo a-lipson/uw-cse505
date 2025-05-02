@@ -245,9 +245,9 @@ Module Interpreters.
  * Define a function that sums the natural numbers up to (and including) n.
  *)
 Fixpoint sum_upto (n : nat) : nat :=
-  match n with 
-  | 0 => 0 
-  | S n => S n + sum_upto n 
+  match n with
+  | 0 => 0
+  | S n => S n + sum_upto n
   end.
 
 Compute sum_upto 4.  (* should print 10 because 0 + 1 + 2 + 3 + 4 = 10 *)
@@ -291,10 +291,10 @@ Fixpoint eval_arith (e : arith) (v : valuation) : nat :=
   match e with
   | Const n => n
   | Var x =>
-      match lookup x v with
-        | None => 0
-        | Some n => n
-      end
+    match lookup x v with
+    | None => 0
+    | Some n => n
+    end
   | Plus  e1 e2 => eval_arith e1 v + eval_arith e2 v
   | Minus e1 e2 => eval_arith e1 v - eval_arith e2 v
   | Times e1 e2 => eval_arith e1 v * eval_arith e2 v
@@ -344,18 +344,27 @@ Definition sum_n : cmd :=
   done.
 
 Definition sum_n_body : cmd := 
-    "output" <- "output" + "input";
-    "input" <- "input" - 1.
+  "output" <- "output" + "input";
+  "input" <- "input" - 1.
 
 Lemma sum_n_body_ok: 
-   forall n n0 v, 
+  forall n acc v, 
     lookup "input" v = Some n -> 
-    lookup "output" v = Some n0 -> 
+    lookup "output" v = Some acc -> 
     map_equiv 
       (do_n_times (eval_cmd sum_n_body) n v) 
-      (("input", 0) :: ("output", sum_upto n) :: v).
+      (("input", 0) :: ("output", acc + sum_upto n ) :: v).
 Proof.
-Admitted.
+  induction n; intros acc v Hinput Houtput x. 
+  - simpl. solve_map_cases. rewrite e, Houtput. f_equal. lia.
+  - cbn [do_n_times sum_upto].
+    unfold map_equiv in *.
+    rewrite IHn with (acc := acc + S n);
+    solve_map_cases.
+    + f_equal. lia.
+    + rewrite Hinput. f_equal. lia.
+    + rewrite Hinput, Houtput. f_equal.
+Qed.
 
 (* PROBLEM 5 [20 points, ~35 tactics]
  *
@@ -373,9 +382,9 @@ Proof.
   intros.
   unfold sum_n.
   fold sum_n_body.
-  cbn -[sum_n_body].
+  cbn -[sum_n_body]. (* avoid expanding sum_n_body *)
   rewrite H.
-  rewrite sum_n_body_ok with (n0 := 0); solve_map_cases.
+  rewrite sum_n_body_ok with (acc := 0); solve_map_cases.
 Qed.
 
 
