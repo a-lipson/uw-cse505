@@ -912,6 +912,15 @@ Definition sum_inv (input : nat) (s : sum_state) : Prop :=
   let (partial_sum, steps_remaining) := s in 
   partial_sum = Interpreters.sum_upto(input) - Interpreters.sum_upto(steps_remaining).
 
+Lemma sum_lemma: 
+  forall input, 
+    Interpreters.sum_upto input - input = Interpreters.sum_upto (input - 1).
+Proof.
+  induction input.
+  - reflexivity.
+  - simpl. replace (input - 0) with (input) by lia. lia.
+Qed.
+
 (* PROBLEM 20 [6 points, ~5 tactics]
  * Prove that your inductive invariant holds.
  *)
@@ -921,8 +930,11 @@ Lemma sum_inv_invariant :
 Proof.
   invariant_induction_boilerplate.
   - lia.
-  - rewrite IH.
-Admitted. (* Change to Qed. when done *)
+  - rewrite IH. 
+    rewrite <- sum_lemma. 
+    
+    reflexivity. 
+Qed. (* Change to Qed. when done *)
 
 (* PROBLEM 21 [6 points, ~10 LOC]
  * Finally, we can prove that sum_safe holds!
