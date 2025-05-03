@@ -919,9 +919,14 @@ Lemma sum_inv_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_inv input).
 Proof.
+<<<<<<< HEAD
   invariant_induction_boilerplate.
   - lia.
   - rewrite IH. lia.  
+=======
+  (* invariant_induction_boilerplate. *)
+  (* - simpl. rewrite (input - input) as 0 by lia. *)
+>>>>>>> a990d0d0ae4c53cf30102b851a00b5cdc936d8af
 Admitted. (* Change to Qed. when done *)
 
 (* PROBLEM 21 [6 points, ~10 LOC]
@@ -933,7 +938,18 @@ Theorem sum_safe_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_safe input).
 Proof.
-Admitted. (* Change to Qed. when done *)
+  intros input.
+  apply invariant_implies with (P := sum_inv input).
+  - apply sum_inv_invariant.
+  - unfold sum_state, sum_inv, sum_safe.
+    intros [x y] Hinv Hfinal.
+    rewrite Hfinal, Nat.sub_0_r in Hinv.
+    exact Hinv.
+    (*
+       using Nat.sub_0_r instead of assert (input - 0 = input) by lia. 
+       could also unfold sum_upto definition to get at nats with lia. 
+    *)
+Qed. 
 
 (*
             ____                  _     _                     _  _
@@ -946,7 +962,7 @@ Admitted. (* Change to Qed. when done *)
 *)
 
 (*
- * Copied from Week 5 lecture code.  We won't explain this code until Tuesday
+ * Copied from Week 5 lecture code. We won't explain this code until Tuesday
  * of Week 5.
  *)
 
