@@ -813,9 +813,12 @@ Qed.
 Theorem rotater_a_ne_b_invariant :
   is_invariant rotater_sys rotater_a_ne_b.
 Proof.
-  apply invariant_implies with (P := rotater_a_ne_b_ind).
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  apply invariant_implies with (P := rotater_a_ne_b_ind). 
+  - apply rotater_a_ne_b_ind_invariant.
+  - unfold rotater_state, rotater_a_ne_b_ind, rotater_a_ne_b.
+    destruct s as [[a b] c]. (* tuples left assoc pairs *)
+    intuition.
+Qed.
 
 (* -------------------------------------------------------------------------- *)
 (* -------------------------------------------------------------------------- *)
