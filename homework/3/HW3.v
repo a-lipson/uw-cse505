@@ -1113,6 +1113,14 @@ Definition sum : cmd :=
  * Hint: If you use the tactics provided in Week05.v, you can get a much shorter
  * proof.
  *)
+Ltac step_easy :=
+repeat (
+  apply StepSeqLDone ||
+  eapply StepSeqLStep ||
+  (apply StepWhileFalse; cbn; reflexivity) ||
+  (apply StepAssign; reflexivity)
+); cbn.
+
 Theorem sum_3 :
   forall v1,
     lookup "input" v1 = Some 3 ->
@@ -1120,7 +1128,17 @@ Theorem sum_3 :
       trc step (v1, sum) (v2, Skip) /\
       lookup "output" v2 = Some 6.
 Proof.
-  (* YOUR CODE HERE *)
+  intros. 
+  eexists.
+  split.
+  - admit. 
+  - 
+   
+
+    
+   
+
+    (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
 (*
