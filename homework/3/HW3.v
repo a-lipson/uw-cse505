@@ -920,8 +920,8 @@ Lemma sum_inv_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_inv input).
 Proof.
-  invariant_induction_boilerplate.
-  - simpl. rewrite (input - input) as 0 by lia.
+  (* invariant_induction_boilerplate. *)
+  (* - simpl. rewrite (input - input) as 0 by lia. *)
 Admitted. (* Change to Qed. when done *)
 
 (* PROBLEM 21 [6 points, ~10 LOC]
@@ -938,9 +938,12 @@ Proof.
   - apply sum_inv_invariant.
   - unfold sum_state, sum_inv, sum_safe.
     intros [x y] Hinv Hfinal.
-    rewrite Hfinal, Nat.sub_0_r in Hinv.  
-    (* there might be a better way of achieiving this *)
+    rewrite Hfinal, Nat.sub_0_r in Hinv.
     exact Hinv.
+    (*
+       using Nat.sub_0_r instead of assert (input - 0 = input) by lia. 
+       could also unfold sum_upto definition to get at nats with lia. 
+    *)
 Qed. 
 
 (*
