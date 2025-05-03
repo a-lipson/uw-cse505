@@ -653,18 +653,28 @@ Proof.
       destruct s1.
       + rewrite H0. repeat constructor. 
       + simpl in *.   
-        * destruct s2.
-          -- constructor.
-          -- rewrite H0. constructor. apply H.
+       destruct s2.
+        * constructor.
+        * rewrite H0. constructor. apply H.
 Qed.
-
-        
+  
 Theorem counter2_safe_invariant :
   is_invariant counter2_sys counter2_safe.
 Proof.
-  apply invariant_implies.
-  
+  apply invariant_implies with (P := counter2_even).
+    - unfold is_invariant.
+      + intros. 
+      simpl in *.
+      unfold counter2_even in *.
+      unfold counter2_state in *.
+      destruct sN.
+        * constructor.
+        * destruct H0.
+          -- rewrite H. constructor.
+          -- shelve.
+    - intros.
 
+          -- 
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
