@@ -910,8 +910,7 @@ Definition sum_safe (input : nat) (s : sum_state) : Prop :=
  *)
 Definition sum_inv (input : nat) (s : sum_state) : Prop :=
   let (partial_sum, steps_remaining) := s in 
-  partial_sum = Interpreters.sum_upto (input - steps_remaining).
-  
+  partial_sum = Interpreters.sum_upto(input) - Interpreters.sum_upto(steps_remaining).
 
 (* PROBLEM 20 [6 points, ~5 tactics]
  * Prove that your inductive invariant holds.
@@ -921,7 +920,8 @@ Lemma sum_inv_invariant :
     is_invariant (sum_sys input) (sum_inv input).
 Proof.
   invariant_induction_boilerplate.
-  - simpl. rewrite (input - input) as 0 by lia.
+  - lia.
+  - rewrite IH. lia.  
 Admitted. (* Change to Qed. when done *)
 
 (* PROBLEM 21 [6 points, ~10 LOC]
