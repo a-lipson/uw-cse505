@@ -896,7 +896,7 @@ Definition sum_sys (input : nat) : trsys sum_state := {|
  *)
 Definition sum_safe (input : nat) (s : sum_state) : Prop :=
   let (sum, steps_remaining) := s in 
-  steps_remaining = 0 -> sum = Interpreters.sum_upto(input).
+  steps_remaining = 0 -> sum = Interpreters.sum_upto input.
 
 (*
    CTI for sum_safe:
@@ -909,9 +909,8 @@ Definition sum_safe (input : nat) (s : sum_state) : Prop :=
  * a property that *is* inductive and will help us prove sum_safe.
  *)
 Definition sum_inv (input : nat) (s : sum_state) : Prop :=
-    let (partial_sum, steps_remaining) := s in 
-    Interpreters.sum_upto input = 
-      partial_sum + Interpreters.sum_upto input - Interpreters.sum_upto(input - steps_remaining).
+  let (partial_sum, steps_remaining) := s in 
+  partial_sum = Interpreters.sum_upto (input - steps_remaining).
   
 
 (* PROBLEM 20 [6 points, ~5 tactics]
