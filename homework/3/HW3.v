@@ -723,7 +723,7 @@ Definition rotater_sys : trsys rotater_state := {|
 
 (* Here is a property of rotater_sys states. *)
 Definition rotater_a_ne_b (s : rotater_state) : Prop :=
-  let '(a, b, c) := s in (* apostrophe syntax = irrefutable pattern matching *)
+  let '(a, b, c) := s in (* apostrophe syntax is irrefutable pattern matching *)
   a <> b.
 (*
    per the model above, this invariant asserts that the 
@@ -897,9 +897,11 @@ Definition sum_sys (input : nat) : trsys sum_state := {|
 Definition sum_safe (input : nat) (s : sum_state) : Prop :=
   let (sum, steps_remaining) := s in 
   steps_remaining = 0 -> sum = Interpreters.sum_upto(input).
+
 (*
    CTI for sum_safe:
-   
+   consider any state where the steps remaining is zero
+   but the sum is not equivalent to the triangle number of input.
 *)
 
 (* PROBLEM 19 [6 points, ~3 LOC]
