@@ -658,18 +658,15 @@ Proof.
           -- rewrite H0. constructor. apply H.
 Qed.
 
-        
 Theorem counter2_safe_invariant :
   is_invariant counter2_sys counter2_safe.
 Proof.
   apply invariant_implies.
-  
-
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
 (*
- * PROBLEM 9 [5 points, ~6 tactics]
+ cj * PROBLEM 9 [5 points, ~6 tactics]
  *
  * Prove that counter2_sys steps never decrease the state.
  *
@@ -684,7 +681,6 @@ Proof.
   induction H.
     - lia.
     - simpl in *.  
-      unfold counter2_step in IHtrc.
       rewrite H in IHtrc.
       lia.
 Qed.  
@@ -703,6 +699,16 @@ Inductive rotater_step : rotater_state -> rotater_state -> Prop :=
 | rotater_step_step :
   forall a b c,
     rotater_step (a, b, c) (b, c, a).
+(* 
+   consider an upward-pointing triangle with vertices a b c, 
+   labelled clockwise starting from the top.
+   one rotation step is equivalent to rotating 
+   the triangle once anticlockwise (120 deg) to retain symmetry.
+   this is a cyclic group of order 3, 
+   which is isomorphic to the integers modulo 3, 
+   indeed, as given by the number in the top vertex
+   using the provided initial state.
+*)
 
 Definition rotater_sys : trsys rotater_state := {|
   Init := rotater_init;
@@ -711,8 +717,14 @@ Definition rotater_sys : trsys rotater_state := {|
 
 (* Here is a property of rotater_sys states. *)
 Definition rotater_a_ne_b (s : rotater_state) : Prop :=
-  let '(a, b, c) := s in
+  let '(a, b, c) := s in (* apostrophe syntax = irrefutable pattern matching *)
   a <> b.
+(*
+   per the model above, this invariant asserts that the 
+   top vertex is not equal to the bottom right vertex.
+   this property is indeed invariant with the given initial conditions, 
+   but this invariant is not inductive when consider other states. 
+*)
 
 
 (*
@@ -721,7 +733,11 @@ Definition rotater_a_ne_b (s : rotater_state) : Prop :=
  * Give a counterexample to induction (CTI) that demonstrates that
  * rotater_a_ne_b is not inductive.
  *)
-(* YOUR ANSWER HERE *)
+(*
+   consider the state (0,1,1), where a=0!=1=b. 
+   then, with one rotation, we achieve the state 
+   (1,1,0), where a=1=b, which yields a CTI.
+*)
 
 (*
  * PROBLEM 11 [2 points, ~3 LOC]
@@ -737,7 +753,11 @@ Definition rotater_a_ne_b (s : rotater_state) : Prop :=
  * the next two problems below, which use your definition.
  *)
 Definition rotater_a_ne_b_ind (s : rotater_state) : Prop :=
-  True. (* REPLACE WITH YOUR ACTUAL DEFINITION *)
+  let '(a,b,c) := s in 
+  a <> b /\ b <> c /\ c <> a. 
+(*
+   this invariant holds inductively for all states with distinct values.
+*)
 
 (*
  * PROBLEM 12 [4 points, ~8 tactics]
@@ -750,8 +770,9 @@ Lemma rotater_a_ne_b_ind_invariant :
     is_invariant rotater_sys rotater_a_ne_b_ind.
 Proof.
   invariant_induction_boilerplate.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  - lia.
+  - intuition.
+Qed.
 
 (*
  * PROBLEM 13 [2 points, ~2 sentences]
@@ -763,7 +784,18 @@ Admitted. (* Change to Qed when done *)
  * not reachable. (You don't need to prove anything, just explain informally in
  * English.)
  *)
-(* YOUR ANSWER HERE *)
+(*
+   The reachable set of states for our initial condtions is small enough 
+   to where we it can be delineated in full. 
+   however, note that our states only ever hold the values 0, 1, and 2. 
+   there is no way to change the values by step, we only swap their order.
+   so, the values 1, 2, 3 are not reachable by step, but are still closed 
+   under the given inductive variant. 
+   note that our previous example of the state (0,1,1) is not a CTI here because
+   this invariant does not even hold initially on this state (CTS). 
+   in fact, our invariant inductively holds for any state with all distinct values,
+   which is indeed an overapproximation of just the distinct values 0, 1, and 2.
+*)
 
 (*
  * PROBLEM 14 [2 points, ~5 tactics]
