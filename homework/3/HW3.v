@@ -923,8 +923,8 @@ Proof.
   induction input.
   - reflexivity.
   - simpl. 
-    rewrite Nat.sub_0_r.
-    lia.
+    replace (input - 0) with (input) by lia. 
+    reflexivity.
 Qed.
 
 
