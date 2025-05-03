@@ -919,16 +919,16 @@ Lemma sum_inv_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_inv input).
 Proof.
-<<<<<<< HEAD
   invariant_induction_boilerplate.
   - lia.
-  - rewrite IH. lia.  
-=======
-  (* invariant_induction_boilerplate. *)
-  (* - simpl. rewrite (input - input) as 0 by lia. *)
->>>>>>> a990d0d0ae4c53cf30102b851a00b5cdc936d8af
+  - rewrite IH.
 Admitted. (* Change to Qed. when done *)
 
+(* PROBLEM 21 [6 points, ~10 LOC]
+ * Finally, we can prove that sum_safe holds!
+ *
+ * Hint: You'll want to use sum_inv_invariant in your proof.
+ *)
 (* PROBLEM 21 [6 points, ~10 LOC]
  * Finally, we can prove that sum_safe holds!
  *
@@ -950,7 +950,6 @@ Proof.
        could also unfold sum_upto definition to get at nats with lia. 
     *)
 Qed. 
-
 (*
             ____                  _     _                     _  _
            / ___|    ___    ___  | |_  (_)   ___    _ __     | || |
@@ -962,7 +961,7 @@ Qed.
 *)
 
 (*
- * Copied from Week 5 lecture code. We won't explain this code until Tuesday
+ * Copied from Week 5 lecture code.  We won't explain this code until Tuesday
  * of Week 5.
  *)
 
