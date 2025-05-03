@@ -933,7 +933,15 @@ Theorem sum_safe_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_safe input).
 Proof.
-Admitted. (* Change to Qed. when done *)
+  intros input.
+  apply invariant_implies with (P := sum_inv input).
+  - apply sum_inv_invariant.
+  - unfold sum_state, sum_inv, sum_safe.
+    intros [x y] Hinv Hfinal.
+    rewrite Hfinal, Nat.sub_0_r in Hinv.  
+    (* there might be a better way of achieiving this *)
+    exact Hinv.
+Qed. 
 
 (*
             ____                  _     _                     _  _
@@ -946,7 +954,7 @@ Admitted. (* Change to Qed. when done *)
 *)
 
 (*
- * Copied from Week 5 lecture code.  We won't explain this code until Tuesday
+ * Copied from Week 5 lecture code. We won't explain this code until Tuesday
  * of Week 5.
  *)
 
