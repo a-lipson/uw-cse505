@@ -921,6 +921,8 @@ Lemma sum_inv_invariant :
   forall input,
     is_invariant (sum_sys input) (sum_inv input).
 Proof.
+  invariant_induction_boilerplate.
+  - simpl. rewrite (input - input) as 0 by lia.
 Admitted. (* Change to Qed. when done *)
 
 (* PROBLEM 21 [6 points, ~10 LOC]
