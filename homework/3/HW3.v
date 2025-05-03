@@ -598,8 +598,11 @@ Definition counter2_sys : trsys counter2_state := {|
   Step := counter2_step
 |}.
 
-(* Let's prove the system never reaches state 3. *)
+Inductive even : nat -> Prop :=
+| even_O : even O
+| even_SS : forall n, even n -> even (S (S n)).
 
+(* Let's prove the system never reaches state 3. *)
 Definition counter2_safe (s : counter2_state) : Prop :=
   s <> 3.
 
@@ -633,10 +636,33 @@ Definition counter2_safe (s : counter2_state) : Prop :=
  * Hint: You may find that you need the definition of `even`.
  * Feel free to copy/paste it.
  *)
+Definition counter2_even (s : counter2_state) : Prop :=
+  even s.
 
+Theorem stronger_invariant:
+  is_invariant counter2_sys counter2_even.
+Proof.
+  apply invariant_induction.
+    - unfold initially_holds.
+      intros.
+      destruct s.
+      + constructor.
+      + congruence.
+    - unfold closed_under_step.
+      intros.
+      destruct s1.
+      + rewrite H0. repeat constructor. 
+      + simpl in *.   
+        * destruct s2.
+          -- constructor.
+          -- rewrite H0. constructor. apply H.
+Qed.
+
+        
 Theorem counter2_safe_invariant :
   is_invariant counter2_sys counter2_safe.
 Proof.
+  apply invariant_implies.
   
 
   (* YOUR CODE HERE *)
