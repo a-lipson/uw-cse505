@@ -921,6 +921,29 @@ Proof.
   - simpl. replace (input - 0) with (input) by lia. lia.
 Qed.
 
+Lemma annoying_lemma:
+  forall input input0,
+        Interpreters.sum_upto input - (Interpreters.sum_upto input0 - input0) = 
+        Interpreters.sum_upto input - Interpreters.sum_upto input0 + input0.
+Proof.
+intros.
+induction input0.
+- lia.
+- simpl in *. 
+
+
+  replace (input0 + Interpreters.sum_upto input0 - input0) 
+  with (Interpreters.sum_upto input0)
+  by lia.
+
+  unfold Interpreters.sum_upto.  
+
+  replace (S (input0 + Interpreters.sum_upto input0))
+  with (1 + input0 + Interpreters.sum_upto input0) by lia.
+
+Admitted.
+
+
 (* PROBLEM 20 [6 points, ~5 tactics]
  * Prove that your inductive invariant holds.
  *)
@@ -932,7 +955,7 @@ Proof.
   - lia.
   - rewrite IH. 
     rewrite <- sum_lemma. 
-    
+    rewrite annoying_lemma.
     reflexivity. 
 Qed. (* Change to Qed. when done *)
 
