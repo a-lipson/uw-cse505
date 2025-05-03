@@ -639,7 +639,7 @@ Definition counter2_safe (s : counter2_state) : Prop :=
 Definition counter2_even (s : counter2_state) : Prop :=
   even s.
 
-Theorem stronger_invariant:
+Theorem counter2_even_inv:
   is_invariant counter2_sys counter2_even.
 Proof.
   apply invariant_induction.
@@ -662,19 +662,22 @@ Theorem counter2_safe_invariant :
   is_invariant counter2_sys counter2_safe.
 Proof.
   apply invariant_implies with (P := counter2_even).
-    - unfold is_invariant.
-      + intros. 
-      simpl in *.
-      unfold counter2_even in *.
-      unfold counter2_state in *.
-      destruct sN.
-        * constructor.
-        * destruct H0.
-          -- rewrite H. constructor.
-          -- shelve.
-    - intros.
+    - apply counter2_even_inv.
+    - unfold counter2_even, counter2_safe.
+      intros.
+      intuition.
+      rewrite H0 in H.
+      inversion H.
+      inversion H2.
+Qed.
+      
+      
+      
 
-          -- 
+
+
+
+  
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
