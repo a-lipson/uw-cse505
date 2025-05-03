@@ -860,20 +860,22 @@ Admitted. (* Change to Qed when done *)
 (* PROBLEM 15 [1 points, ~2 LOC]
  * Fill  in the definition for sum_state.
  *)
-Definition sum_state : Type :=
-  bool. (* Change bool to your definition. *)
+Definition sum_state : Type := nat * nat. (* sum, iterations_left pairs *)
 
 (* PROBLEM 16 [1 points, ~2 LOC]
  * Fill  in the definition for sum_init.
  *)
-Definition sum_init (input : nat) (s : sum_state) : Prop :=
-  False. (* Change False to your definition. *)
+Definition sum_init (input : nat) (s : sum_state) : Prop := 
+  s = (0, input).
+
 
 (* PROBLEM 17 [4 points, ~4 LOC]
  * Fill in the type definition for sum_step.
  *)
 Inductive sum_step : sum_state -> sum_state -> Prop :=
-  . (* Your definition here. *)
+  | sum_step_step: 
+      forall sum input, 
+        sum_step (sum, input) (sum + input, input - 1).
 
 (* Here's the definition for our transition system. *)
 Definition sum_sys (input : nat) : trsys sum_state := {|
@@ -890,7 +892,9 @@ Definition sum_sys (input : nat) : trsys sum_state := {|
  * Interpreters.sum_upto, or you can copy paste it closer to here.
  *)
 Definition sum_safe (input : nat) (s : sum_state) : Prop :=
-  False. (* Change False to your definition. *)
+    let (sum, iterations_left) := s in 
+    iterations_left = 0 -> sum = Interpreters.sum_upto(input).
+   (* Change False to your definition. *)
 
 (* PROBLEM 19 [6 points, ~3 LOC]
  * sum_safe is not an inductive invariant. Come up with and define
