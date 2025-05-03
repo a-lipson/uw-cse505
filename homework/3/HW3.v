@@ -666,7 +666,7 @@ Proof.
 Admitted. (* Change to Qed when done *)
 
 (*
- cj * PROBLEM 9 [5 points, ~6 tactics]
+ * PROBLEM 9 [5 points, ~6 tactics]
  *
  * Prove that counter2_sys steps never decrease the state.
  *
