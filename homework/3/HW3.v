@@ -908,7 +908,8 @@ Definition sum_safe (input : nat) (s : sum_state) : Prop :=
  *)
 Definition sum_inv (input : nat) (s : sum_state) : Prop :=
     let (partial_sum, steps_remaining) := s in 
-    partial_sum = Interpreters.sum_upto 
+    Interpreters.sum_upto input = 
+      partial_sum + Interpreters.sum_upto input - Interpreters.sum_upto(input - steps_remaining).
   
 
 (* PROBLEM 20 [6 points, ~5 tactics]
