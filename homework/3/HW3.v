@@ -671,16 +671,6 @@ Proof.
       inversion H2.
 Qed.
       
-      
-      
-
-
-
-
-  
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
 (*
  * PROBLEM 9 [5 points, ~6 tactics]
  *
