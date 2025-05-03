@@ -695,7 +695,6 @@ Qed.
  * Here is another transition system. Part of this homework is to understand
  * what it does.
  *)
-
 Definition rotater_state : Type := nat * nat * nat.
 
 Definition rotater_init (s : rotater_state) : Prop :=
@@ -910,38 +909,23 @@ Definition sum_safe (input : nat) (s : sum_state) : Prop :=
  *)
 Definition sum_inv (input : nat) (s : sum_state) : Prop :=
   let (partial_sum, steps_remaining) := s in 
-  partial_sum = Interpreters.sum_upto(input) - Interpreters.sum_upto(steps_remaining).
+  Interpreters.sum_upto(input) = partial_sum + Interpreters.sum_upto(steps_remaining).
 
-Lemma sum_lemma: 
+
+Lemma sum_input_step : 
   forall input, 
-    Interpreters.sum_upto input - input = Interpreters.sum_upto (input - 1).
+    Interpreters.sum_upto input = input + Interpreters.sum_upto (input - 1).
 Proof.
+  (* 
+     this is the bridging lemma between the functional behavior of sum_upto
+     and the definition given in Hstep. 
+  *)
   induction input.
   - reflexivity.
-  - simpl. replace (input - 0) with (input) by lia. lia.
+  - simpl. 
+    rewrite Nat.sub_0_r.
+    lia.
 Qed.
-
-Lemma annoying_lemma:
-  forall input input0,
-        Interpreters.sum_upto input - (Interpreters.sum_upto input0 - input0) = 
-        Interpreters.sum_upto input - Interpreters.sum_upto input0 + input0.
-Proof.
-intros.
-induction input0.
-- lia.
-- simpl in *. 
-
-
-  replace (input0 + Interpreters.sum_upto input0 - input0) 
-  with (Interpreters.sum_upto input0)
-  by lia.
-
-  unfold Interpreters.sum_upto.  
-
-  replace (S (input0 + Interpreters.sum_upto input0))
-  with (1 + input0 + Interpreters.sum_upto input0) by lia.
-
-Admitted.
 
 
 (* PROBLEM 20 [6 points, ~5 tactics]
@@ -954,16 +938,10 @@ Proof.
   invariant_induction_boilerplate.
   - lia.
   - rewrite IH. 
-    rewrite <- sum_lemma. 
-    rewrite annoying_lemma.
-    reflexivity. 
-Qed. (* Change to Qed. when done *)
+    rewrite sum_input_step. 
+    lia.
+Qed.
 
-(* PROBLEM 21 [6 points, ~10 LOC]
- * Finally, we can prove that sum_safe holds!
- *
- * Hint: You'll want to use sum_inv_invariant in your proof.
- *)
 (* PROBLEM 21 [6 points, ~10 LOC]
  * Finally, we can prove that sum_safe holds!
  *
@@ -978,13 +956,11 @@ Proof.
   - apply sum_inv_invariant.
   - unfold sum_state, sum_inv, sum_safe.
     intros [x y] Hinv Hfinal.
-    rewrite Hfinal, Nat.sub_0_r in Hinv.
-    exact Hinv.
-    (*
-       using Nat.sub_0_r instead of assert (input - 0 = input) by lia. 
-       could also unfold sum_upto definition to get at nats with lia. 
-    *)
+    rewrite Hfinal in Hinv.
+    unfold Interpreters.sum_upto in *. 
+    lia.
 Qed. 
+
 (*
             ____                  _     _                     _  _
            / ___|    ___    ___  | |_  (_)   ___    _ __     | || |
