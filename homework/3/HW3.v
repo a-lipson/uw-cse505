@@ -113,9 +113,9 @@ Lemma kinda_sum_commuter :
   forall e, kinda_sum e = kinda_sum (commuter e).
 Proof.
   induction e.    
-  - reflexivity. 
-    - simpl. rewrite IHe1, IHe2. lia.
-    - simpl. rewrite IHe1, IHe2. lia.
+  - reflexivity.
+  - simpl. rewrite IHe1, IHe2. lia.
+  - simpl. rewrite IHe1, IHe2. lia.
 Qed.
 
 (*
@@ -225,10 +225,6 @@ induction e.
     * apply_ih.
     * apply_ih.
 Qed.
-<<<<<<< HEAD
-=======
-
->>>>>>> 8553bebe048a21b45b5277fe2afb26be82db6a21
 End AST.
 
 (*
@@ -574,13 +570,6 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
-<<<<<<< HEAD
-  intros.
-  apply invariant_induction.
-
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-=======
   intros A R x y trcRxy z Ryz.
   apply trc_transitive with (y := y).
   - assumption.
@@ -589,7 +578,6 @@ Admitted. (* Change to Qed when done *)
     + apply trc_refl.
 Qed.
 
->>>>>>> 8553bebe048a21b45b5277fe2afb26be82db6a21
 
 (*
  * Here is a definition of a transition system that is similar to the "counter"
@@ -645,9 +633,12 @@ Definition counter2_safe (s : counter2_state) : Prop :=
  * Hint: You may find that you need the definition of `even`.
  * Feel free to copy/paste it.
  *)
+
 Theorem counter2_safe_invariant :
   is_invariant counter2_sys counter2_safe.
 Proof.
+  
+
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
@@ -663,9 +654,15 @@ Theorem counter2_ge :
     trc counter2_sys.(Step) s0 sN ->
     sN >= s0.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
+  intros. 
+  induction H.
+    - lia.
+    - simpl in *.  
+      unfold counter2_step in IHtrc.
+      rewrite H in IHtrc.
+      lia.
+Qed.  
+        
 (*
  * Here is another transition system. Part of this homework is to understand
  * what it does.
