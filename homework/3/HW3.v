@@ -861,24 +861,24 @@ Qed.
  *)
 
 (* PROBLEM 15 [1 points, ~2 LOC]
- * Fill  in the definition for sum_state.
+ * Fill in the definition for sum_state.
  *)
-Definition sum_state : Type := nat * nat. (* sum, steps_left pairs *)
+Definition sum_state : Type := 
+  nat * nat. (* pair of sum and steps_remaining *)
 
 (* PROBLEM 16 [1 points, ~2 LOC]
- * Fill  in the definition for sum_init.
+ * Fill in the definition for sum_init.
  *)
 Definition sum_init (input : nat) (s : sum_state) : Prop := 
   s = (0, input).
-
 
 (* PROBLEM 17 [4 points, ~4 LOC]
  * Fill in the type definition for sum_step.
  *)
 Inductive sum_step : sum_state -> sum_state -> Prop :=
-  | sum_step_step: 
-      forall sum input, 
-        sum_step (sum, input) (sum + input, input - 1).
+| sum_step_step: 
+  forall sum input, 
+    sum_step (sum, input) (sum + input, input - 1).
 
 (* Here's the definition for our transition system. *)
 Definition sum_sys (input : nat) : trsys sum_state := {|
@@ -895,14 +895,19 @@ Definition sum_sys (input : nat) : trsys sum_state := {|
  * Interpreters.sum_upto, or you can copy paste it closer to here.
  *)
 Definition sum_safe (input : nat) (s : sum_state) : Prop :=
-    let (sum, steps_remaining) := s in 
-    steps_remaining = 0 -> sum = Interpreters.sum_upto(input).
+  let (sum, steps_remaining) := s in 
+  steps_remaining = 0 -> sum = Interpreters.sum_upto(input).
+(*
+   CTI for sum_safe:
+   
+*)
 
 (* PROBLEM 19 [6 points, ~3 LOC]
  * sum_safe is not an inductive invariant. Come up with and define
  * a property that *is* inductive and will help us prove sum_safe.
  *)
 Definition sum_inv (input : nat) (s : sum_state) : Prop :=
+  True.
   
 
 (* PROBLEM 20 [6 points, ~5 tactics]
