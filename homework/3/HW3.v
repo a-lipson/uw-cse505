@@ -1190,27 +1190,36 @@ Lemma all_states_reachable_rotater_exact_reachable :
   forall s, rotater_exact_reachable s -> 
     exists s, reachable rotater_sys s.
 Proof.
-  intros s H. 
-  destruct s as [[a b] c].
-  destruct H as [H012 | [H120 | H201]]. (* hypothesis right assoc *)
-  all: unfold reachable.
-  - exists (0,1,2).
-    exists (0,1,2).
-    split.
-    + reflexivity.
-    + apply trc_refl.
-  - exists (1,2,0).
-    exists (0,1,2).
-    split.
-    + reflexivity.
-    + apply trc_front with (y := (1,2,0)).
+  intros s H.
+  exists s.
+  unfold reachable.
+  exists (0,1,2).
+  split.
+  - reflexivity. 
+  - destruct s as [[a b] c].
+    unfold rotater_exact_reachable in H.
+    destruct H as [H012 | [H120 | H201]].
+    (*
+       smart destruct substitution equivalent to 
+       destruct H012 as [Ha [Hb Hc]].
+       subst a b c.
+    *)
+    + destruct H012 as [-> [-> ->]].
+      apply trc_refl.
+      
+    + destruct H120 as [-> [-> ->]].
+      eapply trc_front.
       * apply rotater_step_step.
       * apply trc_refl.
-  - exists (2,1,0). 
-    exis
+      
+    + destruct H201 as [-> [-> ->]].
+      eapply trc_front.
+      * apply rotater_step_step.
+      * eapply trc_front.
+        -- apply rotater_step_step.
+        -- apply trc_refl.
+Qed.
 
-
-Abort.
 
 Definition example := (1, 2, 3).
 
