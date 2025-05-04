@@ -672,7 +672,7 @@ Proof.
 Qed.
       
 (*
- * PROBLEM 9 [5 points, ~6 tactics]
+ * PROBLEM 10 [5 points, ~6 tactics]
  *
  * Prove that counter2_sys steps never decrease the state.
  *
@@ -692,8 +692,8 @@ Proof.
 Qed.  
         
 (*
- * Here is another transition system. Part of this homework is to understand
- * what it does.
+ * Here is another transition system. 
+ * Part of this homework is to understand what it does.
  *)
 Definition rotater_state : Type := nat * nat * nat.
 
@@ -790,15 +790,16 @@ Qed.
  * English.)
  *)
 (*
-   The reachable set of states for our initial condtions is small enough 
-   to where we it can be delineated in full. 
-   however, note that our states only ever hold the values 0, 1, and 2. 
-   there is no way to change the values by step, we only swap their order.
-   so, the values 1, 2, 3 are not reachable by step, but are still closed 
-   under the given inductive variant. 
-   note that our previous example of the state (0,1,1) is not a CTI here because
-   this invariant does not even hold initially on this state (CTS). 
-   in fact, our invariant inductively holds for any state with all distinct values,
+   Consider the state (1,2,3).
+   The reachable set of states for our initial condtions is 
+   small enough to where we it can be delineated in full. 
+   Nowever, note that our states only ever hold the values 0, 1, and 2. 
+   There is no way to change the values by step, we only swap their order.
+   So, the values 1, 2, 3 are not reachable by step, 
+   but are still closed under the given inductive variant. 
+   Note that our previous example of the state (0,1,1) is not a CTI here 
+   because this invariant does not even hold initially on this state (CTS). 
+   In fact, our invariant inductively holds for any state with all distinct values,
    which is indeed an overapproximation of just the distinct values 0, 1, and 2.
 *)
 
@@ -1146,11 +1147,10 @@ Qed.
  *
  * (a) How many reachable states of the rotater system are there?
  *     (Just give the number. No need to prove your answer.)
- *     3. 
  *
- * (b) Define a property on rotater_states that characterizes the reachable
- *     states. Don't use any other definitions. Essentially you should just list
- *     the reachable states directly here.
+ * (b) Define a property on rotater_states that characterizes the reachable states. 
+ *     Don't use any other definitions. 
+ *     Essentially you should just list the reachable states directly here.
  *
  * (c) Prove that your property from part (b) is an invariant of rotater_sys.
  *
@@ -1160,14 +1160,7 @@ Qed.
  * (e) Prove that the informal example of an unreachable state from problem 13
  *     is actually unreachable (i.e., does not satisfy your characterization of
  *     reachable states).
- *)
-(*
- * (a) YOUR ANSWER HERE
- * (b) Define your property in Rocq here
- * (c) Prove (in Rocq) that your property is an invariant here
- * (d) Prove (in Rocq) that every state satisfying your property is reachable
- * (e) Prove (in Rocq) that your informal example from Problem 13 does not
- *     satisfy your proptery.
+ *
  *
  * Your answer to part (a) should be an English comment.
  *
@@ -1175,6 +1168,58 @@ Qed.
  *
  * Your answers to parts (c)-(e) should be Rocq lemmas with proofs.
  *)
+
+(* (a) 3. *)
+
+(* (b) reachable states are (0,1,2), (1,2,0), (2,0,1). *)
+Definition rotater_exact_reachable (s : rotater_state) : Prop :=
+  let '(a,b,c) := s in 
+  (a = 0 /\ b = 1 /\ c = 2) \/
+  (a = 1 /\ b = 2 /\ c = 0) \/
+  (a = 2 /\ b = 0 /\ c = 1).
+
+(* (c) Prove (in Rocq) that your property is an invariant here *)
+Lemma rotater_reachable_states_invariant :
+  is_invariant rotater_sys rotater_exact_reachable.
+Proof.
+  invariant_induction_boilerplate; lia.
+Qed.
+
+(* (d) Prove (in Rocq) that every state satisfying your property is reachable *)
+Lemma all_states_reachable_rotater_exact_reachable :
+  forall s, rotater_exact_reachable s -> 
+    exists s, reachable rotater_sys s.
+Proof.
+  intros s H. 
+  destruct s as [[a b] c].
+  destruct H as [H012 | [H120 | H201]]. (* hypothesis right assoc *)
+  all: unfold reachable.
+  - exists (0,1,2).
+    exists (0,1,2).
+    split.
+    + reflexivity.
+    + apply trc_refl.
+  - exists (1,2,0).
+    exists (0,1,2).
+    split.
+    + reflexivity.
+    + apply trc_front with (y := (1,2,0)).
+      * apply rotater_step_step.
+      * apply trc_refl.
+  - exists (2,1,0). 
+    exis
+
+
+Abort.
+
+Definition example := (1, 2, 3).
+
+(* (e) Prove (in Rocq) that your informal example from Problem 13 does not satisfy your property. *)
+Lemma example_not_rotater_exact_reachable : 
+  forall s, rotater_exact_reachable s -> s <> example.
+Proof.
+
+Abort.
 
 (*
  * PROBLEM 24 [2 points, ~6 tactics]
