@@ -977,12 +977,12 @@ Qed.
  *)
 
 Definition eq_dec (A : Type) :=
-  forall (x : A),
-    forall (y : A),
-      {x = y} + {x <> y}.
+  forall (x y : A),
+    {x = y} + {x <> y}.
 
 Notation var := string.
 Definition var_eq : eq_dec var := string_dec.
+
 Definition valuation := list (var * nat).
 
 Fixpoint lookup (x : var) (v : valuation) : option nat :=
@@ -1082,13 +1082,15 @@ Definition sum : cmd :=
  * Prove this kind of weird theorem about a particular concrete execution of
  * the sum program on the input 3.
  *
- * Hint: Our solution uses a lot of tactics, but it's pretty repetitive. This is
- * another example of proving specific ("easy") things being more difficult (or
- * at least, more tedious) than proving general ("hard") things.
+ * Hint: Our solution uses a lot of tactics, but it's pretty repetitive. 
+ * This is another example of proving specific ("easy") things being 
+ * more difficult (or at least, more tedious) 
+ * than proving general ("hard") things.
  *
- * Hint: If you use the tactics provided in Week05.v, you can get a much shorter
- * proof.
+ * Hint: If you use the tactics provided in Week05.v, 
+ * you can get a much shorter proof.
  *)
+
 Ltac step_easy :=
 repeat (
   apply StepSeqLDone ||
