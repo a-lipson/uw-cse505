@@ -1228,16 +1228,13 @@ Lemma example_not_rotater_exact_reachable :
   forall s, rotater_exact_reachable s -> s <> example.
 Proof.
   intros.
-  destruct s.
+  destruct s as [[a b] c].
   unfold rotater_exact_reachable in H.
   unfold example.
-  destruct p as (a, b).
   destruct H.
-  intuition.
-  - rewrite H1 in H0. rewrite H in H0. rewrite H3 in H0. inversion H0.
+  - destruct H as [-> [-> ->]]; congruence.
   - destruct H.
-    + destruct H. destruct H0. rewrite H, H0, H1. congruence.
-    + destruct H. destruct H0. rewrite H, H0, H1. congruence.
+    all: destruct H as [-> [-> ->]]; congruence.
 Qed.
 
 (*
