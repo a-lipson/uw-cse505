@@ -1111,23 +1111,24 @@ Theorem sum_3 :
       trc step (v1, sum) (v2, Skip) /\
       lookup "output" v2 = Some 6.
 Proof.
-  intros. 
-  eexists.  
+  intros.
+  eexists.
   split.
-  -  repeat trc_easy. 
-     trc_enter_loop.
-     rewrite H. lia.
-     trc_enter_loop.  
-     rewrite H. 
-     repeat trc_easy. 
-     rewrite H.
-     simpl.
-     trc_enter_loop.
-     repeat trc_easy. 
-     trc_enter_loop.
-     repeat trc_easy. 
-    apply trc_refl.  
-  - reflexivity.   
+  - repeat trc_easy.
+    trc_enter_loop.
+    rewrite H.
+    lia.
+    trc_enter_loop.
+    rewrite H.
+    repeat trc_easy.
+    rewrite H.
+    simpl.
+    trc_enter_loop.
+    repeat trc_easy.
+    trc_enter_loop.
+    repeat trc_easy.
+    apply trc_refl.
+  - reflexivity.
 Qed.
 
 (*
@@ -1145,6 +1146,7 @@ Qed.
  *
  * (a) How many reachable states of the rotater system are there?
  *     (Just give the number. No need to prove your answer.)
+ *     3. 
  *
  * (b) Define a property on rotater_states that characterizes the reachable
  *     states. Don't use any other definitions. Essentially you should just list
