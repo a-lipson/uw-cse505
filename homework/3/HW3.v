@@ -1231,6 +1231,9 @@ Proof.
   destruct s as [[a b] c].
   unfold rotater_exact_reachable in H.
   unfold example.
+  (*
+  repeat (destruct H; (repeat (destruct H as [-> [-> ->]]; try congruence))).
+  *)
   destruct H.
   - destruct H as [-> [-> ->]]; congruence.
   - destruct H.
@@ -1300,9 +1303,9 @@ Example parallel_counter_not_deterministic :
     parallel_counter_step s1 s3 /\
     s2 <> s3.
 Proof.
-  eexists (2, 2, 2).
-  eexists (1, 3, 2). 
-  eexists (2, 1, 3).
+  exists (2, 2, 2).
+  exists (1, 3, 2). 
+  exists (2, 1, 3).
   split.
   - econstructor.
   - split.
@@ -1390,12 +1393,15 @@ Qed.
   1) The homework took us about 16-20 hours. We lost count :) 
 
 
-  2) We think this assignment was so incredibly impactful in the sense that it forced us to be really familiar with the concepts.
+  2) We think this assignment was incredibly impactful in the sense that it forced us to be really familiar with the concepts and Rocq.
+     As they say, you can't learn to swim by watching someone else, you must get in the water. 
+     The same holds for writing proofs in a proof assistant. It's so obvious when we go over it in lecture, 
+     but the ideas only really start to sink in once we have to perform the tasks ourselves.
      Our discussions were very conceptual; actually using the proofs we were given in Rocq requires understanding, so we left feeling
-     like operational semantics made a LOT more sense.  Additionally, by the end, we got so much better at finding inductive invariants, and it 
-     was super cool seeing those skills come together.
-
-     The code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
+     like operational semantics made a LOT more sense. However, admittedly, there were times when we were just, "slinging tactics,"
+     until we got the proof to work, then went back to understand what was going on.
+     Additionally, by the end, we got so much better at finding inductive invariants, and it was super cool seeing those skills come together.
+     Lastly, the code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
 
 
   3) We don't have any 'do better next time' beyond rotater being spelled rotater instead of rotator...
@@ -1411,9 +1417,6 @@ Qed.
      I didn't want to use the Ltacs at first since I wanted to make sure I understood what was going on, but 
      ultimately I thought I was stuck in an infinite loop of econstructor so I used the ltacs and realized I was acutally doing it right 
      in the first place (but this is very silly lol).
-
-
-
 *)
 
 
