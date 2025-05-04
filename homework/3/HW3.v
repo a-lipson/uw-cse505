@@ -927,7 +927,6 @@ Proof.
     reflexivity.
 Qed.
 
-
 (* PROBLEM 20 [6 points, ~5 tactics]
  * Prove that your inductive invariant holds.
  *)
@@ -938,7 +937,7 @@ Proof.
   invariant_induction_boilerplate.
   - lia.
   - rewrite IH. 
-    rewrite sum_input_step. 
+    rewrite sum_input_step.  
     lia.
 Qed.
 
@@ -1097,6 +1096,12 @@ repeat (
   (apply StepAssign; reflexivity)
 ); cbn.
 
+Ltac trc_easy :=
+  eapply trc_front; [solve [step_easy]|]; cbn.
+
+Ltac trc_enter_loop :=
+  eapply trc_front; [step_easy; apply StepWhileTrue; cbn; try lia|]; cbn.
+
 Theorem sum_3 :
   forall v1,
     lookup "input" v1 = Some 3 ->
@@ -1105,17 +1110,23 @@ Theorem sum_3 :
       lookup "output" v2 = Some 6.
 Proof.
   intros. 
-  eexists.
+  eexists.  
   split.
-  - admit. 
-  - 
-   
-
-    
-   
-
-    (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  -  repeat trc_easy. 
+     trc_enter_loop.
+     rewrite H. lia.
+     trc_enter_loop.  
+     rewrite H. 
+     repeat trc_easy. 
+     rewrite H.
+     simpl.
+     trc_enter_loop.
+     repeat trc_easy. 
+     trc_enter_loop.
+     repeat trc_easy. 
+    apply trc_refl.  
+  - reflexivity.   
+Qed.
 
 (*
              ____                  _     _                     ____
