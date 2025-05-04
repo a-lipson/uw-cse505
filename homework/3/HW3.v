@@ -1379,7 +1379,35 @@ Qed.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(*
+  1) The homework took us about 16-20 hours. We lost count :) 
+
+
+  2) We think this assignment was so incredibly impactful in the sense that it forced us to be really familiar with the concepts.
+     Our discussions were very conceptual; actually using the proofs we were given in Rocq requires understanding, so we left feeling
+     like operational semantics made a LOT more sense.  Additionally, by the end, we got so much better at finding inductive invariants, and it 
+     was super cool seeing those skills come together.
+
+     The code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
+
+
+  3) We don't have any 'do better next time' beyond rotater being spelled rotater instead of rotator...
+     As for frustrating/confusing, understanding what Rocq actually wanted us to do at first was very frustrating
+     since it felt like nothing we did was making any progress. 
+
+     I don't want to speak for both of us, but from my (Daniel) perspective, I felt like most of my issues / things I
+     was getting stuck on weren't actually issues with the concepts, rather, just not knowing how to make Rocq do what I wanted.
+     Learning how the e-versions of the tactics worked was very huge for me, but while trying to figure it out I was so confused...
+     Similarly, realizing I can destruct a pattern match and get my own variables was very important but I hadn't seen it before.
+     I know we have the tactics guide but maybe seeing some exampels of stuff like this would be nice :)
+     Another thing that was a bit frustrating was the problem where the ltacs can reduce it from like 200 tactics to like 10 - 
+     I didn't want to use the Ltacs at first since I wanted to make sure I understood what was going on, but 
+     ultimately I thought I was stuck in an infinite loop of econstructor so I used the ltacs and realized I was acutally doing it right 
+     in the first place (but this is very silly lol).
+
+
+
+*)
 
 
 
