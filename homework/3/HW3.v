@@ -1243,9 +1243,11 @@ Lemma counter2_deterministic :
     counter2_step s1 s3 ->
     s2 = s3.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
+  intros.
+  inversion H.
+  inversion H0.
+  reflexivity.
+Qed.
 
 (* Here is yet another transition system. *)
 Definition parallel_counter_state : Type := nat * nat * nat.
@@ -1291,8 +1293,16 @@ Example parallel_counter_not_deterministic :
     parallel_counter_step s1 s3 /\
     s2 <> s3.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  eexists (2, 2, 2).
+  eexists (1, 3, 2). 
+  eexists (2, 1, 3).
+  split.
+  - econstructor.
+  - split.
+    + econstructor.
+    + discriminate.
+Qed.  
+     
 
 (* Here is the safety property. *)
 Definition parallel_counter_safe
@@ -1309,13 +1319,38 @@ Definition parallel_counter_safe
  *
  * Prove that the safety property is an invariant.
  *)
+
+Definition parallel_counter_sum   
+  (input : nat)
+  (s : parallel_counter_state)
+: Prop :=
+  let '(a, b, c) := s in
+  a + b + c = input.
+
+Lemma parallel_counter_sum_invariant: 
+  forall input, 
+    is_invariant (parallel_counter_sys input) (parallel_counter_sum input).
+Proof.
+  invariant_induction_boilerplate.
+    - lia.
+    - rewrite <- IH. lia. 
+    - rewrite <- IH. lia.
+Qed.
+
 Theorem parallel_counter_safe_invariant :
   forall input,
     is_invariant (parallel_counter_sys input) (parallel_counter_safe input).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
+  intros.
+  apply invariant_implies with (P := parallel_counter_sum input).
+    - apply parallel_counter_sum_invariant.
+    - intros [x y] H.
+      simpl in *.
+      destruct x as (a, b).
+      rewrite <- H.
+      lia.
+Qed.
+       
 (*
  * PROBLEM 27 [5 points, 1 picture]
  *
