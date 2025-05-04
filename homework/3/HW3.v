@@ -1206,12 +1206,10 @@ Proof.
     *)
     + destruct H012 as [-> [-> ->]].
       apply trc_refl.
-      
     + destruct H120 as [-> [-> ->]].
       eapply trc_front.
       * apply rotater_step_step.
       * apply trc_refl.
-      
     + destruct H201 as [-> [-> ->]].
       eapply trc_front.
       * apply rotater_step_step.
@@ -1231,9 +1229,6 @@ Proof.
   destruct s as [[a b] c].
   unfold rotater_exact_reachable in H.
   unfold example.
-  (*
-  repeat (destruct H; (repeat (destruct H as [-> [-> ->]]; try congruence))).
-  *)
   destruct H.
   - destruct H as [-> [-> ->]]; congruence.
   - destruct H.
@@ -1412,11 +1407,24 @@ Qed.
      was getting stuck on weren't actually issues with the concepts, rather, just not knowing how to make Rocq do what I wanted.
      Learning how the e-versions of the tactics worked was very huge for me, but while trying to figure it out I was so confused...
      Similarly, realizing I can destruct a pattern match and get my own variables was very important but I hadn't seen it before.
-     I know we have the tactics guide but maybe seeing some exampels of stuff like this would be nice :)
-     Another thing that was a bit frustrating was the problem where the ltacs can reduce it from like 200 tactics to like 10 - 
+     I know we have the tactics guide but maybe seeing some examples of stuff like this would be nice :)
+     Another thing that was a bit frustrating was the problem where the ltacs can reduce it from like 200 tactics to like 10 -
      I didn't want to use the Ltacs at first since I wanted to make sure I understood what was going on, but 
      ultimately I thought I was stuck in an infinite loop of econstructor so I used the ltacs and realized I was acutally doing it right 
      in the first place (but this is very silly lol).
+
+     Luckily, you, the graders shall be able to discern any of the i statements betwixt Daniel and myself because i make sure to ne'er 
+     capitalize the word "i," when i (lipson) write. Anyhow, i concur with Daniel, especially with regards to language o' tactics because
+     i am unfortunately a victim of oversubscription to the DRY philosophy and, likewise, averse to copy and paste. 
+     However, sometimes, a simple copy and paste is just the best way to go writing a proof. 
+     For, unlike some code, proofs are not meant to be write once read never, we ought to communicate them.
+     And, alas, just like the mystical and magestic lambda, the excessive use of ltacs to reduce code size can sometimes have an obfuscating effect.
+     So, we aim to strike a balance between extracting repetitive tactics and also clearly sectioning the statemnts we are trying to prove. 
+     Quasi-concretely, if we have three subgoals where reflexivity solves the first and the same tactic chain T solves the latter two cases, 
+     then i think it's better to include all three cases with subgoal bullet points instead of something like try destruction tactic; reflexivity; T.
+     (even where we might repeat the same line twice at essentially the same level of the proof). 
+     Anyhow, figuring out when to extract to an Ltac to avoid repition in not really a goal per se, that's more of a meta-Rocq skill
+     which we shall pick up along the way, but we need to acquire it to achive our actual course goals of learning that programs are transition sytems.
 *)
 
 
