@@ -1298,9 +1298,9 @@ Example parallel_counter_not_deterministic :
     parallel_counter_step s1 s3 /\
     s2 <> s3.
 Proof.
-  exists (2, 2, 2).
-  exists (1, 3, 2). 
-  exists (2, 1, 3).
+  exists (2, 2, 2). (* initial state *)
+  exists (1, 3, 2). (* possible state 1 *)
+  exists (2, 1, 3). (* possible state 2 *)
   split.
   - econstructor.
   - split.
@@ -1325,6 +1325,7 @@ Definition parallel_counter_safe
  * Prove that the safety property is an invariant.
  *)
 
+(* constructing the stronger invariant *)
 Definition parallel_counter_sum   
   (input : nat)
   (s : parallel_counter_state)
@@ -1359,13 +1360,16 @@ Qed.
 (*
  * PROBLEM 27 [5 points, 1 picture]
  *
- * Find a nice way to visualize the state space of the parallel counter for a
- * fixed value of "input". (Say, input = 5 or something to keep things simple.)
- * Draw a picture shows the reachable states, the "bad" states (that violate
- * parallel_counter_safe), and the states that satisfy your strengthened
- * from the previous problem.
+ * Find a nice way to visualize the state space of the parallel counter for a fixed value of "input". 
+ * (Say, input = 5 or something to keep things simple.)
+ * Draw a picture that shows:
+ * - the reachable states, 
+ * - the "bad" states (that violate parallel_counter_safe), and
+ * - the states that satisfy your strengthened invariant from the previous problem.
  *)
-(* YOUR PICTURE HERE *)
+(*
+google drive link: https://drive.google.com/file/d/1QaXfmKGuEkHdkvp2v72xTs01eC3ymoWl/view?usp=sharing
+*)
 (* You can draw it in ascii art, or upload it to Gradescope as a separate file
  * and mention the filename here, or upload it somewhere else on the internet
  * and put a link here.
@@ -1393,7 +1397,7 @@ Qed.
      The same holds for writing proofs in a proof assistant. It's so obvious when we go over it in lecture, 
      but the ideas only really start to sink in once we have to perform the tasks ourselves.
      Our discussions were very conceptual; actually using the proofs we were given in Rocq requires understanding, so we left feeling
-     like operational semantics made a LOT more sense. However, admittedly, there were times when we were just, "slinging tactics,"
+     like operational semantics made a LOT more sense. However, there were times when we were just, "slinging tactics,"
      until we got the proof to work, then went back to understand what was going on.
      Additionally, by the end, we got so much better at finding inductive invariants, and it was super cool seeing those skills come together.
      Lastly, the code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
