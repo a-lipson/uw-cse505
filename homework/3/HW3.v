@@ -1206,12 +1206,10 @@ Proof.
     *)
     + destruct H012 as [-> [-> ->]].
       apply trc_refl.
-      
     + destruct H120 as [-> [-> ->]].
       eapply trc_front.
       * apply rotater_step_step.
       * apply trc_refl.
-      
     + destruct H201 as [-> [-> ->]].
       eapply trc_front.
       * apply rotater_step_step.
@@ -1228,16 +1226,13 @@ Lemma example_not_rotater_exact_reachable :
   forall s, rotater_exact_reachable s -> s <> example.
 Proof.
   intros.
-  destruct s.
+  destruct s as [[a b] c].
   unfold rotater_exact_reachable in H.
   unfold example.
-  destruct p as (a, b).
   destruct H.
-  intuition.
-  - rewrite H1 in H0. rewrite H in H0. rewrite H3 in H0. inversion H0.
+  - destruct H as [-> [-> ->]]; congruence.
   - destruct H.
-    + destruct H. destruct H0. rewrite H, H0, H1. congruence.
-    + destruct H. destruct H0. rewrite H, H0, H1. congruence.
+    all: destruct H as [-> [-> ->]]; congruence.
 Qed.
 
 (*
@@ -1303,9 +1298,9 @@ Example parallel_counter_not_deterministic :
     parallel_counter_step s1 s3 /\
     s2 <> s3.
 Proof.
-  eexists (2, 2, 2).
-  eexists (1, 3, 2). 
-  eexists (2, 1, 3).
+  exists (2, 2, 2). (* initial state *)
+  exists (1, 3, 2). (* possible state 1 *)
+  exists (2, 1, 3). (* possible state 2 *)
   split.
   - econstructor.
   - split.
@@ -1329,6 +1324,7 @@ Definition parallel_counter_safe
  * Prove that the safety property is an invariant.
  *)
 
+(* constructing the stronger invariant *)
 Definition parallel_counter_sum   
   (input : nat)
   (s : parallel_counter_state)
@@ -1363,13 +1359,16 @@ Qed.
 (*
  * PROBLEM 27 [5 points, 1 picture]
  *
- * Find a nice way to visualize the state space of the parallel counter for a
- * fixed value of "input". (Say, input = 5 or something to keep things simple.)
- * Draw a picture shows the reachable states, the "bad" states (that violate
- * parallel_counter_safe), and the states that satisfy your strengthened
- * from the previous problem.
+ * Find a nice way to visualize the state space of the parallel counter for a fixed value of "input". 
+ * (Say, input = 5 or something to keep things simple.)
+ * Draw a picture that shows:
+ * - the reachable states, 
+ * - the "bad" states (that violate parallel_counter_safe), and
+ * - the states that satisfy your strengthened invariant from the previous problem.
  *)
-(* YOUR PICTURE HERE *)
+(*
+google drive link: https://drive.google.com/file/d/1QaXfmKGuEkHdkvp2v72xTs01eC3ymoWl/view?usp=sharing
+*)
 (* You can draw it in ascii art, or upload it to Gradescope as a separate file
  * and mention the filename here, or upload it somewhere else on the internet
  * and put a link here.
@@ -1392,12 +1391,15 @@ Qed.
   1) The homework took us about 16-20 hours. We lost count :) 
 
 
-  2) We think this assignment was so incredibly impactful in the sense that it forced us to be really familiar with the concepts.
+  2) We think this assignment was incredibly impactful in the sense that it forced us to be really familiar with the concepts and Rocq.
+     As they say, you can't learn to swim by watching someone else, you must get in the water. 
+     The same holds for writing proofs in a proof assistant. It's so obvious when we go over it in lecture, 
+     but the ideas only really start to sink in once we have to perform the tasks ourselves.
      Our discussions were very conceptual; actually using the proofs we were given in Rocq requires understanding, so we left feeling
-     like operational semantics made a LOT more sense.  Additionally, by the end, we got so much better at finding inductive invariants, and it 
-     was super cool seeing those skills come together.
-
-     The code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
+     like operational semantics made a LOT more sense. However, there were times when we were just, "slinging tactics,"
+     until we got the proof to work, then went back to understand what was going on.
+     Additionally, by the end, we got so much better at finding inductive invariants, and it was super cool seeing those skills come together.
+     Lastly, the code from lecture was super useful this week as well as to have intuition for how to break down our proofs and what tactics to use.
 
 
   3) We don't have any 'do better next time' beyond rotater being spelled rotater instead of rotator...
@@ -1408,14 +1410,24 @@ Qed.
      was getting stuck on weren't actually issues with the concepts, rather, just not knowing how to make Rocq do what I wanted.
      Learning how the e-versions of the tactics worked was very huge for me, but while trying to figure it out I was so confused...
      Similarly, realizing I can destruct a pattern match and get my own variables was very important but I hadn't seen it before.
-     I know we have the tactics guide but maybe seeing some exampels of stuff like this would be nice :)
-     Another thing that was a bit frustrating was the problem where the ltacs can reduce it from like 200 tactics to like 10 - 
+     I know we have the tactics guide but maybe seeing some examples of stuff like this would be nice :)
+     Another thing that was a bit frustrating was the problem where the ltacs can reduce it from like 200 tactics to like 10 -
      I didn't want to use the Ltacs at first since I wanted to make sure I understood what was going on, but 
      ultimately I thought I was stuck in an infinite loop of econstructor so I used the ltacs and realized I was acutally doing it right 
      in the first place (but this is very silly lol).
 
-
-
+     Luckily, you, the graders shall be able to discern any of the i statements betwixt Daniel and myself because i make sure to ne'er 
+     capitalize the word "i," when i (lipson) write. Anyhow, i concur with Daniel, especially with regards to language o' tactics because
+     i am unfortunately a victim of oversubscription to the DRY philosophy and, likewise, averse to copy and paste. 
+     However, sometimes, a simple copy and paste is just the best way to go writing a proof. 
+     For, unlike some code, proofs are not meant to be write once read never, we ought to communicate them.
+     And, alas, just like the mystical and magestic lambda, the excessive use of ltacs to reduce code size can sometimes have an obfuscating effect.
+     So, we aim to strike a balance between extracting repetitive tactics and also clearly sectioning the statemnts we are trying to prove. 
+     Quasi-concretely, if we have three subgoals where reflexivity solves the first and the same tactic chain T solves the latter two cases, 
+     then i think it's better to include all three cases with subgoal bullet points instead of something like try destruction tactic; reflexivity; T.
+     (even where we might repeat the same line twice at essentially the same level of the proof). 
+     Anyhow, figuring out when to extract to an Ltac to avoid repition in not really a goal per se, that's more of a meta-Rocq skill
+     which we shall pick up along the way, but we need to acquire it to achive our actual course goals of learning that programs are transition sytems.
 *)
 
 
