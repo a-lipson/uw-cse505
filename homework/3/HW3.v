@@ -1312,8 +1312,7 @@ Proof.
     + econstructor.
     + discriminate.
 Qed.  
-     
-
+    
 (* Here is the safety property. *)
 Definition parallel_counter_safe
   (input : nat)
