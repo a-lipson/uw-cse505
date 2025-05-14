@@ -373,9 +373,9 @@ Lemma deconstruct_sequence_execution :
   forall v v' c1 c2 c',
     (v, c1;; c2) -->* (v', c') ->
     exists v1' c1',
-      trc step (v, c1) (v1', c1') /\
+      (v, c1) -->* (v1', c1') /\
       (c' = (c1';; c2) \/
-        (c1' = Skip /\ trc step (v1', c2) (v', c')) \/
+        (c1' = Skip /\ (v1', c2) -->* (v', c')) \/
         (c' = Panic /\ c1' = Panic /\ v1' = v')).
 Proof.
   intros v v' c1 c2 c' Hstep.
@@ -421,10 +421,16 @@ Lemma reconstruct_sequence_execution :
   forall v1 c1 v2 c2 v3,
     trc step (v1, c1) (v2, Skip) ->
     trc step (v2, c2) (v3, Skip) ->
-    trc step (v1, c1;;c2) (v3, Skip).
+    trc step (v1, c1;; c2) (v3, Skip).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  apply trc_seq_l_trc with (c3 := c2) in H.
+  eapply trc_transitive with (y := (v2, Skip;; c2)).
+  - apply H.
+  - econstructor.
+    + apply StepSeqLDone.
+    + apply H0.
+Qed.
 
 (*
  * PROBLEM 3 [5 points, ~15 tactics]
@@ -447,8 +453,13 @@ Lemma sequence_assoc :
     trc step (v, (c1;;c2);;c3) (v', Skip) ->
     trc step (v, c1;;(c2;;c3)) (v', Skip).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  apply deconstruct_sequence_execution in H.
+  break_up_hyps_or.  
+  - rewrite H0. shelve.
+  - rewrite H0 in H. shelve.
+  - inversion H0.
+Admitted.
 
 (*
  * PROBLEM 4 [5 points, 1 comment or picture]
@@ -470,10 +481,21 @@ Admitted. (* Change to Qed when done *)
  *    has_no_whiles c1        has_no_whiles c2
  *  -------------------------------------------- HNWIf
  *         has_no_whiles (If e c1 c2)
+ *
+ *    has_no_whiles c1        has_no_whiles c2
+ *  -------------------------------------------- HNWSeq
+ *         has_no_whiles (c1;;c2)
+ *
+ *               x                 e
+ *  -------------------------------------------- HNWAssign
+ *            has_no_whiles (Assign x e)
+ *
+ *    
+ *  -------------------------------------------- HNWSkip
+ *              has_no_whiles (Skip)
  *)
-  (* YOUR DEFINITION HERE *)
-  (* If you choose to submit your definition by uploading a picture, please say
-     so here so we know where to look for it. *)
+
+
 
 (*
  * PROBLEM 5 [5 points, ~0 tactics]
@@ -485,9 +507,20 @@ Admitted. (* Change to Qed when done *)
  * lines. If you find a bug in your definition later, be sure to update it both
  * here and "on paper".
  *)
+
+ (*
+ 
+ 
+ | StepSeqLStep :
+  forall v c1 c2 v' c1',
+    step (v, c1) (v', c1') ->
+    step (v, Sequence c1 c2) (v', Sequence c1' c2)
+    *)
+
 Inductive has_no_whiles : cmd -> Prop :=
-  (* YOUR CODE HERE *)
-.
+  
+ 
+
 
 (*
  * PROBLEM 6 [5 points, ~6 tactics]
