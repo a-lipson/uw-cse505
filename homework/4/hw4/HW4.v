@@ -521,15 +521,13 @@ Qed.
 
 Inductive has_no_whiles : cmd -> Prop :=
   | HNWSkip: has_no_whiles(Skip)
-  | HNWAssign: 
-     forall x e, has_no_whiles (Assign x e)
-  | HNWSeq: 
-      forall c1 c2, has_no_whiles c1 /\ has_no_whiles c2 -> 
-                    has_no_whiles (c1;;c2)
-  | HNWIf: 
-      forall c1 c2 e, has_no_whiles c1 /\ has_no_whiles c2 -> 
-                    has_no_whiles (If e c1 c2).
-   
+  | HNWAssign: forall x e, has_no_whiles (Assign x e)
+  | HNWSeq: forall c1 c2, 
+      has_no_whiles c1 /\ has_no_whiles c2 ->
+        has_no_whiles (c1;;c2)
+  | HNWIf: forall c1 c2 e, 
+      has_no_whiles c1 /\ has_no_whiles c2 ->
+        has_no_whiles (If e c1 c2).
 
 (*
  * PROBLEM 6 [5 points, ~6 tactics]
@@ -681,6 +679,8 @@ Admitted. (* Change to Qed when done *)
 *)
 
 (* Here is one of our old friends: counting up and down. *)
+(* each iteration transfers a successor from y to x
+   until there are none remaining to move *)
 Definition two_counters :=
   "x" <- 0;;
   "y" <- "input";;
@@ -689,13 +689,17 @@ Definition two_counters :=
     "y" <- "y" - 1
   done.
 
+Definition two_counters_loop_body := 
+  "x" <- "x" + 1;; 
+  "y" <- "y" - 1.
+
 (* Convert the above program to a transition system automatically using the
    operational semantics. *)
 Definition two_counters_sys (input : nat) :=
   cmd_to_trsys [("input", input)] two_counters.
 
 (* Here is our "safety property":
- *     when the program terminates, x is equal to input
+ * when the program terminates, x is equal to input
  *)
 Definition two_counters_safe (input : nat) (s : valuation * cmd) : Prop :=
   let (v, c) := s in
@@ -805,26 +809,48 @@ Qed.
  * commands so you don't have to write them out yourself.
  *
  * Hint: There are many ways to do the details, but we recommend following the
- * same structure as the examples from Week04.v. Your invariant should be a
+ * same structure as the examples from Week05.v. Your invariant should be a
  * disjunction of conjunctions whose left conjuncts are equations about the
  * syntax of the reachable programs. That way you can use the fancy tactics from
- * Week04.v, such as magic_select_case, to make your life easier. These tactics
+ * Week05.v, such as magic_select_case, to make your life easier. These tactics
  * have been pasted into the starter code above for your convenience. You may
- * wish to review Week04.v for more information about how they work and how to
+ * wish to review Week05.v for more information about how they work and how to
  * use them.
  *
  * Hint: Repeating for emphasis: we recommend using magic_select_case. To use
- * it, you must structure your invariant exactly like we did in Week04.v.
+ * it, you must structure your invariant exactly like we did in Week05.v.
  *
  * Hint: Once you get the definitions set up correctly, the proof itself is
  * relatively easy. Again, the hard/tedious part is setting up the definitions
  * correctly.
  *)
+
+Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
+  let (v, c) := s in
+  (c = two_counters /\ lookup "input" v = Some input) \/
+
+(* 
+   TODO: enumerate memory in all reachable states
+  see https://gitlab.cs.washington.edu/cse-505-spring-2025/505sp25/-/blob/main/week05/Week05.v?ref_type=heads#L909 for reference. 
+*)
+
+  (c = tc_after_step_one /\ lookup ) \/
+  (c = tc_after_step_two /\ lookup ) \/
+  (c = tc_after_step_three /\ lookup ) \/
+  (c = tc_top_of_loop /\ lookup ) \/
+  (c = tc_body /\ lookup ) \/
+  (c = tc_body_after_step_one /\ lookup ) \/
+  (c = tc_body_after_step_two /\ lookup ) \/
+  (c = tc_after_loop /\ lookup ).
+
 Theorem two_counters_correct :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_safe input).
 Proof.
-  (* YOUR CODE HERE *)
+  invariant_induction_boilerplate.
+  - intuition. 
+    unfold two_counters.
+
 Admitted. (* Change to Qed when done *)
 
 
