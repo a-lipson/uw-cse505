@@ -595,7 +595,7 @@ Proof.
   destruct n.
   - congruence.
   -  eexists. reflexivity. 
-Qed. (* Change to Qed when done *)
+Qed.
 
 (*
  * PROBLEM 8 [10 points, ~20 tactics]
@@ -623,7 +623,51 @@ Theorem has_no_whiles_terminates :
     exists v',
       trc step (v, c) (v', Skip).
 Proof.
-  (* YOUR CODE HERE *)
+  intros. revert v H.
+  induction c.
+  - intros. repeat econstructor.
+  - repeat econstructor.
+  - intros. 
+    inversion H. 
+    destruct H1. 
+    specialize (IHc1 v H1).
+    destruct IHc1.
+    eexists.
+    eapply reconstruct_sequence_execution.
+    exact H4.
+    specialize (IHc2 x H3).
+    destruct IHc2. (* what the actual fuk*)
+
+
+  (* intros. revert v. 
+  induction H.
+  - intros. eexists. constructor.
+  - repeat econstructor. 
+  - intros. destruct H. destruct H. destruct H0. 
+    + eexists. 
+      eapply reconstruct_sequence_execution. 
+      constructor.
+      constructor.
+    + eexists.
+      eapply reconstruct_sequence_execution.
+      constructor.
+      all: repeat econstructor.
+    + shelve.
+    + destruct H. eexists.  *)
+
+
+(*
+    + econstructor. 
+      eapply reconstruct_sequence_execution. 
+      constructor. constructor.
+    + econstructor. eapply reconstruct_sequence_execution.
+      econstructor. econstructor. econstructor. econstructor. econstructor.
+    + econstructor. econstructor. econstructor.   
+    +
+
+*)
+
+    
 Admitted. (* Change to Qed when done *)
 
 (*
