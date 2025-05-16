@@ -368,6 +368,9 @@ Proof.
   bash_execution.
 Qed.
 
+(*
+either the first cmd in a seq will panic, or it will skip.
+*)
 Lemma deconstruct_sequence_execution :
   forall v v' c1 c2 c',
     (v, c1;; c2) -->* (v', c') ->
@@ -416,6 +419,9 @@ Qed.
  * And if you decide to induct on a derivation of trc, you will need the
  * "remember trick" to get a useful induction hypothesis.
  *)
+(*
+the sequence of two commands which reach skip will also reach skip
+*)
 Lemma reconstruct_sequence_execution :
   forall v1 c1 v2 c2 v3,
     trc step (v1, c1) (v2, Skip) ->
@@ -454,11 +460,19 @@ Lemma sequence_assoc :
 Proof.
   intros.
   apply deconstruct_sequence_execution in H.
-  break_up_hyps_or.  
-  - rewrite H0. shelve.
-  - rewrite H0 in H. shelve.
-  - inversion H0.
-Admitted.
+  break_up_hyps_or; subst.
+  - discriminate. (* skip cannot step *)
+  - apply deconstruct_sequence_execution in H.
+    break_up_hyps_or; subst.
+    + discriminate.
+    + eapply reconstruct_sequence_execution.
+      * apply H.
+      * eapply reconstruct_sequence_execution.
+        -- apply H2.
+        -- apply H1.
+    + discriminate.
+  - discriminate. (* panic *) 
+Qed.
 
 (*
  * PROBLEM 4 [5 points, 1 comment or picture]
