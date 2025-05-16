@@ -637,13 +637,16 @@ Proof.
     + apply H2.
   - destruct IHhas_no_whiles1 with v. 
     destruct IHhas_no_whiles2 with v.
-    destruct (eval_arith e v)  eqn:Heval. 
-    + eexists. econstructor. apply StepIfFalse. lia. exact H2.
-    + eexists. econstructor. apply StepIfTrue. rewrite Heval. lia. exact H1.
+    destruct (eval_arith e v) eqn:Heval. 
+    + eexists. econstructor. 
+      apply StepIfFalse. 
+      lia. exact H2.
+    + eexists. econstructor. 
+      apply StepIfTrue. 
+      rewrite Heval. lia. exact H1.
 Qed. 
     
  
-
 (*
              ____                  _     _                     ____
             / ___|    ___    ___  | |_  (_)   ___    _ __     |___ \
@@ -820,11 +823,6 @@ Definition two_counter_body_invariant_after_step input v :=
     a + b = input  /\ b > 0.
 
 
-(* 
-   TODO: enumerate memory in all reachable states
-  see https://gitlab.cs.washington.edu/cse-505-spring-2025/505sp25/-/blob/main/week05/Week05.v?ref_type=heads#L909 for reference.
-*)
-
 Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
   let (v, c) := s in
   (c = two_counters /\ lookup "input" v = Some input) \/
@@ -852,23 +850,21 @@ invariant_induction_boilerplate.
          two_counter_body_invariant,
          two_counter_body_invariant_after_step in *;
 
-  magic_select_case; 
+  magic_select_case;
   break_up_hyps;
-  cbn in *; 
-  find_rewrites; 
+  cbn in *;
+  find_rewrites;
   eauto 10.
   all: simpl; magic_select_case; eauto.
 
-  + (* reconstruct loop invariant *)
-    rewrite H2.
+  + rewrite H2.
     eexists; eexists; split.
     eauto.
     repeat split.
     lia.
 
-  + (* *)
-    destruct H1. break_up_hyps.
-    eexists; eexists. 
+  + destruct H1. break_up_hyps.
+    eexists; eexists.
     repeat split.
     exact H.
     exact H1.
@@ -877,31 +873,28 @@ invariant_induction_boilerplate.
     rewrite H1 in H0.
     lia.
 
-  + (* *)
-    destruct H1. break_up_hyps.
-    split. 
+  + destruct H1. break_up_hyps.
+    split.
     simpl in H0.
     rewrite H1 in H0.
     rewrite H0 in H1.
     exact H1.
-    simpl in H0. 
+    simpl in H0.
     rewrite H1 in H0.
     rewrite H.
     f_equal. lia.
 
-  + (* *)
-    destruct H1. break_up_hyps. rewrite H. 
-    eexists; eexists; split. 
-    replace (x + 1) with (S x) by lia. 
+  + destruct H1. break_up_hyps. rewrite H.
+    eexists; eexists; split.
+    replace (x + 1) with (S x) by lia.
     split. split.
-    exact H0. 
+    exact H0.
     split.
-    exact H1. 
+    exact H1.
     exact H2.
 
-  + (* *)
-    destruct H1. break_up_hyps. rewrite H0.
-    eexists. eexists; split. 
+  + destruct H1. break_up_hyps. rewrite H0.
+    eexists. eexists; split.
     exact H.
     repeat split; lia.
 Qed.
