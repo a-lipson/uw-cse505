@@ -641,12 +641,6 @@ Proof.
     + eexists. econstructor. apply StepIfTrue. rewrite Heval. lia. exact H1.
 Qed. 
     
-   
- 
-
-    
-Admitted. (* Change to Qed when done *)
-
 (*
              ____                  _     _                     ____
             / ___|    ___    ___  | |_  (_)   ___    _ __     |___ \
@@ -1359,15 +1353,6 @@ Fixpoint sum_upto (n : nat) :=
  * Hint: The hard part is getting the loop invariant correct. It should be
  * similar to your solution to Problem 5 [CHECK] on HW3.
  *)
-Lemma sum_upto_n: 
-  forall n,
-  sum_upto (S n) = (S n) + sum_upto(n).
-Proof.
-induction n.
-  - simpl. lia.
-  - reflexivity.
-Qed.
-
 
 Theorem sum_triple :
   forall input,
@@ -1381,19 +1366,13 @@ Proof.
   fancy_ht_while (fun v => 
     sum_upto input = eval_arith "output" v + sum_upto (eval_arith "input" v)). 
   all: bash_assert_implies.
+  destruct y.
+  - lia.
+  - simpl.  replace (S (y + sum_upto y)) with (S y + sum_upto y) by lia.
+    replace (y - 0) with (y) by lia. lia.
+Qed.
   
-
-
       
-  
-
-
-  
-
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
-
 (*
  * PROBLEM 11 [5 points, ~3 sentences]
  *
@@ -1406,6 +1385,7 @@ Admitted. (* Change to Qed when done *)
  *    is true, and is in fact a _sound_ Hoare triple.
  *    Explain why this Hoare triple is sound, in your own words.
      
+      This hoare triple
  *
  * 2. What implications does this have for Hoare logic, more generally?
  *    I.e., what is the relationship between termination of the programs
@@ -1430,7 +1410,7 @@ Theorem doesnt_terminate_ht :
     (fun v => eval_arith "x" v <> 4).
 Proof.
   auto_triple.
-  (* YOUR CODE HERE *)
+  
 Admitted. (* Change to Qed when done *)
 
 
