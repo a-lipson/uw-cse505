@@ -464,12 +464,10 @@ Proof.
   - discriminate. (* skip cannot step *)
   - apply deconstruct_sequence_execution in H.
     break_up_hyps_or; subst.
-    + discriminate.
-    + eapply reconstruct_sequence_execution.
-      * apply H.
-      * eapply reconstruct_sequence_execution.
-        -- apply H2.
-        -- apply H1.
+    + discriminate. (* skip caanot step *)
+    + eapply reconstruct_sequence_execution; eauto. 
+    (* auto handles application of hypothesis *)
+      * eapply reconstruct_sequence_execution; eauto.
     + discriminate.
   - discriminate. (* panic *) 
 Qed.
