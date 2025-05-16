@@ -624,13 +624,18 @@ Proof.
   intros. 
   revert v.
   induction H.
-  - intros. eexists. constructor.
-  - repeat econstructor. 
-  - intros. destruct H. shelve. 
-  - inversion H. destruct e. 
-    + intros. destruct n.
-      --
-  
+  - intros.
+    eexists. 
+    econstructor.
+  - intros. eexists. econstructor. 
+    + intuition.
+    + intuition.
+  - intros. destruct H. inversion H. inversion H0. 
+    + eauto.
+    + eauto.
+    +   
+       
+
 
 
 
@@ -846,19 +851,19 @@ Definition two_counter_loop_invariant input v :=
   exists a b,
     lookup "x" v = Some a /\
     lookup "y" v = Some b /\
-    a + b = input.
+    a + b = input /\ b >= 0.
 
 Definition two_counter_body_invariant input v :=
   exists a b,
     lookup "x" v = Some a /\
-    lookup "y" v = Some (S b) /\
-    a + S b = input.
+    lookup "y" v = Some b /\
+    a + b = input /\ b > 0.
 
 Definition two_counter_body_invariant_after_step input v :=
   exists a b,
-    lookup "x" v = Some a /\
-    lookup "y" v = Some (S b) /\
-    a + S b = S input.
+    lookup "x" v = Some (S a) /\
+    lookup "y" v = Some b /\
+    a + b = input  /\ b > 0.
 
 
 (* 
@@ -869,8 +874,8 @@ Definition two_counter_body_invariant_after_step input v :=
 Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
   let (v, c) := s in
   (c = two_counters /\ lookup "input" v = Some input) \/
-  (c = tc_after_step_one /\ lookup "x" v = Some 0) \/
-  (c = tc_after_step_two /\ lookup "x" v = Some 0) \/
+  (c = tc_after_step_one /\ lookup "x" v = Some 0 /\ lookup "input" v = Some input) \/
+  (c = tc_after_step_two /\ lookup "x" v = Some 0 /\ lookup "input" v = Some input) \/
   (c = tc_after_step_three /\ two_counter_loop_invariant input v) \/
   (c = tc_top_of_loop /\ two_counter_loop_invariant input v) \/
   (c = tc_body /\ two_counter_body_invariant input v) \/
@@ -894,79 +899,25 @@ invariant_induction_boilerplate.
   break_up_hyps;
   cbn in *;
   find_rewrites; eauto 20.
-  + simpl. magic_select_case. exact H1. (* step two *)
-  + shelve. 
-  + simpl. magic_select_case. exact H1.
-  + simpl.
-    magic_select_case. 
-    unfold two_counter_body_invariant.
-    unfold two_counter_loop_invariant in H1.
-    destruct H1.
-    break_up_hyps. 
-    simpl in H0.
-    rewrite H1 in H0. 
-    destruct x0. 
-    exfalso. 
-    apply H0. 
-    reflexivity.
-    eexists. 
-    eexists. 
-    split. 
-    exact H.
-    split. 
-    exact H1. 
-    exact H2. 
-  + unfold two_counters_inv. 
-    magic_select_case. 
-    split. 
-    simpl in H0.
-    destruct H1.
-    break_up_hyps. 
-    rewrite H1 in H0.
-    rewrite H1.
-    rewrite H0.
-    reflexivity.
-    simpl in H0.
-    destruct H1.
-    break_up_hyps.
-    rewrite H1 in H0.
-    rewrite H.
-    f_equal.
-    rewrite <- H2.
-    rewrite H0. lia.
-  + simpl. 
-    magic_select_case. 
-    unfold two_counter_body_invariant in H1.
-    break_up_hyps.
-    rewrite H.
-    unfold two_counter_body_invariant_after_step.
-    destruct x.
-    eexists. eexists. split. 
-    simpl. f_equal. 
-    cbn. rewrite H0. split. reflexivity.
-    f_equal. rewrite <- H1. lia.
-    eexists. eexists. simpl; split.
-    f_equal. split. exact H0. f_equal. rewrite <- H1. lia.
-  + simpl. magic_select_case. exact H1.
-  + simpl.
-    magic_select_case. 
-    destruct H1.
-    break_up_hyps.
-    rewrite H0.
-    simpl.
-    unfold two_counter_loop_invariant. simpl. 
-    eexists. eexists.
-    split.
-    exact H.
-    split.
-    f_equal.
-    simpl in H1.
-    inversion H1.
-    lia.
-  Unshelve.
-Admitted.
-
-
+  all: simpl. all: magic_select_case.
+  + rewrite H0. rewrite H2. split. all: reflexivity.
+  + rewrite H2. unfold two_counter_loop_invariant. eexists. eexists. split. all: simpl. exact H.
+    simpl. split. f_equal. split. reflexivity. destruct input. lia. lia.
+  + exact H1.
+  + unfold two_counter_body_invariant. destruct H1. destruct H. destruct H. destruct H1. destruct H2.
+    eexists. eexists. split. exact H. split. exact H1. split. exact H2. intuition. simpl in H0. rewrite H1 in H0.
+    destruct x0. destruct H3. all: lia. 
+  + split. simpl in H0. unfold two_counter_loop_invariant in H1. break_up_hyps. rewrite H1 in H0. 
+    rewrite H0 in H1. exact H1. destruct H1. break_up_hyps. simpl in H0. rewrite H1 in H0.
+    rewrite H. f_equal. rewrite <- H2. rewrite H0. lia.
+  + destruct H1. break_up_hyps.   
+    rewrite H. unfold two_counter_body_invariant_after_step. simpl. 
+    eexists. eexists. split. simpl. replace (x + 1) with (S x) by lia. f_equal.
+    split. exact H0. split. exact H1. exact H2.
+  + exact H1.
+  + destruct H1. break_up_hyps. rewrite H0. unfold two_counter_loop_invariant. eexists. eexists. all: simpl.
+    split. exact H. split.  f_equal. split. lia. lia.
+Qed.
 
 
 Theorem two_counters_safe_inv :
@@ -1449,6 +1400,16 @@ Fixpoint sum_upto (n : nat) :=
  * Hint: The hard part is getting the loop invariant correct. It should be
  * similar to your solution to Problem 5 [CHECK] on HW3.
  *)
+Lemma sum_upto_n: 
+  forall n,
+  sum_upto (S n) = (S n) + sum_upto(n).
+Proof.
+induction n.
+  - simpl. lia.
+  - reflexivity.
+Qed.
+
+
 Theorem sum_triple :
   forall input,
     hoare_triple
@@ -1456,6 +1417,20 @@ Theorem sum_triple :
      sum
      (fun v => eval_arith "output" v = sum_upto input).
 Proof.
+  intros.
+  auto_triple.
+  fancy_ht_while (fun v => 
+    sum_upto input = eval_arith "output" v + sum_upto (eval_arith "input" v)). 
+  all: bash_assert_implies.
+  
+
+
+      
+  
+
+
+  
+
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
@@ -1471,7 +1446,7 @@ Admitted. (* Change to Qed when done *)
  *            {True} doesnt_terminate {x <> 4}
  *    is true, and is in fact a _sound_ Hoare triple.
  *    Explain why this Hoare triple is sound, in your own words.
- *    (Hint: it may help to look at the definition of sound_triple.)
+     
  *
  * 2. What implications does this have for Hoare logic, more generally?
  *    I.e., what is the relationship between termination of the programs
@@ -1495,6 +1470,7 @@ Theorem doesnt_terminate_ht :
     doesnt_terminate
     (fun v => eval_arith "x" v <> 4).
 Proof.
+  auto_triple.
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
