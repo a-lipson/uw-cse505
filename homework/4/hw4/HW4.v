@@ -507,19 +507,17 @@ Admitted.
  * here and "on paper".
  *)
 
- (*
- 
- 
- | StepSeqLStep :
-  forall v c1 c2 v' c1',
-    step (v, c1) (v', c1') ->
-    step (v, Sequence c1 c2) (v', Sequence c1' c2)
-    *)
-
 Inductive has_no_whiles : cmd -> Prop :=
-  
- 
-
+  | HNWSkip: has_no_whiles(Skip)
+  | HNWAssign: forall x e, has_no_whiles (Assign x e)
+  | HNWSeq: 
+      forall c1 c2, has_no_whiles c1 /\ has_no_whiles c2 -> 
+                    has_no_whiles (c1;;c2)
+  | HNWIf: 
+      forall c1 c2 e, has_no_whiles c1 /\ has_no_whiles c2 -> 
+                    has_no_whiles (If e c1 c2)
+  .
+   
 
 (*
  * PROBLEM 6 [5 points, ~6 tactics]
@@ -533,8 +531,8 @@ Inductive has_no_whiles : cmd -> Prop :=
 Example a_program_without_whiles :
   has_no_whiles (Skip ;; If "x" ("y" <- 3) ("z" <- 4)).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  repeat constructor. 
+Qed. 
 
 (*
  * PROBLEM 7 [5 points, ~6 tactics]
