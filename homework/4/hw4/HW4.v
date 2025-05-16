@@ -594,7 +594,8 @@ Proof.
   intros.
   destruct n.
   - congruence.
-  -  eexists. reflexivity. 
+  - eexists. 
+    reflexivity. 
 Qed.
 
 (*
@@ -623,7 +624,7 @@ Theorem has_no_whiles_terminates :
     exists v',
       trc step (v, c) (v', Skip).
 Proof.
-  intros. 
+  intros.
   revert v.
   induction H; intros.
   - econstructor. econstructor.
@@ -641,11 +642,7 @@ Proof.
     + eexists. econstructor. apply StepIfTrue. rewrite Heval. lia. exact H1.
 Qed. 
     
-   
  
-
-    
-Admitted. (* Change to Qed when done *)
 
 (*
              ____                  _     _                     ____
@@ -825,7 +822,7 @@ Definition two_counter_body_invariant_after_step input v :=
 
 (* 
    TODO: enumerate memory in all reachable states
-  see https://gitlab.cs.washington.edu/cse-505-spring-2025/505sp25/-/blob/main/week05/Week05.v?ref_type=heads#L909 for reference. 
+  see https://gitlab.cs.washington.edu/cse-505-spring-2025/505sp25/-/blob/main/week05/Week05.v?ref_type=heads#L909 for reference.
 *)
 
 Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
@@ -845,35 +842,68 @@ Theorem two_counters_inv_invariant :
     is_invariant (two_counters_sys input) (two_counters_inv input).
 Proof.
 invariant_induction_boilerplate.
-- intuition. 
+- auto.
 - destruct s1 as [v1 c1], s2 as [v2 c2].
   fold (two_counters_inv input (v2, c2)).
   intuition; subst; invert_steps.
-  unfold two_counters_inv;
-  unfold two_counter_loop_invariant, two_counter_body_invariant in *;
-  unfold two_counter_body_invariant_after_step in *.
-  magic_select_case;
+
+  unfold two_counters_inv,
+         two_counter_loop_invariant,
+         two_counter_body_invariant,
+         two_counter_body_invariant_after_step in *;
+
+  magic_select_case; 
   break_up_hyps;
-  cbn in *;
-  find_rewrites; eauto 20.
-  all: simpl. all: magic_select_case.
-  + rewrite H0. rewrite H2. split. all: reflexivity.
-  + rewrite H2. unfold two_counter_loop_invariant. eexists. eexists. split. all: simpl. exact H.
-    simpl. split. f_equal. split. reflexivity. destruct input. lia. lia.
-  + exact H1.
-  + unfold two_counter_body_invariant. destruct H1. destruct H. destruct H. destruct H1. destruct H2.
-    eexists. eexists. split. exact H. split. exact H1. split. exact H2. intuition. simpl in H0. rewrite H1 in H0.
-    destruct x0. destruct H3. all: lia. 
-  + split. simpl in H0. unfold two_counter_loop_invariant in H1. break_up_hyps. rewrite H1 in H0. 
-    rewrite H0 in H1. exact H1. destruct H1. break_up_hyps. simpl in H0. rewrite H1 in H0.
-    rewrite H. f_equal. rewrite <- H2. rewrite H0. lia.
-  + destruct H1. break_up_hyps.   
-    rewrite H. unfold two_counter_body_invariant_after_step. simpl. 
-    eexists. eexists. split. simpl. replace (x + 1) with (S x) by lia. f_equal.
-    split. exact H0. split. exact H1. exact H2.
-  + exact H1.
-  + destruct H1. break_up_hyps. rewrite H0. unfold two_counter_loop_invariant. eexists. eexists. all: simpl.
-    split. exact H. split.  f_equal. split. lia. lia.
+  cbn in *; 
+  find_rewrites; 
+  eauto 10.
+  all: simpl; magic_select_case; eauto.
+
+  + (* reconstruct loop invariant *)
+    rewrite H2.
+    eexists; eexists; split.
+    eauto.
+    repeat split.
+    lia.
+
+  + (* *)
+    destruct H1. break_up_hyps.
+    eexists; eexists. 
+    repeat split.
+    exact H.
+    exact H1.
+    exact H2.
+    simpl in H0.
+    rewrite H1 in H0.
+    lia.
+
+  + (* *)
+    destruct H1. break_up_hyps.
+    split. 
+    simpl in H0.
+    rewrite H1 in H0.
+    rewrite H0 in H1.
+    exact H1.
+    simpl in H0. 
+    rewrite H1 in H0.
+    rewrite H.
+    f_equal. lia.
+
+  + (* *)
+    destruct H1. break_up_hyps. rewrite H. 
+    eexists; eexists; split. 
+    replace (x + 1) with (S x) by lia. 
+    split. split.
+    exact H0. 
+    split.
+    exact H1. 
+    exact H2.
+
+  + (* *)
+    destruct H1. break_up_hyps. rewrite H0.
+    eexists. eexists; split. 
+    exact H.
+    repeat split; lia.
 Qed.
 
 
@@ -1372,9 +1402,9 @@ Qed.
 Theorem sum_triple :
   forall input,
     hoare_triple
-     (fun v => eval_arith "input" v = input)
-     sum
-     (fun v => eval_arith "output" v = sum_upto input).
+      (fun v => eval_arith "input" v = input)
+      sum
+      (fun v => eval_arith "output" v = sum_upto input).
 Proof.
   intros.
   auto_triple.
