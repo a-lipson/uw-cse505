@@ -895,7 +895,7 @@ invariant_induction_boilerplate.
   cbn in *;
   find_rewrites; eauto 20.
   + simpl. magic_select_case. exact H1. (* step two *)
-  + simpl. magic_select_case. shelve. (* STUCKKKK *)
+  + shelve. 
   + simpl. magic_select_case. exact H1.
   + simpl.
     magic_select_case. 
@@ -944,7 +944,9 @@ invariant_induction_boilerplate.
     eexists. eexists. split. 
     simpl. f_equal. 
     cbn. rewrite H0. split. reflexivity.
-    shelve. shelve.
+    f_equal. rewrite <- H1. lia.
+    eexists. eexists. simpl; split.
+    f_equal. split. exact H0. f_equal. rewrite <- H1. lia.
   + simpl. magic_select_case. exact H1.
   + simpl.
     magic_select_case. 
@@ -961,18 +963,17 @@ invariant_induction_boilerplate.
     simpl in H1.
     inversion H1.
     lia.
-Qed.
+  Unshelve.
+Admitted.
 
 
 
 
-Theorem two_counters_correct :
+Theorem two_counters_safe_inv :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_safe input).
 Proof.
-  invariant_induction_boilerplate.
-  - intuition. 
-    unfold two_counters.
+
 
 Admitted. (* Change to Qed when done *)
 
