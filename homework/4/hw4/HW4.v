@@ -883,7 +883,7 @@ Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
   (c = tc_body_after_step_two /\ two_counter_body_invariant_after_step input v) \/
   (c = tc_after_loop /\ lookup "y" v = Some 0 /\ lookup "x" v = Some input).
 
-Theorem two_counters_correct :
+Theorem two_counters_inv_invariant :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_inv input).
 Proof.
@@ -924,9 +924,15 @@ Theorem two_counters_safe_inv :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_safe input).
 Proof.
+  intros.
+  apply invariant_implies with (P := two_counters_inv input).
+  - apply two_counters_inv_invariant.
+  - intros. unfold two_counters_safe; unfold two_counters_inv in H. destruct s. intuition; eauto 20.
+    all: try rewrite H in H0; try discriminate.
+    all: try rewrite H1 in H0; try discriminate.
+Qed.
 
 
-Admitted. (* Change to Qed when done *)
 
 
 
