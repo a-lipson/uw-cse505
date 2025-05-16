@@ -621,7 +621,20 @@ Theorem has_no_whiles_terminates :
     exists v',
       trc step (v, c) (v', Skip).
 Proof.
-  intros. revert v H.
+  intros. 
+  revert v.
+  induction H.
+  - intros. eexists. constructor.
+  - repeat econstructor. 
+  - intros. destruct H. shelve. 
+  - inversion H. destruct e. 
+    + intros. destruct n.
+      --
+  
+
+
+
+  (* intros. revert v H.
   induction c.
   - intros. repeat econstructor.
   - repeat econstructor.
@@ -630,28 +643,32 @@ Proof.
     destruct H1. 
     specialize (IHc1 v H1).
     destruct IHc1.
+    specialize (IHc2 x H3).
+    destruct IHc2.
     eexists.
     eapply reconstruct_sequence_execution.
     exact H4.
-    specialize (IHc2 x H3).
-    destruct IHc2. (* what the actual fuk*)
+    apply H5.
+  - intros. 
+    inversion H. 
+    destruct H1.
+    specialize (IHc1 v H1).
+    destruct IHc1.
+    specialize (IHc2 v H4).
+    destruct IHc2.
+    clear H0 H2 H3 c0 c3 H1 H4 e0.
+    econstructor.    
+    econstructor.    
+    econstructor.    
+    shelve.
+    apply H5.
+  -  *)
 
 
-  (* intros. revert v. 
-  induction H.
-  - intros. eexists. constructor.
-  - repeat econstructor. 
-  - intros. destruct H. destruct H. destruct H0. 
-    + eexists. 
-      eapply reconstruct_sequence_execution. 
-      constructor.
-      constructor.
-    + eexists.
-      eapply reconstruct_sequence_execution.
-      constructor.
-      all: repeat econstructor.
-    + shelve.
-    + destruct H. eexists.  *)
+
+    
+
+
 
 
 (*
@@ -825,23 +842,71 @@ Qed.
  * correctly.
  *)
 
-Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
-  let (v, c) := s in
-  (c = two_counters /\ lookup "input" v = Some input) \/
+Definition two_counter_loop_invariant input v :=
+  exists x y,
+    lookup "x" v = Some x /\
+    lookup "y" v = Some y /\
+    x + y = input.
+
+Definition two_counter_body_invariant input v :=
+  exists x y,
+    lookup "x" v = Some x /\
+    lookup "y" v = Some (S y) /\
+    x + S y = S input.
+
+Definition two_counter_body_invariant_after_step input v :=
+  exists x y,
+    lookup "x" v = Some (S x) /\
+    lookup "y" v = Some y /\
+    x + y = S input.
+
 
 (* 
    TODO: enumerate memory in all reachable states
   see https://gitlab.cs.washington.edu/cse-505-spring-2025/505sp25/-/blob/main/week05/Week05.v?ref_type=heads#L909 for reference. 
 *)
 
-  (c = tc_after_step_one /\ lookup ) \/
-  (c = tc_after_step_two /\ lookup ) \/
-  (c = tc_after_step_three /\ lookup ) \/
-  (c = tc_top_of_loop /\ lookup ) \/
-  (c = tc_body /\ lookup ) \/
-  (c = tc_body_after_step_one /\ lookup ) \/
-  (c = tc_body_after_step_two /\ lookup ) \/
-  (c = tc_after_loop /\ lookup ).
+Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
+  let (v, c) := s in
+  (c = two_counters /\ lookup "input" v = Some input) \/
+  (c = tc_after_step_one /\ lookup "x" v = Some 0) \/
+  (c = tc_after_step_two /\ lookup "x" v = Some 0) \/
+  (c = tc_after_step_three /\ two_counter_loop_invariant input v) \/
+  (c = tc_top_of_loop /\ two_counter_loop_invariant input v) \/
+  (c = tc_body /\ two_counter_body_invariant input v) \/
+  (c = tc_body_after_step_one /\ two_counter_body_invariant_after_step input v) \/
+  (c = tc_body_after_step_two /\ two_counter_body_invariant_after_step input v) \/
+  (c = tc_after_loop /\ lookup "y" v = Some 0).
+
+
+
+Theorem two_counters_correct :
+  forall input,
+    is_invariant (two_counters_sys input) (two_counters_inv input).
+Proof.
+invariant_induction_boilerplate.
+- intuition. 
+- destruct s1 as [v1 c1], s2 as [v2 c2].
+  fold (two_counters_inv input (v2, c2)).
+  intuition; subst; invert_steps.
+  unfold two_counters_inv;
+  unfold two_counter_loop_invariant, two_counter_body_invariant in *;
+  unfold two_counter_body_invariant_after_step in *.
+  magic_select_case;
+  break_up_hyps;
+  cbn in *;
+  find_rewrites.
+  + reflexivity. (* step one *)
+  + simpl. magic_select_case. exact H1. (* step two *)
+  + shelve.
+  + simpl. magic_select_case. exact H1. (* step four *)
+  + 
+    
+    
+
+
+
+
 
 Theorem two_counters_correct :
   forall input,
@@ -852,6 +917,8 @@ Proof.
     unfold two_counters.
 
 Admitted. (* Change to Qed when done *)
+
+
 
 
 (* This is the end of this section. More starter code appears below. Search for
