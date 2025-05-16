@@ -529,8 +529,7 @@ Inductive has_no_whiles : cmd -> Prop :=
                     has_no_whiles (c1;;c2)
   | HNWIf: 
       forall c1 c2 e, has_no_whiles c1 /\ has_no_whiles c2 -> 
-                    has_no_whiles (If e c1 c2)
-  .
+                    has_no_whiles (If e c1 c2).
    
 
 (*
@@ -594,12 +593,10 @@ Lemma n_not_zero_is_succ :
       n = S m.
 Proof.
   intros.
-  eexists.
   destruct n.
   - congruence.
-  - Fail reflexivity.
-  (* Edit the above proof. *)
-Admitted. (* Change to Qed when done *)
+  -  eexists. reflexivity. 
+Qed. (* Change to Qed when done *)
 
 (*
  * PROBLEM 8 [10 points, ~20 tactics]
