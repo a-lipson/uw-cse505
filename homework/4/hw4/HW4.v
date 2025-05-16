@@ -523,7 +523,8 @@ Qed.
 
 Inductive has_no_whiles : cmd -> Prop :=
   | HNWSkip: has_no_whiles(Skip)
-  | HNWAssign: forall x e, has_no_whiles (Assign x e)
+  | HNWAssign: 
+     forall x e, has_no_whiles (Assign x e)
   | HNWSeq: 
       forall c1 c2, has_no_whiles c1 /\ has_no_whiles c2 -> 
                     has_no_whiles (c1;;c2)
