@@ -852,12 +852,12 @@ Definition two_counter_body_invariant input v :=
   exists x y,
     lookup "x" v = Some x /\
     lookup "y" v = Some (S y) /\
-    x + S y = S input.
+    x + (S y) = input.
 
 Definition two_counter_body_invariant_after_step input v :=
   exists x y,
     lookup "x" v = Some (S x) /\
-    lookup "y" v = Some y /\
+    lookup "y" v = Some (S y) /\
     x + y = S input.
 
 
@@ -876,7 +876,7 @@ Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
   (c = tc_body /\ two_counter_body_invariant input v) \/
   (c = tc_body_after_step_one /\ two_counter_body_invariant_after_step input v) \/
   (c = tc_body_after_step_two /\ two_counter_body_invariant_after_step input v) \/
-  (c = tc_after_loop /\ lookup "y" v = Some 0).
+  (c = tc_after_loop /\ lookup "y" v = Some 0 /\ lookup "x" v = Some input).
 
 
 
@@ -898,7 +898,12 @@ invariant_induction_boilerplate.
   find_rewrites.
   + reflexivity. (* step one *)
   + simpl. magic_select_case. exact H1. (* step two *)
-  + shelve.
+  + unfold two_counters_inv. 
+    magic_select_case. 
+    unfold two_counter_loop_invariant.
+    eexists. eexists. split.
+    -- simpl. exact H1.
+    -- simpl. 
   + simpl. magic_select_case. exact H1. (* step four *)
   + 
     
