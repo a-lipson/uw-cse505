@@ -1414,11 +1414,24 @@ Qed.
  *    is true, and is in fact a _sound_ Hoare triple.
  *    Explain why this Hoare triple is sound, in your own words.
      
-      This hoare triple
- *
+     Consider an arbitrary Hoare triple {P} c {Q}. The triple asserts that prior to the execution of c,
+    the program must be in a state satisfying the assertion P; it also asserts that after the execution of c,
+    the assertion Q must hold. We're essentially saying 'Starting from a state where P holds, if c terminates, then Q must hold.'
+
+    Because the starting state is {True}, every single state satisfies the precondition - even 
+    a state where x = 4. Therefore, that first part of the implication holds; any state asserts P.
+    However, because c never terminates, the implication is vacously true; we can put
+    anything in the final assertion, since the code never actually terminates.
+
+
  * 2. What implications does this have for Hoare logic, more generally?
  *    I.e., what is the relationship between termination of the programs
- *    a Hoare triple is true? (1 sentence is fine)
+ *    a Hoare triple is true? (1 sentence is fine) (*sorry ours is 2*)
+
+      If a program never terminates, then any assertion can be put after the code -
+      even False - since the postcondition requires termination.Therefore, we cannot prove
+      nontermination in Rocq directly, since this would require a proof of False (can use exfalso though).
+
  *)
 Definition doesnt_terminate :=
   "x" <- 5;;
@@ -1439,8 +1452,11 @@ Theorem doesnt_terminate_ht :
     (fun v => eval_arith "x" v <> 4).
 Proof.
   auto_triple.
+  fancy_ht_while (fun v => eval_arith ("x" - 4) v <> 0).
+  all: bash_assert_implies.
+Qed.
   
-Admitted. (* Change to Qed when done *)
+  
 
 
 (*
