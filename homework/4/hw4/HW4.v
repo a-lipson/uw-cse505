@@ -843,22 +843,22 @@ Qed.
  *)
 
 Definition two_counter_loop_invariant input v :=
-  exists x y,
-    lookup "x" v = Some x /\
-    lookup "y" v = Some y /\
-    x + y = input.
+  exists a b,
+    lookup "x" v = Some a /\
+    lookup "y" v = Some b /\
+    a + b = input.
 
 Definition two_counter_body_invariant input v :=
-  exists x y,
-    lookup "x" v = Some x /\
-    lookup "y" v = Some (S y) /\
-    x + (S y) = input.
+  exists a b,
+    lookup "x" v = Some a /\
+    lookup "y" v = Some (S b) /\
+    a + (S b) = input.
 
 Definition two_counter_body_invariant_after_step input v :=
-  exists x y,
-    lookup "x" v = Some (S x) /\
-    lookup "y" v = Some (S y) /\
-    x + y = S input.
+  exists a b,
+    lookup "x" v = Some (S a) /\
+    lookup "y" v = Some (S b) /\
+    S a + S b = S input.
 
 
 (* 
@@ -878,8 +878,6 @@ Definition two_counters_inv (input : nat) (s : valuation * cmd) : Prop :=
   (c = tc_body_after_step_two /\ two_counter_body_invariant_after_step input v) \/
   (c = tc_after_loop /\ lookup "y" v = Some 0 /\ lookup "x" v = Some input).
 
-
-
 Theorem two_counters_correct :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_inv input).
@@ -895,20 +893,75 @@ invariant_induction_boilerplate.
   magic_select_case;
   break_up_hyps;
   cbn in *;
-  find_rewrites.
-  + reflexivity. (* step one *)
+  find_rewrites; eauto 20.
   + simpl. magic_select_case. exact H1. (* step two *)
+  + simpl. magic_select_case. shelve. (* STUCKKKK *)
+  + simpl. magic_select_case. exact H1.
+  + simpl.
+    magic_select_case. 
+    unfold two_counter_body_invariant.
+    unfold two_counter_loop_invariant in H1.
+    destruct H1.
+    break_up_hyps. 
+    simpl in H0.
+    rewrite H1 in H0. 
+    destruct x0. 
+    exfalso. 
+    apply H0. 
+    reflexivity.
+    eexists. 
+    eexists. 
+    split. 
+    exact H.
+    split. 
+    exact H1. 
+    exact H2. 
   + unfold two_counters_inv. 
     magic_select_case. 
-    unfold two_counter_loop_invariant.
-    eexists. eexists. split.
-    -- simpl. exact H1.
-    -- simpl. 
-  + simpl. magic_select_case. exact H1. (* step four *)
-  + 
-    
-    
-
+    split. 
+    simpl in H0.
+    destruct H1.
+    break_up_hyps. 
+    rewrite H1 in H0.
+    rewrite H1.
+    rewrite H0.
+    reflexivity.
+    simpl in H0.
+    destruct H1.
+    break_up_hyps.
+    rewrite H1 in H0.
+    rewrite H.
+    f_equal.
+    rewrite <- H2.
+    rewrite H0. lia.
+  + simpl. 
+    magic_select_case. 
+    unfold two_counter_body_invariant in H1.
+    break_up_hyps.
+    rewrite H.
+    unfold two_counter_body_invariant_after_step.
+    destruct x.
+    eexists. eexists. split. 
+    simpl. f_equal. 
+    cbn. rewrite H0. split. reflexivity.
+    shelve. shelve.
+  + simpl. magic_select_case. exact H1.
+  + simpl.
+    magic_select_case. 
+    destruct H1.
+    break_up_hyps.
+    rewrite H0.
+    simpl.
+    unfold two_counter_loop_invariant. simpl. 
+    eexists. eexists.
+    split.
+    exact H.
+    split.
+    f_equal.
+    simpl in H1.
+    inversion H1.
+    lia.
+Qed.
 
 
 
