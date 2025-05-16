@@ -523,11 +523,13 @@ Inductive has_no_whiles : cmd -> Prop :=
   | HNWSkip: has_no_whiles(Skip)
   | HNWAssign: forall x e, has_no_whiles (Assign x e)
   | HNWSeq: forall c1 c2, 
-      has_no_whiles c1 /\ has_no_whiles c2 ->
-        has_no_whiles (c1;;c2)
+      has_no_whiles c1 ->
+      has_no_whiles c2 ->
+      has_no_whiles (c1;;c2)
   | HNWIf: forall c1 c2 e, 
-      has_no_whiles c1 /\ has_no_whiles c2 ->
-        has_no_whiles (If e c1 c2).
+      has_no_whiles c1 ->
+      has_no_whiles c2 ->
+      has_no_whiles (If e c1 c2).
 
 (*
  * PROBLEM 6 [5 points, ~6 tactics]
@@ -623,69 +625,24 @@ Theorem has_no_whiles_terminates :
 Proof.
   intros. 
   revert v.
-  induction H.
-  - intros.
-    eexists. 
-    econstructor.
-  - intros. eexists. econstructor. 
-    + intuition.
-    + intuition.
-  - intros. destruct H. inversion H. inversion H0. 
-    + eauto.
-    + eauto.
-    +   
-       
-
-
-
-
-  (* intros. revert v H.
-  induction c.
-  - intros. repeat econstructor.
-  - repeat econstructor.
-  - intros. 
-    inversion H. 
-    destruct H1. 
-    specialize (IHc1 v H1).
-    destruct IHc1.
-    specialize (IHc2 x H3).
-    destruct IHc2.
-    eexists.
+  induction H; intros.
+  - econstructor. econstructor.
+  - repeat econstructor.  
+  - destruct IHhas_no_whiles1 with v.
+    destruct IHhas_no_whiles2 with x.
+    econstructor. 
     eapply reconstruct_sequence_execution.
-    exact H4.
-    apply H5.
-  - intros. 
-    inversion H. 
-    destruct H1.
-    specialize (IHc1 v H1).
-    destruct IHc1.
-    specialize (IHc2 v H4).
-    destruct IHc2.
-    clear H0 H2 H3 c0 c3 H1 H4 e0.
-    econstructor.    
-    econstructor.    
-    econstructor.    
-    shelve.
-    apply H5.
-  -  *)
-
-
-
+    + apply H1.
+    + apply H2.
+  - destruct IHhas_no_whiles1 with v. 
+    destruct IHhas_no_whiles2 with v.
+    destruct (eval_arith e v)  eqn:Heval. 
+    + eexists. econstructor. apply StepIfFalse. lia. exact H2.
+    + eexists. econstructor. apply StepIfTrue. rewrite Heval. lia. exact H1.
+Qed. 
     
-
-
-
-
-(*
-    + econstructor. 
-      eapply reconstruct_sequence_execution. 
-      constructor. constructor.
-    + econstructor. eapply reconstruct_sequence_execution.
-      econstructor. econstructor. econstructor. econstructor. econstructor.
-    + econstructor. econstructor. econstructor.   
-    +
-
-*)
+   
+ 
 
     
 Admitted. (* Change to Qed when done *)
@@ -931,10 +888,6 @@ Proof.
     all: try rewrite H in H0; try discriminate.
     all: try rewrite H1 in H0; try discriminate.
 Qed.
-
-
-
-
 
 
 (* This is the end of this section. More starter code appears below. Search for
