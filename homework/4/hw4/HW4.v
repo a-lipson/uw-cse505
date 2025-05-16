@@ -852,13 +852,13 @@ Definition two_counter_body_invariant input v :=
   exists a b,
     lookup "x" v = Some a /\
     lookup "y" v = Some (S b) /\
-    a + (S b) = input.
+    a + S b = input.
 
 Definition two_counter_body_invariant_after_step input v :=
   exists a b,
-    lookup "x" v = Some (S a) /\
+    lookup "x" v = Some a /\
     lookup "y" v = Some (S b) /\
-    S a + S b = S input.
+    a + S b = S input.
 
 
 (* 
@@ -1175,8 +1175,11 @@ Lemma trc_back :
       R y z ->
       trc R x z.
 Proof.
-  (* On HW3 *)
-Admitted.
+  intros.
+  induction H.
+  - econstructor. exact H0. constructor. 
+  - econstructor. exact H. specialize (IHtrc H0). exact IHtrc.
+Qed.
 Local Hint Resolve trc_back : core.
 
 Lemma trcb_front :
@@ -1186,8 +1189,13 @@ Lemma trcb_front :
       R x y ->
       trc_backward R x z.
 Proof.
-  (* Very similar to previous lemma. *)
-Admitted.
+  intros.
+  induction H.
+  - econstructor. econstructor. exact H0.
+  - specialize (IHtrc_backward H0).
+    econstructor. exact IHtrc_backward.  
+    exact H1.
+Qed.
 
 Lemma trc_implies_trc_backward :
   forall A (R : A -> A -> Prop) x y,
