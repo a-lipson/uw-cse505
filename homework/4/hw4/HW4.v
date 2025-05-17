@@ -362,15 +362,13 @@ Notation "e '-->*' e'" := (trc step e e') (at level 75).
 Lemma deconstruct_panicked_execution :
   forall v v' c,
     (v, Panic) -->* (v', c) ->
-    v' = v /\
+    v' = v /\ 
     c = Panic.
 Proof.
   bash_execution.
 Qed.
 
-(*
-either the first cmd in a seq will panic, or it will skip.
-*)
+(* either the first cmd in a seq will panic, or it will skip. *)
 Lemma deconstruct_sequence_execution :
   forall v v' c1 c2 c',
     (v, c1;; c2) -->* (v', c') ->
@@ -424,9 +422,9 @@ the sequence of two commands which reach skip will also reach skip
 *)
 Lemma reconstruct_sequence_execution :
   forall v1 c1 v2 c2 v3,
-    trc step (v1, c1) (v2, Skip) ->
-    trc step (v2, c2) (v3, Skip) ->
-    trc step (v1, c1;; c2) (v3, Skip).
+    (v1, c1) -->* (v2, Skip) ->
+    (v2, c2) -->* (v3, Skip) ->
+    (v1, c1;; c2) -->* (v3, Skip).
 Proof.
   intros.
   apply trc_seq_l_trc with (c3 := c2) in H.
@@ -907,7 +905,11 @@ Proof.
   intros.
   apply invariant_implies with (P := two_counters_inv input).
   - apply two_counters_inv_invariant.
-  - intros. unfold two_counters_safe; unfold two_counters_inv in H. destruct s. intuition; eauto 20.
+  - intros.
+    unfold two_counters_safe;
+    unfold two_counters_inv in H.
+    destruct s.
+    intuition; eauto.
     all: try rewrite H in H0; try discriminate.
     all: try rewrite H1 in H0; try discriminate.
 Qed.
@@ -1397,8 +1399,10 @@ Proof.
   all: bash_assert_implies.
   destruct y.
   - lia.
-  - simpl.  replace (S (y + sum_upto y)) with (S y + sum_upto y) by lia.
-    replace (y - 0) with (y) by lia. lia.
+  - simpl. 
+    replace (S (y + sum_upto y)) with (S y + sum_upto y) by lia.
+    replace (y - 0) with (y) by lia. 
+    lia.
 Qed.
   
       
@@ -1413,25 +1417,26 @@ Qed.
  *            {True} doesnt_terminate {x <> 4}
  *    is true, and is in fact a _sound_ Hoare triple.
  *    Explain why this Hoare triple is sound, in your own words.
-     
-     Consider an arbitrary Hoare triple {P} c {Q}. The triple asserts that prior to the execution of c,
-    the program must be in a state satisfying the assertion P; it also asserts that after the execution of c,
-    the assertion Q must hold. We're essentially saying 'Starting from a state where P holds, if c terminates, then Q must hold.'
-
-    Because the starting state is {True}, every single state satisfies the precondition - even 
-    a state where x = 4. Therefore, that first part of the implication holds; any state asserts P.
-    However, because c never terminates, the implication is vacously true; we can put
-    anything in the final assertion, since the code never actually terminates.
-
-
+ *   
+ *  Consider an arbitrary Hoare triple {P} c {Q}. The triple asserts that prior to the execution of c,
+ *  the program must be in a state satisfying the assertion P; 
+ *  it also asserts that after the execution of c, the assertion Q must hold. 
+ *  We're essentially saying 'Starting from a state where P holds, if c terminates, then Q must hold.'
+ *
+ *  Because the starting state is {True}, every single state satisfies the precondition - even 
+ *  a state where x = 4. Therefore, that first part of the implication holds; any state asserts P.
+ *  However, because c never terminates, the implication is vacously true; we can put
+ *  anything in the final assertion, since the code never actually terminates.
+ *
+ *
  * 2. What implications does this have for Hoare logic, more generally?
  *    I.e., what is the relationship between termination of the programs
- *    a Hoare triple is true? (1 sentence is fine) (*sorry ours is 2*)
-
-      If a program never terminates, then any assertion can be put after the code -
-      even False - since the postcondition requires termination.Therefore, we cannot prove
-      nontermination in Rocq directly, since this would require a proof of False (can use exfalso though).
-
+ *    a Hoare triple is true? (1 sentence is fine)
+ *
+ *    If a program never terminates, then any assertion, even False, can be put after the code 
+ *    because the postcondition requires termination.
+ *    We get a handle on determining the termination of programs with asserts and panics.
+ *
  *)
 Definition doesnt_terminate :=
   "x" <- 5;;
@@ -1474,7 +1479,7 @@ lemmas to handle the new case. This is great practice for seeing how all the
 pieces fit together!
 
 The feature we will add is a nondeterministic branching operator, which we will
-call "Amb" for "ambiguous".  It's kind of like an if statement, except there is
+call "Amb" for "ambiguous". It's kind of like an if statement, except there is
 no branch condition. When the Amb statement is executed, it nondeterministically
 chooses whether to execute the "then" or the "else" branch.
 *)
@@ -1681,33 +1686,59 @@ Definition sound_triple (P : assertion) (c : cmd) (Q : assertion) : Prop :=
     (v, c) -->* (v', c') ->
     c' <> Panic /\ (c' = Skip -> Q v').
 
+(*
+   insert from week 6 to get a better understanding of what we're trying to do
+*)
+Lemma deconstruct_conditional_execution :
+  forall v v' e c1 c2 c',
+    (v, If e c1 c2) -->* (v', c') ->
+    (v' = v /\ c' = If e c1 c2) \/
+    (eval_arith e v <> 0 /\ (v, c1) -->* (v', c')) \/
+    (eval_arith e v = 0 /\ (v, c2) -->* (v', c')).
+Proof.
+  intros v v' e c1 c2 c' Hstep.
+  invert_one_trc; auto.
+  invert_one_step; auto.
+Qed.
+
+Lemma hoare_conditional_ok :
+  forall P Q e c1 c2,
+    sound_triple (fun v => P v /\ eval_arith e v <> 0) c1 Q ->
+    sound_triple (fun v => P v /\ eval_arith e v = 0) c2 Q ->
+    sound_triple P (If e c1 c2) Q.
+Proof.
+  intros P Q e c1 c2 IHc1 IHc2 v v' c' HP Hstep. 
+  apply deconstruct_conditional_execution in Hstep.
+  break_up_hyps_or. subst.
+  - split; congruence.
+  - eapply IHc1; eauto.
+  - eapply IHc2; eauto.
+Qed.
+(*
+   end insert from week 6
+*)
+
 
 (*
  * PROBLEM 14 [5 points, ~15 tactics]
  *
- * Prove the main theorem holds for this new language. You don't need to reprove
- * the old cases; just do the Amb case in the induction by filling out the
- * provided proof template below.
+ * Prove the main theorem holds for this new language. 
+ * You don't need to reprove the old cases; 
+ * just do the Amb case in the induction by filling out the provided proof template below.
  *
- * Hint: First, state and prove a deconstruction lemma for executions starting
- * from Amb. This lemma should not require induction. Then use your lemma to
- * complete the case of the soundness proof, also without using induction.
+ * Hint: First, state and prove a deconstruction lemma for executions starting from Amb. 
+ * This lemma should not require induction. 
+ * Then use your lemma to complete the case of the soundness proof, also without using induction.
  *)
-
 Lemma deconstruct_amb_execution: 
-  forall c1 c2 v v' c',
-    (v, Amb c1 c2) -->* (v', c') ->  
-    (v, c1) -->* (v', c') /\ (v, c2) -->* (v', c') /\ c' <> Panic.
+  forall v v' c1 c2 c',
+    (v, Amb c1 c2) -->* (v', c') -> 
+    c' <> Panic ->
+      (v, c1) -->* (v', c') \/ (* note the disjunction, only one of the paths was taken. *)
+      (v, c2) -->* (v', c').
 Proof.
-  intros. inversion H. destruct x.
-  - split.
-    + destruct H2.
-      destruct H3.
-      shelve.
-     
-  
-  
-
+  intros v v' c1 c2 c' Htrc Hnpanic.
+  invert_one_trc.
 Admitted.
 
 Theorem hoare_ok :
@@ -1726,11 +1757,11 @@ Proof.
   + admit.
   (* Add a bullet point and complete the new case of the proof corresponding to
      the Hoare rule you added. *)
-  + apply deconstruct_amb_execution in Hstep. destruct Hstep. destruct H2. split.
-    * exact H3.
-    * destruct (IHhoare_triple1 v v' c' Hv) as [Hsafe1 HQ1].
-      destruct (IHhoare_triple2 v v' c' Hv) as [Hsafe2 HQ2].
-      exact H2. exact H1. exact HQ1.        
+  + apply deconstruct_amb_execution in Hstep.
+    break_up_hyps_or.
+    - eapply IHhoare_triple1; eauto.
+    - eapply IHhoare_triple2; eauto.
+    - (* inversion Hstep; subst. *)
 Admitted. (* Leave this line alone, since we didn't re-do the whole proof. *)
 
 (* Here is a program using Amb to compute *a* factorial. *)
