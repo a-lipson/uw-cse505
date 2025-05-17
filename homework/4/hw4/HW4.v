@@ -1824,7 +1824,6 @@ Proof.
   - reflexivity.
 Qed.     
    
-    
 
 (*
 Here is an implementation of the "parallel counter" from the HW3 Challenge
@@ -1858,6 +1857,12 @@ Definition amb_counter :=
   done;;
   "output" <- "c".
 
+
+(* Definition two_counter_loop_invariant input v :=
+  exists a b,
+    lookup "x" v = Some a /\
+    lookup "y" v = Some b /\
+    a + b = input /\ b >= 0. *)
 (*
  * PROBLEM 16 [5 points, ~7 tactics]
  *
@@ -1868,6 +1873,8 @@ Definition amb_counter :=
  * shouldn't be too bad to come up with it even if you didn't do that problem,
  * since it is also pretty similar to the invariant for two_counters.
  *)
+
+ (* eval_arith "a" v + eval_arith "b" v  + eval_arith "c" v  = input *)
 Theorem amb_counter_triple :
   forall input,
     hoare_triple
@@ -1875,8 +1882,16 @@ Theorem amb_counter_triple :
       amb_counter
       (fun v => eval_arith "output" v = input).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  auto_triple.
+  (* fancy_ht_while (fun v =>  ((eval_arith "a" v > 0) \/ (eval_arith "b" v  > 0)) /\ ((eval_arith "a" v + eval_arith "b" v  + eval_arith "c" v = input)) /\
+                            ((eval_arith "a" v = 0) /\ ((eval_arith "b" v + eval_arith "c" v) = input)) \/
+                            ((eval_arith "b" v = 0) /\ ((eval_arith "a" v + eval_arith "c" v) = input))). *)
+  fancy_ht_while (fun v =>  (eval_arith "a" v + eval_arith "b" v  + eval_arith "c" v = input)).
+  all: bash_assert_implies; eauto 20.
+  - eapply ht_amb. auto_triple. all: bash_assert_implies. auto_triple. all: bash_assert_implies.
+ Qed.
+
 
 End NondeterministicImp.
 
@@ -1957,7 +1972,9 @@ Definition F := \"x", \"y", "y".
 Lemma T_T :
   T @ T @ F -->* T.
 Proof.
-  (* YOUR CODE HERE *)
+  econstructor.
+  - eapply step_app_left. eapply step_beta. constructor.
+  - 
 Admitted. (* Change to Qed when done *)
 
 Definition Omega :=
