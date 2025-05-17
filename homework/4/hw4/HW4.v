@@ -1738,7 +1738,7 @@ Lemma deconstruct_amb_execution:
       (v, c2) -->* (v', c').
 Proof.
   intros v v' c1 c2 c' Htrc Hnpanic.
-  invert_one_trc.
+  invert_one_trc.  
 Admitted.
 
 Theorem hoare_ok :
@@ -1808,7 +1808,13 @@ Theorem ambfact_is_nodeterministic_fact :
       exists n,
         eval_arith "output" v = fact n).
 Proof.
-  (* YOUR CODE HERE *)
+  auto_triple.
+  fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v)).
+  all: intros; bash_assert_implies.
+  - eapply ht_amb.
+    + eapply ht_consequence_left.
+      *
+      
 Admitted. (* Change to Qed when done *)
 
 
