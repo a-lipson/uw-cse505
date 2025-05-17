@@ -1733,13 +1733,17 @@ Qed.
 Lemma deconstruct_amb_execution: 
   forall v v' c1 c2 c',
     (v, Amb c1 c2) -->* (v', c') -> 
-    c' <> Panic ->
-      (v, c1) -->* (v', c') \/ (* note the disjunction, only one of the paths was taken. *)
-      (v, c2) -->* (v', c').
+      ((v, c1) -->* (v', c')) \/ (* note the disjunction, only one of the paths was taken. *)
+      ((v, c2) -->* (v', c')) \/ (* note the disjunction, only one of the paths was taken. *)
+      (v', c') = (v, Amb c1 c2).
 Proof.
-  intros v v' c1 c2 c' Htrc Hnpanic.
-  invert_one_trc.  
-Admitted.
+  intros.
+  invert_one_trc.
+  - right. right. reflexivity.
+  - invert_one_step.
+    + left. exact H1. 
+    + right. left. exact H1.
+Qed.
 
 Theorem hoare_ok :
   forall P c Q,
@@ -1761,7 +1765,11 @@ Proof.
     break_up_hyps_or.
     - eapply IHhoare_triple1; eauto.
     - eapply IHhoare_triple2; eauto.
-    - (* inversion Hstep; subst. *)
+    - split. 
+      auto. 
+      intros. 
+      subst. 
+      discriminate.
 Admitted. (* Leave this line alone, since we didn't re-do the whole proof. *)
 
 (* Here is a program using Amb to compute *a* factorial. *)
@@ -1810,10 +1818,8 @@ Theorem ambfact_is_nodeterministic_fact :
 Proof.
   auto_triple.
   fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v)).
-  all: intros; bash_assert_implies.
-  - eapply ht_amb.
-    + eapply ht_consequence_left.
-      *
+  - eapply ht_amb. auto_triple. bash_assert_implies.   
+   
       
 Admitted. (* Change to Qed when done *)
 
