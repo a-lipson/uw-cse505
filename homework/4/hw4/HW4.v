@@ -2029,9 +2029,32 @@ End UTLC.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(* 
+  1. 30-40 hrs 
+  2. [Daniel]: I think that going from the tedious operational semantics to 
+      hoare logic was super valuable, since I was able to gain a deeper understanding
+      of operational semantics before actually going into hoare logic. I think I got a LOT better 
+      at Rocq because of that -- and that made the Hoare section go a lot smoother.
 
+      [Alex]: TODO TODO TODO
 
+  3. [Daniel]: On the other hand, this homework was very tedious... I found myself
+                going in circles over and over trying to prove things that I thought I understood.
+                I would wake up and just do 505 until I went to bed; on Thursday, I spent ~9 hours
+                on the same two problems and wasn't able to prove either of them. I felt like I didn't actually
+                know Rocq or PL and I had figured out how to luck into the correct answerwith a high rate of success. 
+
+                I know this is the confusion/tedium section, but ultimately I want to underscore
+                that going through this gauntlet really increased my understanding of the course 
+                content and made me a lot better at Rocq. I think next time, I wouldn't really change anything!
+                I think the level of difficulty was perfect. 
+
+                One thing I do think needs to be explained or changed is that when you're using
+                auto_triple, you get an existential on the proposition ?R. I didn't realize that
+                this existential was an actual *thing*, and I spent about an hour on an 'impossible' proof
+                until I realized that since that ?R actually did something I could apply it and complete the proof.
+                I still don't fully understand what it is, so that is definitely something I wish we went over.
+*)
 (* --- End of Core Points --- *)
 
 (*
