@@ -1456,8 +1456,6 @@ Proof.
   all: bash_assert_implies.
 Qed.
   
-  
-
 
 (*
             ____                  _     _                     _  _
@@ -1592,9 +1590,11 @@ Inductive hoare_triple : assertion -> cmd -> assertion -> Prop :=
   forall I e c,
     hoare_triple (fun v => I v /\ eval_arith e v <> 0) c I ->
     hoare_triple I (While e c) (fun v => I v /\ eval_arith e v = 0)
-
-(* YOUR CODE HERE *)
-.
+| ht_amb: 
+  forall P Q c1 c2,
+    hoare_triple (fun v => P v) c1 Q ->
+    hoare_triple (fun v => P v) c2 Q ->
+    hoare_triple P (Amb c1 c2) Q.
 
 (* Copy-pasted automation. *)
 Lemma ht_sequence_reverse :
@@ -1693,6 +1693,23 @@ Definition sound_triple (P : assertion) (c : cmd) (Q : assertion) : Prop :=
  * from Amb. This lemma should not require induction. Then use your lemma to
  * complete the case of the soundness proof, also without using induction.
  *)
+
+Lemma deconstruct_amb_execution: 
+  forall c1 c2 v v' c',
+    (v, Amb c1 c2) -->* (v', c') ->  
+    (v, c1) -->* (v', c') /\ (v, c2) -->* (v', c') /\ c' <> Panic.
+Proof.
+  intros. inversion H. destruct x.
+  - split.
+    + destruct H2.
+      destruct H3.
+      shelve.
+     
+  
+  
+
+Admitted.
+
 Theorem hoare_ok :
   forall P c Q,
     hoare_triple P c Q ->
@@ -1709,7 +1726,11 @@ Proof.
   + admit.
   (* Add a bullet point and complete the new case of the proof corresponding to
      the Hoare rule you added. *)
-  (* YOUR CODE HERE *)
+  + apply deconstruct_amb_execution in Hstep. destruct Hstep. destruct H2. split.
+    * exact H3.
+    * destruct (IHhoare_triple1 v v' c' Hv) as [Hsafe1 HQ1].
+      destruct (IHhoare_triple2 v v' c' Hv) as [Hsafe2 HQ2].
+      exact H2. exact H1. exact HQ1.        
 Admitted. (* Leave this line alone, since we didn't re-do the whole proof. *)
 
 (* Here is a program using Amb to compute *a* factorial. *)
