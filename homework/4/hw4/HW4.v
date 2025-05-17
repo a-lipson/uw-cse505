@@ -1816,13 +1816,15 @@ Theorem ambfact_is_nodeterministic_fact :
       exists n,
         eval_arith "output" v = fact n).
 Proof.
-  auto_triple.
-  fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v)).
-  - eapply ht_amb. auto_triple. bash_assert_implies.   
+  auto_triple; bash_assert_implies.
+  fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v)); 
+  bash_assert_implies; eauto.
+  - eapply ht_amb; auto_triple; bash_assert_implies. all: exact H.   
+  - bash_assert_implies. replace (y1 + 1) with (S y1) by lia. simpl. lia.
+  - reflexivity.
+Qed.     
    
-      
-Admitted. (* Change to Qed when done *)
-
+    
 
 (*
 Here is an implementation of the "parallel counter" from the HW3 Challenge
