@@ -362,7 +362,7 @@ Notation "e '-->*' e'" := (trc step e e') (at level 75).
 Lemma deconstruct_panicked_execution :
   forall v v' c,
     (v, Panic) -->* (v', c) ->
-    v' = v /\ 
+    v' = v /\
     c = Panic.
 Proof.
   bash_execution.
@@ -463,11 +463,11 @@ Proof.
   - apply deconstruct_sequence_execution in H.
     break_up_hyps_or; subst.
     + discriminate. (* skip caanot step *)
-    + eapply reconstruct_sequence_execution; eauto. 
+    + eapply reconstruct_sequence_execution; eauto.
     (* auto handles application of hypothesis *)
       * eapply reconstruct_sequence_execution; eauto.
     + discriminate.
-  - discriminate. (* panic *) 
+  - discriminate. (* panic *)
 Qed.
 
 (*
@@ -499,7 +499,7 @@ Qed.
  *  -------------------------------------------- HNWAssign
  *            has_no_whiles (Assign x e)
  *
- *    
+ *
  *  -------------------------------------------- HNWSkip
  *              has_no_whiles (Skip)
  *)
@@ -520,11 +520,11 @@ Qed.
 Inductive has_no_whiles : cmd -> Prop :=
   | HNWSkip: has_no_whiles(Skip)
   | HNWAssign: forall x e, has_no_whiles (Assign x e)
-  | HNWSeq: forall c1 c2, 
+  | HNWSeq: forall c1 c2,
       has_no_whiles c1 ->
       has_no_whiles c2 ->
       has_no_whiles (c1;;c2)
-  | HNWIf: forall c1 c2 e, 
+  | HNWIf: forall c1 c2 e,
       has_no_whiles c1 ->
       has_no_whiles c2 ->
       has_no_whiles (If e c1 c2).
@@ -541,8 +541,8 @@ Inductive has_no_whiles : cmd -> Prop :=
 Example a_program_without_whiles :
   has_no_whiles (Skip ;; If "x" ("y" <- 3) ("z" <- 4)).
 Proof.
-  repeat constructor. 
-Qed. 
+  repeat constructor.
+Qed.
 
 (*
  * PROBLEM 7 [5 points, ~6 tactics]
@@ -592,8 +592,8 @@ Proof.
   intros.
   destruct n.
   - congruence.
-  - eexists. 
-    reflexivity. 
+  - eexists.
+    reflexivity.
 Qed.
 
 (*
@@ -626,25 +626,25 @@ Proof.
   revert v.
   induction H; intros.
   - econstructor. econstructor.
-  - repeat econstructor.  
+  - repeat econstructor.
   - destruct IHhas_no_whiles1 with v.
     destruct IHhas_no_whiles2 with x.
-    econstructor. 
+    econstructor.
     eapply reconstruct_sequence_execution.
     + apply H1.
     + apply H2.
-  - destruct IHhas_no_whiles1 with v. 
+  - destruct IHhas_no_whiles1 with v.
     destruct IHhas_no_whiles2 with v.
-    destruct (eval_arith e v) eqn:Heval. 
-    + eexists. econstructor. 
-      apply StepIfFalse. 
+    destruct (eval_arith e v) eqn:Heval.
+    + eexists. econstructor.
+      apply StepIfFalse.
       lia. exact H2.
-    + eexists. econstructor. 
-      apply StepIfTrue. 
+    + eexists. econstructor.
+      apply StepIfTrue.
       rewrite Heval. lia. exact H1.
-Qed. 
-    
- 
+Qed.
+
+
 (*
              ____                  _     _                     ____
             / ___|    ___    ___  | |_  (_)   ___    _ __     |___ \
@@ -666,8 +666,8 @@ Definition two_counters :=
     "y" <- "y" - 1
   done.
 
-Definition two_counters_loop_body := 
-  "x" <- "x" + 1;; 
+Definition two_counters_loop_body :=
+  "x" <- "x" + 1;;
   "y" <- "y" - 1.
 
 (* Convert the above program to a transition system automatically using the
@@ -1112,7 +1112,7 @@ Lemma trc_back :
 Proof.
   intros.
   induction H.
-  - econstructor. exact H0. constructor. 
+  - econstructor. exact H0. constructor.
   - econstructor. exact H. specialize (IHtrc H0). exact IHtrc.
 Qed.
 Local Hint Resolve trc_back : core.
@@ -1128,7 +1128,7 @@ Proof.
   induction H.
   - econstructor. econstructor. exact H0.
   - specialize (IHtrc_backward H0).
-    econstructor. exact IHtrc_backward.  
+    econstructor. exact IHtrc_backward.
     exact H1.
 Qed.
 
@@ -1394,18 +1394,18 @@ Theorem sum_triple :
 Proof.
   intros.
   auto_triple.
-  fancy_ht_while (fun v => 
-    sum_upto input = eval_arith "output" v + sum_upto (eval_arith "input" v)). 
+  fancy_ht_while (fun v =>
+    sum_upto input = eval_arith "output" v + sum_upto (eval_arith "input" v)).
   all: bash_assert_implies.
   destruct y.
   - lia.
-  - simpl. 
+  - simpl.
     replace (S (y + sum_upto y)) with (S y + sum_upto y) by lia.
-    replace (y - 0) with (y) by lia. 
+    replace (y - 0) with (y) by lia.
     lia.
 Qed.
-  
-      
+
+
 (*
  * PROBLEM 11 [5 points, ~3 sentences]
  *
@@ -1417,13 +1417,13 @@ Qed.
  *            {True} doesnt_terminate {x <> 4}
  *    is true, and is in fact a _sound_ Hoare triple.
  *    Explain why this Hoare triple is sound, in your own words.
- *   
+ *
  *  Consider an arbitrary Hoare triple {P} c {Q}. The triple asserts that prior to the execution of c,
- *  the program must be in a state satisfying the assertion P; 
- *  it also asserts that after the execution of c, the assertion Q must hold. 
+ *  the program must be in a state satisfying the assertion P;
+ *  it also asserts that after the execution of c, the assertion Q must hold.
  *  We're essentially saying 'Starting from a state where P holds, if c terminates, then Q must hold.'
  *
- *  Because the starting state is {True}, every single state satisfies the precondition - even 
+ *  Because the starting state is {True}, every single state satisfies the precondition - even
  *  a state where x = 4. Therefore, that first part of the implication holds; any state asserts P.
  *  However, because c never terminates, the implication is vacously true; we can put
  *  anything in the final assertion, since the code never actually terminates.
@@ -1433,7 +1433,7 @@ Qed.
  *    I.e., what is the relationship between termination of the programs
  *    a Hoare triple is true? (1 sentence is fine)
  *
- *    If a program never terminates, then any assertion, even False, can be put after the code 
+ *    If a program never terminates, then any assertion, even False, can be put after the code
  *    because the postcondition requires termination.
  *    We get a handle on determining the termination of programs with asserts and panics.
  *
@@ -1460,7 +1460,7 @@ Proof.
   fancy_ht_while (fun v => eval_arith ("x" - 4) v <> 0).
   all: bash_assert_implies.
 Qed.
-  
+
 
 (*
             ____                  _     _                     _  _
@@ -1595,7 +1595,7 @@ Inductive hoare_triple : assertion -> cmd -> assertion -> Prop :=
   forall I e c,
     hoare_triple (fun v => I v /\ eval_arith e v <> 0) c I ->
     hoare_triple I (While e c) (fun v => I v /\ eval_arith e v = 0)
-| ht_amb: 
+| ht_amb:
   forall P Q c1 c2,
     hoare_triple (fun v => P v) c1 Q ->
     hoare_triple (fun v => P v) c2 Q ->
@@ -1707,7 +1707,7 @@ Lemma hoare_conditional_ok :
     sound_triple (fun v => P v /\ eval_arith e v = 0) c2 Q ->
     sound_triple P (If e c1 c2) Q.
 Proof.
-  intros P Q e c1 c2 IHc1 IHc2 v v' c' HP Hstep. 
+  intros P Q e c1 c2 IHc1 IHc2 v v' c' HP Hstep.
   apply deconstruct_conditional_execution in Hstep.
   break_up_hyps_or. subst.
   - split; congruence.
@@ -1722,27 +1722,25 @@ Qed.
 (*
  * PROBLEM 14 [5 points, ~15 tactics]
  *
- * Prove the main theorem holds for this new language. 
- * You don't need to reprove the old cases; 
+ * Prove the main theorem holds for this new language.
+ * You don't need to reprove the old cases;
  * just do the Amb case in the induction by filling out the provided proof template below.
  *
- * Hint: First, state and prove a deconstruction lemma for executions starting from Amb. 
- * This lemma should not require induction. 
+ * Hint: First, state and prove a deconstruction lemma for executions starting from Amb.
+ * This lemma should not require induction.
  * Then use your lemma to complete the case of the soundness proof, also without using induction.
  *)
-Lemma deconstruct_amb_execution: 
+Lemma deconstruct_amb_execution:
   forall v v' c1 c2 c',
-    (v, Amb c1 c2) -->* (v', c') -> 
-      ((v, c1) -->* (v', c')) \/ (* note the disjunction, only one of the paths was taken. *)
-      ((v, c2) -->* (v', c')) \/ (* note the disjunction, only one of the paths was taken. *)
-      (v', c') = (v, Amb c1 c2).
+    (v, Amb c1 c2) -->* (v', c') ->
+      (v, c1) -->* (v', c') \/
+      (v, c2) -->* (v', c') \/
+      (v', c') = (v, Amb c1 c2). (* reflexive case *)
+      (* note the disjunction, only one of the paths was taken. *)
 Proof.
   intros.
-  invert_one_trc.
-  - right. right. reflexivity.
-  - invert_one_step.
-    + left. exact H1. 
-    + right. left. exact H1.
+  invert_one_trc; auto.
+  invert_one_step; auto.
 Qed.
 
 Theorem hoare_ok :
@@ -1765,10 +1763,10 @@ Proof.
     break_up_hyps_or.
     - eapply IHhoare_triple1; eauto.
     - eapply IHhoare_triple2; eauto.
-    - split. 
-      auto. 
-      intros. 
-      subst. 
+    - split.
+      auto.
+      intros.
+      subst.
       discriminate.
 Admitted. (* Leave this line alone, since we didn't re-do the whole proof. *)
 
@@ -1817,13 +1815,16 @@ Theorem ambfact_is_nodeterministic_fact :
         eval_arith "output" v = fact n).
 Proof.
   auto_triple; bash_assert_implies.
-  fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v)); 
+  fancy_ht_while (fun v => eval_arith "acc" v = fact (eval_arith "n" v));
   bash_assert_implies; eauto.
-  - eapply ht_amb; auto_triple; bash_assert_implies. all: exact H.   
-  - bash_assert_implies. replace (y1 + 1) with (S y1) by lia. simpl. lia.
+  - eapply ht_amb; auto_triple; bash_assert_implies.
+    all: exact H.
+  - bash_assert_implies.
+    replace (y1 + 1) with (S y1) by lia.
+    simpl. lia.
   - reflexivity.
-Qed.     
-   
+Qed.
+
 
 (*
 Here is an implementation of the "parallel counter" from the HW3 Challenge
@@ -1858,11 +1859,6 @@ Definition amb_counter :=
   "output" <- "c".
 
 
-(* Definition two_counter_loop_invariant input v :=
-  exists a b,
-    lookup "x" v = Some a /\
-    lookup "y" v = Some b /\
-    a + b = input /\ b >= 0. *)
 (*
  * PROBLEM 16 [5 points, ~7 tactics]
  *
@@ -1884,12 +1880,14 @@ Theorem amb_counter_triple :
 Proof.
   intros.
   auto_triple.
-  (* fancy_ht_while (fun v =>  ((eval_arith "a" v > 0) \/ (eval_arith "b" v  > 0)) /\ ((eval_arith "a" v + eval_arith "b" v  + eval_arith "c" v = input)) /\
-                            ((eval_arith "a" v = 0) /\ ((eval_arith "b" v + eval_arith "c" v) = input)) \/
-                            ((eval_arith "b" v = 0) /\ ((eval_arith "a" v + eval_arith "c" v) = input))). *)
+  (* since we are just passing successor between three numbers, the their sum should remain constant *)
   fancy_ht_while (fun v =>  (eval_arith "a" v + eval_arith "b" v  + eval_arith "c" v = input)).
   all: bash_assert_implies; eauto 20.
-  - eapply ht_amb. auto_triple. all: bash_assert_implies. auto_triple. all: bash_assert_implies.
+  - eapply ht_amb.
+    auto_triple.
+    all: bash_assert_implies.
+    auto_triple.
+    all: bash_assert_implies.
  Qed.
 
 
@@ -1908,9 +1906,9 @@ End NondeterministicImp.
 
 Module UTLC.
 Inductive expr : Type :=
-| Var : var -> expr
-| Abs : var -> expr -> expr
-| App : expr -> expr -> expr.
+| Var : var -> expr (* variable *)
+| Abs : var -> expr -> expr (* abstraction *)
+| App : expr -> expr -> expr. (* application *)
 
 Declare Scope utlc_scope.
 Coercion Var : var >-> expr.
@@ -1932,15 +1930,19 @@ Inductive value : expr -> Prop :=
     value (\x, e).
 Local Hint Constructors value : core.
 
+(* computation rules *)
 Inductive step : expr -> expr -> Prop :=
+(* beta reduction, i.e. function application *)
 | step_beta :
   forall x e v,
     value v ->
     step (App (\x, e) v) (subst x v e)
+(* reduce operator *)
 | step_app_left :
   forall e1 e1' e2,
     step e1 e1' ->
     step (App e1 e2) (App e1' e2)
+(* reduce operand *)
 | step_app_right :
   forall v1 e2 e2',
     step e2 e2' ->
@@ -1973,13 +1975,20 @@ Lemma T_T :
   T @ T @ F -->* T.
 Proof.
   econstructor.
-  - eapply step_app_left. eapply step_beta. constructor.
-  - unfold subst. simpl. econstructor. eapply step_beta. constructor. constructor.  
+  - eapply step_app_left.
+    eapply step_beta.
+    constructor.
+  - unfold subst.
+    simpl.
+    econstructor.
+    eapply step_beta.
+    constructor.
+    constructor.
 Qed.
 
+(* Y combinator*)
 Definition Omega :=
-  (\"x", "x" @ "x") @
-  (\"x", "x" @ "x").
+  (\"x", "x" @ "x") @ (\"x", "x" @ "x").
 
 Definition diverges e :=
   forall e',
@@ -2003,10 +2012,28 @@ Definition diverges e :=
 Theorem omega_diverges :
   diverges Omega.
 Proof.
+  (* Omega can produce another instance of itself after one step. *)
   unfold diverges.
   intros.
-  shelve.
-Admitted. (* Change to Qed when done *)
+  (* keep track of original `e` term *)
+  remember Omega as omega eqn:Heq.
+  induction H; subst.
+  - (* base case, refl: e -->* e' *)
+    exists Omega.
+    apply step_beta.
+    constructor.
+  - (* step case, front: e --> e' -->* e'' *)
+    assert (y = Omega).
+    {
+      inversion H.
+      - constructor.
+      (* abstractions do not step in call-by-value. *)
+      - inversion H4.
+      - inversion H3.
+    }
+    apply IHtrc in H1.
+    exact H1.
+Qed.
 
 End UTLC.
 
@@ -2030,11 +2057,11 @@ End UTLC.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* 
-  1. 30-40 hrs 
-  2. [Daniel]: I think that going from the tedious operational semantics to 
+(*
+  1. 30-40 hrs
+  2. [Daniel]: I think that going from the tedious operational semantics to
       hoare logic was super valuable, since I was able to gain a deeper understanding
-      of operational semantics before actually going into hoare logic. I think I got a LOT better 
+      of operational semantics before actually going into hoare logic. I think I got a LOT better
       at Rocq because of that -- and that made the Hoare section go a lot smoother.
 
       [Alex]: TODO TODO TODO
@@ -2043,12 +2070,12 @@ End UTLC.
                 going in circles over and over trying to prove things that I thought I understood.
                 I would wake up and just do 505 until I went to bed; on Thursday, I spent ~9 hours
                 on the same two problems and wasn't able to prove either of them. I felt like I didn't actually
-                know Rocq or PL and I had figured out how to luck into the correct answerwith a high rate of success. 
+                know Rocq or PL and I had figured out how to luck into the correct answerwith a high rate of success.
 
                 I know this is the confusion/tedium section, but ultimately I want to underscore
-                that going through this gauntlet really increased my understanding of the course 
+                that going through this gauntlet really increased my understanding of the course
                 content and made me a lot better at Rocq. I think next time, I wouldn't really change anything!
-                I think the level of difficulty was perfect. 
+                I think the level of difficulty was perfect.
 
                 One thing I do think needs to be explained or changed is that when you're using
                 auto_triple, you get an existential on the proposition ?R. I didn't realize that
@@ -2104,7 +2131,7 @@ Proof.
     destruct (Nat.eq_dec (eval_arith e1 v) 0),
              (Nat.eq_dec (eval_arith e2 v) 0).
     all: auto. exfalso. apply H. simpl. rewrite e, e0. lia.
-  - intros. destruct H. 
+  - intros. destruct H.
     + simpl. intuition. apply H. rewrite <- H0. lia.
     + simpl. intuition. apply H. rewrite <- H0. lia.
 Qed.
@@ -2158,7 +2185,7 @@ Proof.
     + reflexivity.
     + intuition.
   - intros. unfold imp_not. simpl. rewrite H. simpl. lia.
-Qed. 
+Qed.
 
 (*
 Consider this inductive definition of what it means for one expression to be a
