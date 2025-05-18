@@ -2122,8 +2122,18 @@ Qed.
  * Hint: Remember that subtraction returns 0 whenever the "real" answer would be
  * negative.
  *)
+
+
+ (*
+ Inductive arith : Set :=
+| Const (n : nat)
+| Var (x : var)
+| Plus (e1 e2 : arith)
+| Minus (e1 e2 : arith)
+| Times (e1 e2 : arith).
+ *)
 Definition imp_not (e : arith) : arith :=
-  0. (* REPLACE WITH YOUR CODE *)
+  1 - (Times e e).
 
 (*
  * PROBLEM 22 [3 points, ~5 tactics]
@@ -2139,8 +2149,16 @@ Lemma imp_not_is_not :
     eval_arith (imp_not e) v <> 0 <->
     eval_arith e v = 0.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  split.
+  - intros.
+    simpl in H.
+    remember (eval_arith e v) as n.
+    destruct n.
+    + reflexivity.
+    + intuition.
+  - intros. unfold imp_not. simpl. rewrite H. simpl. lia.
+Qed. 
 
 (*
 Consider this inductive definition of what it means for one expression to be a
