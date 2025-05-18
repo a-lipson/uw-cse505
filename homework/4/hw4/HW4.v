@@ -2338,24 +2338,14 @@ Proof.
     - apply subexpr_depth_leq; assumption.
     - apply subexpr_depth_leq; assumption.
   }
-  induction H12.
-  - (* subexpr_refl *)
+  destruct H12.
+  - (* refl *)
     reflexivity.
-  - (* subexpr_inl_plus *)
-    (* need better hypothesis names *)
-    inversion H21; subst.
-    + reflexivity.
-    + apply subexpr_depth_leq in H12, H21, H.
-      rewrite DepthEq in H12.
-      admit.
-    + admit.
-    + admit.
-    + admit.
-    + admit.
-    + admit.
-  - admit. (* subexpr_inl_minus *)
-  - admit. (* subexpr_inl_times *)
-  - admit. (* subexpr_inr_plus *)
-  - admit. (* subexpr_inr_minus *)
-  - admit. (* subexpr_inr_times *)
+  - (* inl_plus *)
+    admit.
+  - admit. (* inl_minus *)
+  - admit. (* inl_times *)
+  - admit. (* inr_plus *)
+  - admit. (* inr_minus *)
+  - admit. (* inr_times *)
 Admitted. (* Change to Qed when done *)
