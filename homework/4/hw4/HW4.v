@@ -1974,8 +1974,8 @@ Lemma T_T :
 Proof.
   econstructor.
   - eapply step_app_left. eapply step_beta. constructor.
-  - 
-Admitted. (* Change to Qed when done *)
+  - unfold subst. simpl. econstructor. eapply step_beta. constructor. constructor.  
+Qed.
 
 Definition Omega :=
   (\"x", "x" @ "x") @
