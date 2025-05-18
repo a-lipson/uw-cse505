@@ -2004,7 +2004,8 @@ Theorem omega_diverges :
   diverges Omega.
 Proof.
   unfold diverges.
-  (* YOUR CODE HERE *)
+  intros.
+  shelve.
 Admitted. (* Change to Qed when done *)
 
 End UTLC.
@@ -2097,8 +2098,17 @@ Lemma imp_plus_is_or :
     eval_arith (e1 + e2)%arith v <> 0 <->
     eval_arith e1 v <> 0 \/ eval_arith e2 v <> 0.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros e1 e2 v.
+  split.
+  - intros.
+    destruct (Nat.eq_dec (eval_arith e1 v) 0),
+             (Nat.eq_dec (eval_arith e2 v) 0).
+    all: auto. exfalso. apply H. simpl. rewrite e, e0. lia.
+  - intros. destruct H. 
+    + simpl. intuition. apply H. rewrite <- H0. lia.
+    + simpl. intuition. apply H. rewrite <- H0. lia.
+Qed.
+
 
 (*
  * PROBLEM 21 [5 points, ~2 LOC]
