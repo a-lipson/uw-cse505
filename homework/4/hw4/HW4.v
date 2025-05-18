@@ -2018,11 +2018,11 @@ Proof.
   (* keep track of original `e` term *)
   remember Omega as omega eqn:Heq.
   induction H; subst.
-  - (* base case, refl: e -->* e' *)
+  - (* base case, refl: Ω -->* Ω *)
     exists Omega.
     apply step_beta.
     constructor.
-  - (* step case, front: e --> e' -->* e'' *)
+  - (* step case, front: Ω --> Ω -->* Ω *)
     assert (y = Omega).
     {
       inversion H.
@@ -2036,12 +2036,6 @@ Proof.
 Qed.
 
 End UTLC.
-
-
-
-
-
-
 
 (* Feedback question *)
 (*
@@ -2058,31 +2052,60 @@ End UTLC.
  *)
 
 (*
-  1. 30-40 hrs
-  2. [Daniel]: I think that going from the tedious operational semantics to
-      hoare logic was super valuable, since I was able to gain a deeper understanding
-      of operational semantics before actually going into hoare logic. I think I got a LOT better
-      at Rocq because of that -- and that made the Hoare section go a lot smoother.
+  1. 20-30 hrs
 
-      [Alex]: TODO TODO TODO
+  2. [Daniel]: I think that going from the tedious operational semantics to
+     hoare logic was super valuable, since I was able to gain a deeper understanding
+     of operational semantics before actually going into hoare logic. I think I got a LOT better
+     at Rocq because of that -- and that made the Hoare section go a lot smoother.
+
+     [alex]: i also continued to practice the 'art' of implementing proofs in Rocq.
+     Working with Hoare logic proofs certainly helped to get a better understanding of
+     the Hoare logic. Additionally, i think one helpful strategy which we employed was to
+     try to reason in plain english in comments throughout the proof when the collection
+     of tactics in the proof did not obviously denote what we were doing.
+     Generally, as mentioned in the last homework reflection, one can only learn to swim
+     by getting in the water; so 'tis good that we are (admittedly almost drowning, or at
+     least it felt that way before 'it clicked') in the turbulent and trepidatious Rocq-y waters.
 
   3. [Daniel]: On the other hand, this homework was very tedious... I found myself
-                going in circles over and over trying to prove things that I thought I understood.
-                I would wake up and just do 505 until I went to bed; on Thursday, I spent ~9 hours
-                on the same two problems and wasn't able to prove either of them. I felt like I didn't actually
-                know Rocq or PL and I had figured out how to luck into the correct answerwith a high rate of success.
+     going in circles over and over trying to prove things that I thought I understood.
+     I would wake up and just do 505 until I went to bed; on Thursday, I spent ~9 hours
+     on the same two problems and wasn't able to prove either of them. I felt like I didn't actually
+     know Rocq or PL and I had figured out how to luck into the correct answerwith a high rate of success.
 
-                I know this is the confusion/tedium section, but ultimately I want to underscore
-                that going through this gauntlet really increased my understanding of the course
-                content and made me a lot better at Rocq. I think next time, I wouldn't really change anything!
-                I think the level of difficulty was perfect.
+     I know this is the confusion/tedium section, but ultimately I want to underscore
+     that going through this gauntlet really increased my understanding of the course
+     content and made me a lot better at Rocq. I think next time, I wouldn't really change anything!
+     I think the level of difficulty was perfect.
 
-                One thing I do think needs to be explained or changed is that when you're using
-                auto_triple, you get an existential on the proposition ?R. I didn't realize that
-                this existential was an actual *thing*, and I spent about an hour on an 'impossible' proof
-                until I realized that since that ?R actually did something I could apply it and complete the proof.
-                I still don't fully understand what it is, so that is definitely something I wish we went over.
+     One thing I do think needs to be explained or changed is that when you're using
+     auto_triple, you get an existential on the proposition ?R. I didn't realize that
+     this existential was an actual *thing*, and I spent about an hour on an 'impossible' proof
+     until I realized that since that ?R actually did something I could apply it and complete the proof.
+     I still don't fully understand what it is, so that is definitely something I wish we went over.
+
+     [alex]: Similar to Daniel, i found that a major source of frustration was that i knew what was needed to complete the proof,
+     even to the extent of writing down a proof tree, yet this was insufficient to develop a proof in Rocq.
+     In particular, with regards to the Y combinator challenge proof, we needed to ensure that Rocq 'knew'
+     or at least kept track of the seemingly obvious fact that we are starting from Omega in the first place!
+     Further, we must choose a particular of the plethora of syntax that is available to us to codify the proof;
+     again, in the Y combinator example, the assertion combined with curly-braces, versus the subgoals.
+     Anyways, this was helpful in the sense that it made me qualify the niceness of being able to type proofs with
+     the irksome lack of intuitiveness with which the Rocq tactics and proofs are undoubtably entangled--
+     at least when it comes to writing proofs in the homework, somehow it always makes suffcient sense in class.
+     Overall, most of the frustration and confusion stems from the Rocq language itself,
+     including the fact that my coq lsp server seems to have zero garbage collection,
+     exceeding 10 GB in memory usage--of course, i just restarted to amend this.
+
+     i think that what i would like to get out of 505 is an understanding of the theoretical content rather than
+     a working understanding of Rocq, the latter would be beneficial, sure, but, from my above comments, seems
+     more like a barrier or roadblock to understanding the concepts rather than a tool to augment their digestibility.
+     Perhaps this stems from my self-identification as a mathematician before being a programmer, and i much prefer the
+     hand-written proof style. Of course, i do admit that i would not wish to attempt to prove many of these problems by hand,
+     and that we do gain a lot from an automated proof assistant. However, Rocq and i are still at arms with one another!
 *)
+
 (* --- End of Core Points --- *)
 
 (*
@@ -2128,12 +2151,14 @@ Proof.
   intros e1 e2 v.
   split.
   - intros.
-    destruct (Nat.eq_dec (eval_arith e1 v) 0),
+    destruct (Nat.eq_dec (eval_arith e1 v) 0), (* decidable equality (LEM) *)
              (Nat.eq_dec (eval_arith e2 v) 0).
-    all: auto. exfalso. apply H. simpl. rewrite e, e0. lia.
-  - intros. destruct H.
-    + simpl. intuition. apply H. rewrite <- H0. lia.
-    + simpl. intuition. apply H. rewrite <- H0. lia.
+    all: auto. exfalso.
+    apply H. simpl. rewrite e, e0. lia.
+  - intros.
+    destruct H.
+    all: simpl; intuition.
+    all: apply H; rewrite <- H0; lia.
 Qed.
 
 
@@ -2160,7 +2185,7 @@ Qed.
 | Times (e1 e2 : arith).
  *)
 Definition imp_not (e : arith) : arith :=
-  1 - (Times e e).
+  1 - (Times e e). (* note that we can use any binop on the expr here. *)
 
 (*
  * PROBLEM 22 [3 points, ~5 tactics]
@@ -2176,15 +2201,16 @@ Lemma imp_not_is_not :
     eval_arith (imp_not e) v <> 0 <->
     eval_arith e v = 0.
 Proof.
-  intros.
-  split.
-  - intros.
-    simpl in H.
+  intros. split; intros.
+  - simpl in H.
     remember (eval_arith e v) as n.
     destruct n.
     + reflexivity.
     + intuition.
-  - intros. unfold imp_not. simpl. rewrite H. simpl. lia.
+  - unfold imp_not.
+    simpl.
+    rewrite H.
+    simpl. lia.
 Qed.
 
 (*
@@ -2247,8 +2273,9 @@ Theorem subexpr_transitive:
     subexpr e2 e3 ->
     subexpr e1 e3.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros e1 e2 e3 H12 H23.
+  induction H23; eauto.
+Qed.
 
 (* We define a function that computes the depth of an AST. *)
 Fixpoint ast_depth (e : arith) : nat :=
@@ -2284,8 +2311,9 @@ Theorem subexpr_depth_leq:
     subexpr e1 e2 ->
     ast_depth e1 <= ast_depth e2.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  induction H; simpl; lia.
+Qed.
 
 (*
  * PROBLEM 25 [5 points, ~20 tactics]
@@ -2302,5 +2330,32 @@ Theorem subexpr_anti_symmetry :
   subexpr e2 e1 ->
   e1 = e2.
 Proof.
-  (* YOUR CODE HERE *)
+  intros e1 e2 H12 H21.
+  assert (ast_depth e1 = ast_depth e2) as DepthEq.
+  {
+    (* https://rocq-prover.org/doc/V8.20.0/stdlib/Coq.Numbers.NatInt.NZOrder.html#NZOrderProp.le_antisymm *)
+    apply Nat.le_antisymm.
+    - apply subexpr_depth_leq; assumption.
+    - apply subexpr_depth_leq; assumption.
+  }
+  induction H12.
+  - (* subexpr_refl *)
+    reflexivity.
+  - (* subexpr_inl_plus *)
+    (* need better hypothesis names *)
+    inversion H21; subst.
+    + reflexivity.
+    + apply subexpr_depth_leq in H12, H21, H.
+      rewrite DepthEq in H12.
+      admit.
+    + admit.
+    + admit.
+    + admit.
+    + admit.
+    + admit.
+  - admit. (* subexpr_inl_minus *)
+  - admit. (* subexpr_inl_times *)
+  - admit. (* subexpr_inr_plus *)
+  - admit. (* subexpr_inr_minus *)
+  - admit. (* subexpr_inr_times *)
 Admitted. (* Change to Qed when done *)
