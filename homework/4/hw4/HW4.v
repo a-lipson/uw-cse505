@@ -2330,19 +2330,13 @@ Qed.
  * Hint: This one is surprisingly tricky. As far as the staff knows, the only
  * way to prove it is to use the notion of ast_depth somewhere...
  *)
-Ltac apply_depth_eq Hsubexpr Hdepth :=
-  apply subexpr_depth_leq in Hsubexpr;
-  rewrite Hdepth in Hsubexpr.
-
 Ltac contradiction_depth :=
   match goal with
-  | [ H: ast_depth ?e1 <= ast_depth ?e2 |- _ ] =>
+  | [ _: ast_depth ?e1 <= ast_depth ?e2 |- _ ] =>
       assert (ast_depth e2 < ast_depth e1) by (simpl; lia); lia
   end.
 
-(*
-see: https://rocq-prover.org/doc/V8.20.0/stdlib/Coq.Numbers.NatInt.NZOrder.html#NZOrderProp.le_antisymm
-*)
+(* see: https://rocq-prover.org/doc/V8.20.0/stdlib/Coq.Numbers.NatInt.NZOrder.html#NZOrderProp.le_antisymm *)
 
 Theorem subexpr_anti_symmetry :
   forall e1 e2,
@@ -2352,34 +2346,8 @@ Theorem subexpr_anti_symmetry :
 Proof.
   intros e1 e2 H12 H21.
   assert (ast_depth e1 = ast_depth e2) as DepthEq.
-  {
-    apply Nat.le_antisymm.
-    - apply subexpr_depth_leq; assumption.
-    - apply subexpr_depth_leq; assumption.
-  }
-  destruct H12.
-  - (* refl *)
-    reflexivity.
-  - (* inl_plus *)
-    apply_depth_eq H12 DepthEq.
-    contradiction_depth.
-  - (* inl_minus *)
-    apply_depth_eq H12 DepthEq.
-    contradiction_depth.
-  - (* inl_times *)
-    apply_depth_eq H12 DepthEq.
-    assert (ast_depth e1 < ast_depth (e1 * e2)) by (simpl; lia).
-    lia.
-  - (* inr_plus *)
-    apply_depth_eq H12 DepthEq.
-    assert (ast_depth e2 < ast_depth (e1 + e2)) by (simpl; lia).
-    lia.
-  - (* inr_minus *)
-    apply_depth_eq H12 DepthEq.
-    assert (ast_depth e2 < ast_depth (e1 - e2)) by (simpl; lia).
-    lia.
-  - (* inr_times *)
-    apply_depth_eq H12 DepthEq.
-    assert (ast_depth e2 < ast_depth (e1 * e2)) by (simpl; lia).
-    lia.
+  apply Nat.le_antisymm; apply subexpr_depth_leq; assumption.
+  destruct H12. reflexivity.
+  all: apply subexpr_depth_leq in H12; rewrite DepthEq in H12;
+  contradiction_depth.
 Qed.
