@@ -898,7 +898,7 @@ invariant_induction_boilerplate.
 Qed.
 
 
-Theorem two_counters_safe_inv :
+Theorem two_counters_correct :
   forall input,
     is_invariant (two_counters_sys input) (two_counters_safe input).
 Proof.
