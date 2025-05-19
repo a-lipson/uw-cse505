@@ -2067,6 +2067,7 @@ End UTLC.
      Generally, as mentioned in the last homework reflection, one can only learn to swim
      by getting in the water; so 'tis good that we are (admittedly almost drowning, or at
      least it felt that way before 'it clicked') in the turbulent and trepidatious Rocq-y waters.
+     The only respite i receive is when we get to write polymorphic Ltacs, taking DRY to the extreme.
 
   3. [Daniel]: On the other hand, this homework was very tedious... I found myself
      going in circles over and over trying to prove things that I thought I understood.
@@ -2095,8 +2096,10 @@ End UTLC.
      the irksome lack of intuitiveness with which the Rocq tactics and proofs are undoubtably entangled--
      at least when it comes to writing proofs in the homework, somehow it always makes suffcient sense in class.
      Overall, most of the frustration and confusion stems from the Rocq language itself,
-     including the fact that my coq lsp server seems to have zero garbage collection,
-     exceeding 10 GB in memory usage--of course, i just restarted to amend this.
+     including the fact that everything is interpreted sequntially, so we can't work on proofs and Ltacs out of
+     order without admits--or comments? idk what else for malformed Ltacs.
+     Also, my coq lsp server seems to have zero garbage collection, exceeding 10 GB in memory usage.
+     Of course, i just restarted to amend this.
 
      i think that what i would like to get out of 505 is an understanding of the theoretical content rather than
      a working understanding of Rocq, the latter would be beneficial, sure, but, from my above comments, seems
@@ -2104,6 +2107,8 @@ End UTLC.
      Perhaps this stems from my self-identification as a mathematician before being a programmer, and i much prefer the
      hand-written proof style. Of course, i do admit that i would not wish to attempt to prove many of these problems by hand,
      and that we do gain a lot from an automated proof assistant. However, Rocq and i are still at arms with one another!
+
+     Also, the file is so large that pressing G in vim doesn't take me to the end of the file right away!
 *)
 
 (* --- End of Core Points --- *)
@@ -2153,8 +2158,8 @@ Proof.
   - intros.
     destruct (Nat.eq_dec (eval_arith e1 v) 0), (* decidable equality (LEM) *)
              (Nat.eq_dec (eval_arith e2 v) 0).
-    all: auto. exfalso.
-    apply H. simpl. rewrite e, e0. lia.
+    all: auto.
+    exfalso. apply H. simpl. rewrite e, e0. lia.
   - intros.
     destruct H.
     all: simpl; intuition.
@@ -2315,6 +2320,7 @@ Proof.
   induction H; simpl; lia.
 Qed.
 
+
 (*
  * PROBLEM 25 [5 points, ~20 tactics]
  *
@@ -2324,6 +2330,20 @@ Qed.
  * Hint: This one is surprisingly tricky. As far as the staff knows, the only
  * way to prove it is to use the notion of ast_depth somewhere...
  *)
+Ltac apply_depth_eq Hsubexpr Hdepth :=
+  apply subexpr_depth_leq in Hsubexpr;
+  rewrite Hdepth in Hsubexpr.
+
+Ltac contradiction_depth :=
+  match goal with
+  | [ H: ast_depth ?e1 <= ast_depth ?e2 |- _ ] =>
+      assert (ast_depth e2 < ast_depth e1) by (simpl; lia); lia
+  end.
+
+(*
+see: https://rocq-prover.org/doc/V8.20.0/stdlib/Coq.Numbers.NatInt.NZOrder.html#NZOrderProp.le_antisymm
+*)
+
 Theorem subexpr_anti_symmetry :
   forall e1 e2,
   subexpr e1 e2 ->
@@ -2333,7 +2353,6 @@ Proof.
   intros e1 e2 H12 H21.
   assert (ast_depth e1 = ast_depth e2) as DepthEq.
   {
-    (* https://rocq-prover.org/doc/V8.20.0/stdlib/Coq.Numbers.NatInt.NZOrder.html#NZOrderProp.le_antisymm *)
     apply Nat.le_antisymm.
     - apply subexpr_depth_leq; assumption.
     - apply subexpr_depth_leq; assumption.
@@ -2342,10 +2361,25 @@ Proof.
   - (* refl *)
     reflexivity.
   - (* inl_plus *)
-    admit.
-  - admit. (* inl_minus *)
-  - admit. (* inl_times *)
-  - admit. (* inr_plus *)
-  - admit. (* inr_minus *)
-  - admit. (* inr_times *)
-Admitted. (* Change to Qed when done *)
+    apply_depth_eq H12 DepthEq.
+    contradiction_depth.
+  - (* inl_minus *)
+    apply_depth_eq H12 DepthEq.
+    contradiction_depth.
+  - (* inl_times *)
+    apply_depth_eq H12 DepthEq.
+    assert (ast_depth e1 < ast_depth (e1 * e2)) by (simpl; lia).
+    lia.
+  - (* inr_plus *)
+    apply_depth_eq H12 DepthEq.
+    assert (ast_depth e2 < ast_depth (e1 + e2)) by (simpl; lia).
+    lia.
+  - (* inr_minus *)
+    apply_depth_eq H12 DepthEq.
+    assert (ast_depth e2 < ast_depth (e1 - e2)) by (simpl; lia).
+    lia.
+  - (* inr_times *)
+    apply_depth_eq H12 DepthEq.
+    assert (ast_depth e2 < ast_depth (e1 * e2)) by (simpl; lia).
+    lia.
+Qed.
