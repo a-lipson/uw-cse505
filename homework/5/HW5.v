@@ -428,15 +428,17 @@ Lemma or_T_left_T :
     value v2 ->
     or e1 e2 -->* T.
 Proof.
-  intros.
+  intros e1 e2 v2 H1 H2 Hv2.
   unfold or.
   eapply trc_transitive.
-  - apply step_star_app_left. eval_utlc. 
-  - eapply trc_transitive.
-    + apply step_star_app_left; eauto.
-    +
-Admitted. (* Change to Qed when done *)
-
+  - eapply step_star_app_left. eapply step_star_app_left. apply H1.
+  - eval_utlc. simpl. eapply trc_transitive.
+    + eapply step_star_app_right. apply H2. constructor.
+    + eapply trc_front.
+      * apply step_beta. apply Hv2.
+      * simpl. fold T. constructor.
+Qed.
+      
 (*
  * PROBLEM 3 [5 points, ~5 tactics]
  *
