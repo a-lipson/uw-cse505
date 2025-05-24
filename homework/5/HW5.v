@@ -480,8 +480,25 @@ Lemma or_T_right_fixed :
     e2 -->* T ->
     or e1 e2 -->* T.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros.
+  unfold or.
+  destruct b.
+  - simpl in *.
+    eapply trc_transitive.
+    + eapply step_star_app_left. eapply step_star_app_left. apply H.
+    + eapply or_T_left_T.
+      * constructor.
+      * apply H0.
+      * constructor.
+  - simpl in H.
+    eapply trc_transitive.
+    + eapply step_star_app_left. eapply step_star_app_left. apply H.
+    + eapply trc_front.
+      * step_utlc.
+      * simpl. eapply trc_transitive.
+        -- eapply step_star_app_right. apply H0. constructor.
+        -- eval_utlc.
+Qed. 
 
 
 (*
