@@ -461,8 +461,13 @@ Example or_T_right_wrong_answer :
     e2 -->* T /\
     or e1 e2 -->* F.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  (* e1 @ T @ e2*)
+  exists (\"x", "x" @ F).
+  eexists. eexists.
+  repeat split; try constructor.
+  unfold or.
+  eval_utlc.   
+Qed.
 
 (*
  * PROBLEM 4 [5 points, ~20 tactics]
