@@ -428,7 +428,13 @@ Lemma or_T_left_T :
     value v2 ->
     or e1 e2 -->* T.
 Proof.
-  (* YOUR CODE HERE *)
+  intros.
+  unfold or.
+  eapply trc_transitive.
+  - apply step_star_app_left. eval_utlc. 
+  - eapply trc_transitive.
+    + apply step_star_app_left; eauto.
+    +
 Admitted. (* Change to Qed when done *)
 
 (*
