@@ -524,9 +524,25 @@ Proof.
   intros.
   revert to from x H.
   induction e.
-  - intros. left. split.
-    + simpl in H. destruct var_eq.
+  - intros. simpl in H. destruct var_eq.
+    + right. split. exact H. simpl in *. subst. reflexivity.
+    + left. split. exact H. simpl in *. intuition. subst. apply n. reflexivity.
+  - intros. simpl in *. destruct H. destruct var_eq.
+    + left. split. split. exact H. exact H0. rewrite <- e0 in H. intuition.
+    + specialize (IHe to from x H0). destruct IHe. 
+      * left. split. split. exact H. destruct H1. exact H1. destruct H1. exact H2. 
+      * right. split. destruct H1. exact H1. split. auto. destruct H1. exact H2.
+  - intros. simpl in *. left. split. destruct H.
+   
+    
+    
+    
+    (* left. destruct IHe1. destruct H0.
+      * split. left. exact H0. exact H1.
+      * split. left. shelve. 
+    
 
+       *)
 Admitted. (* Change to Qed when done *)
 
 (*
