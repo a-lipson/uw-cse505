@@ -521,7 +521,12 @@ Lemma free_vars_subst_1 :
     is_free_var (subst from to e) x ->
     (is_free_var e x /\ x <> from) \/ (is_free_var to x /\ is_free_var e from).
 Proof.
-  (* YOUR CODE HERE *)
+  intros.
+  revert to from x H.
+  induction e.
+  - intros. left. split.
+    + simpl in H. destruct var_eq.
+
 Admitted. (* Change to Qed when done *)
 
 (*
