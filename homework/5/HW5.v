@@ -681,8 +681,14 @@ Lemma free_vars_subst_no_capture :
         (is_free_var e x /\ x <> from) \/
         (is_free_var to x /\ is_free_var e from).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  intros. revert x from H.
+  induction e; intros; simpl.
+  - destruct var_eq; simpl.
+    + subst. intuition. congruence.
+    + intuition.
+      * subst. left. split. reflexivity. congruence.
+      * subst. congruence.
+Admitted.
 
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
