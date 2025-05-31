@@ -652,8 +652,12 @@ Example can_be_both_bound_and_free :
   exists e x,
     is_free_var e x /\ is_bound_var e x.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  exists (\"y", (\"x", "x") @ "x").
+  exists "x".
+  simpl. intuition. discriminate.
+Qed.
+
+
 
 (* Here is a predicate for when it is safe to plug to into e somewhere. *)
 Definition safe_to_subst (e to : expr) : Prop :=
