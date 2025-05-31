@@ -541,11 +541,6 @@ Proof.
       * right. split.  destruct H. exact H. destruct H. right. exact H0.
 Qed.
        
-    
-    
-   
-    
-
 
 (*
  * PROBLEM 6 [5 points, ~9 tactics]
@@ -564,7 +559,7 @@ Example free_vars_subst_2_nope :
      (is_free_var to x /\ is_free_var e from)) /\
     ~ is_free_var (subst from to e) x.
 Proof.
-  (* YOUR CODE HERE *)
+  
 Admitted. (* Change to Qed when done *)
 
 
@@ -584,6 +579,7 @@ Theorem subst_closed :
     closed e ->
     subst from to e = e.
 Proof.
+  intros.
   (* YOUR CODE HERE *)
 Admitted. (* Change to Qed when done *)
 
@@ -607,8 +603,13 @@ Definition Let (x : var) (e1 e2 : expr) : expr :=
  * using "Fix".)
  *)
 Definition SumUpto : expr :=
-  "blah". (* Replace with your code. *)
+ Fix @ (\"rec", \"n",
+    (If (IsZero @ "n")
+      (\"_", Zero)
+      (\"_", Add @ "n" @ ("rec" @ (Pred @ "n")))) @ Id).
 
+    
+  
 Definition Two := Succ @ One.
 Definition Three := Succ @ Two.
 Definition Four := Succ @ Three.
@@ -625,9 +626,10 @@ Definition Five := Succ @ Four.
 Example SumUpto5 :
   SumUpto @ Five -->* numeral 15.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
-
+  apply run_for_n_steps_step_star with (n := 451).
+  compute.
+  intuition.
+Qed.
 
 (* Here are a few challenge problems about UTLC. For more core points, skip to
    the next section. *)
