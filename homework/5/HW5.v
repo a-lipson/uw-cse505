@@ -532,18 +532,20 @@ Proof.
     + specialize (IHe to from x H0). destruct IHe. 
       * left. split. split. exact H. destruct H1. exact H1. destruct H1. exact H2. 
       * right. split. destruct H1. exact H1. split. auto. destruct H1. exact H2.
-  - intros. simpl in *. left. split. destruct H.
+  - intros. simpl in *. destruct H as [H1 | H2].
+    + specialize (IHe1 to from x H1). destruct IHe1. destruct H.
+      * left. split. left. exact H. exact H0.
+      * right. split. destruct H. exact H. destruct H. left. exact H0.
+    + specialize (IHe2 to from x H2). destruct IHe2. destruct H.
+      * left. split. right. exact H. exact H0.
+      * right. split.  destruct H. exact H. destruct H. right. exact H0.
+Qed.
+       
+    
+    
    
     
-    
-    
-    (* left. destruct IHe1. destruct H0.
-      * split. left. exact H0. exact H1.
-      * split. left. shelve. 
-    
 
-       *)
-Admitted. (* Change to Qed when done *)
 
 (*
  * PROBLEM 6 [5 points, ~9 tactics]
