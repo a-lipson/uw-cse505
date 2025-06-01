@@ -1095,12 +1095,18 @@ Lemma strengthening_again :
     lookup x G = Some t1 ->
     G |- e : t.
 Proof.
-  intros.
-eapply context_extentionality with (G1 := (G ++ [(x, t2)])%list).
-  (* eapply context_extentionality with (G1 := ((x, t2)::G)).  *)
+  intros G x t1 t2 e t H Hlookup_x.
+  (* (G1 := ((x, t2)::G)) *)
+  eapply context_extentionality with (G1 := (G ++ [(x, t2)])%list).
   - intros y Hfree.
     rewrite lookup_app.
-Admitted.
+    destruct (lookup y G) eqn:Hlookup_y.
+    + reflexivity.
+    + simpl. destruct (var_eq y x).
+      * subst. rewrite Hlookup_x in Hlookup_y. discriminate.
+      * reflexivity.
+  - assumption.
+Qed.
 
 
 (*
