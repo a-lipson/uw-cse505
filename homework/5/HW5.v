@@ -727,16 +727,15 @@ Example safe_to_subst_not_inductive :
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
-  exists (\"x", (\"y", "y") @ "z").
-  exists (\"z", "z").
-  exists (\"y", "y").
-  exists "z".
+  exists (\"x", (\"x", "x" @ "y") @ "x").
+  exists (\"y", "x").
+  exists (\"x", "x" @ "y").
+  exists (\"y", "x").
+
   split.
   - apply step_beta; constructor. 
   - unfold safe_to_subst. simpl. split.
-    + intros. intuition. 
-    + intuition. specialize (H "z"). apply H.
-    
+    + intros. intuition.     
    
   
 
