@@ -583,22 +583,6 @@ Lemma subst_not_free :
     ~ is_free_var e x ->
     subst x to e = e.
 Proof.
-<<<<<<< HEAD
-  intros.
-  revert x to H.
-  induction e.
-  - intros. simpl. destruct (var_eq x s).
-    + intuition. exfalso. apply H. unfold is_free_var. rewrite e. reflexivity.
-    + reflexivity.
-  - intros. simpl in *. destruct (var_eq x s).
-    + reflexivity.
-    + intuition. specialize (IHe x to). specialize (IHe H). f_equal. exact IHe.
-  - intros. simpl in *. intuition. 
-    specialize (IHe1 x to H0). 
-    specialize (IHe2 x to H1).
-    rewrite IHe1. rewrite IHe2. reflexivity.
-Qed. 
-=======
   induction e; simpl; intros.
   - destruct var_eq.
     + subst. contradiction.
@@ -611,8 +595,7 @@ Qed.
   - f_equal.
     + apply IHe1. auto.
     + apply IHe2. auto.
-Admitted.
->>>>>>> 1311e7fda1a874ddcd29f533704ebea3cafbe00b
+Qed.
 
 Theorem subst_closed :
   forall from to e,
@@ -1093,8 +1076,7 @@ Proof.
   apply context_extentionality with (G1 := []).
   - intros. simpl. intuition.
     apply well_typed_empty_closed in H. unfold closed in H.
-    specialize (H x). exfalso.
-    apply H. exact H0.
+    specialize (H x). contradiction.
   - intuition.
 Qed.
 
@@ -1113,8 +1095,11 @@ Lemma strengthening_again :
     lookup x G = Some t1 ->
     G |- e : t.
 Proof.
-  intros. eapply context_extentionality with (G1 := ((x, t2)::G)).
-  - intros. f_equal.
+  intros.
+eapply context_extentionality with (G1 := (G ++ [(x, t2)])%list).
+  (* eapply context_extentionality with (G1 := ((x, t2)::G)).  *)
+  - intros y Hfree.
+    rewrite lookup_app.
 Admitted.
 
 
