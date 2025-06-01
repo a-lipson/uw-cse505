@@ -1578,8 +1578,20 @@ Proof.
       * eauto.
       * destruct H. eauto.
     + destruct H1. eauto.
-  (* YOUR CODE HERE *)
-Admitted.
+  - unfold unstuck in *. destruct IHhasty1; destruct IHhasty2. 
+    + left. constructor.
+      * exact H1. 
+      * exact H2.
+    + right. destruct H2. eexists. eapply step_pair_second.
+      * exact H1.
+      * exact H2.
+    + right. destruct H1. eexists. apply step_pair_first. exact H1.
+    + right. destruct H1. eexists. apply step_pair_first. exact H1.   
+  - unfold unstuck in *. intuition. 
+    all: invc H; invc H0; eauto.
+  - unfold unstuck in *. intuition. 
+    all: invc H; invc H0; eauto.
+Qed.
 
 Lemma weakening_middle :
   forall G1 G2 G3 e t,
