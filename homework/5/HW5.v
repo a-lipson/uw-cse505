@@ -1215,7 +1215,7 @@ Admitted.
  * Write a sentence or two explaining where a direct proof gets stuck. Be
  * specific, but also brief. Answer the question:
  *
- *    why are the hypotheses to this lemma not enough to imply its conclusion?
+ *    Why are the hypotheses to this lemma not enough to imply its conclusion?
  *
  * Optionally (for zero points), also think about what additional hypothesis you
  * would need to know in order to finish the proof.
@@ -1228,7 +1228,23 @@ Lemma termination_app :
     terminates e2 ->
     terminates (e1 @ e2).
 Proof.
-  (* YOUR COMMENT HERE *)
+  (*
+    We have:
+      (e1 : A -> B) -->* (λx, body) terminates to a lambda
+      (e2 : A) -->* v terminates to a value
+    We want:
+      (e1 @ e2) -->* (λx.body) @ v --> body[x |-> v] terminates
+
+    The proof will get stuck trying to show that
+    the lambda body terminates after substitution
+    because substitution could change the shape
+    and therefore the termination of the body.
+
+    We would need a hypothesis that substitution
+    in the lambda body preserves termination.
+
+    source: week 07 slide 101
+   *)
 Admitted.
 
 (*
