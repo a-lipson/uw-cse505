@@ -691,24 +691,42 @@ Definition safe_to_subst (e to : expr) : Prop :=
  * Hint: Pretty similar to free_vars_subst from Week07.v.
  *)
 Lemma free_vars_subst_no_capture :
-  forall from to e x,
+  forall e to,
     safe_to_subst e to ->
-    is_free_var (subst from to e) x <->
-    (is_free_var e x /\ x <> from) \/
-    (is_free_var to x /\ is_free_var e from).
+    forall from x,
+      is_free_var (subst from to e) x <->
+      (is_free_var e x /\ x <> from) \/
+      (is_free_var to x /\ is_free_var e from).
 Proof.
-  intros from to e x Hto.
+  intros.
   induction e; simpl.
-  - destruct var_eq; intuition; try congruence.
-    left. split. auto. congruence.
-  - destruct var_eq.
+  - destruct var_eq; simpl.
+    + subst. split; intros.
+      * right. auto.
+      * intuition. congruence.
     + intuition.
-      * left. repeat split; intuition. congruence.
+      * left. split; auto. congruence.
       * congruence.
-    + intuition. all: admit.
-  - intuition.
-    (* + apply IHe1. *)
-Admitted. (* Change to Qed when done *)
+  - destruct var_eq; simpl.
+    + intuition.
+      * left. split; auto. congruence.
+      * congruence.
+    + intuition.
+      * rewrite IHe in H2; firstorder.
+      * apply IHe; firstorder.
+      * firstorder.
+      * apply IHe; firstorder.
+  - (* firstorder using  IHe1, IHe2. *)
+    intuition.
+    + rewrite IHe1 in H1.
+      intuition. firstorder.
+    + rewrite IHe2 in H1.
+      intuition. firstorder.
+    + left. apply IHe1; firstorder.
+    + right. apply IHe2; firstorder.
+    + left. apply IHe1; firstorder.
+    + right. apply IHe2; firstorder.
+Qed.
 
 
 
@@ -914,10 +932,9 @@ Admitted.
  *)
 Lemma program_with_stlc :
   exists G t,
-    G |- t : ((Bool ==> Bool) ==> (Bool ==> Bool ==> Bool)).
+    G |- t : (Bool ==> Bool) ==> (Bool ==> Bool ==> Bool).
 Proof.
-  exists [].
-  exists (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
+  exists [], (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
   repeat constructor.
   apply HtApp with (t1 := Bool).
   - apply HtVar. simpl. reflexivity.
