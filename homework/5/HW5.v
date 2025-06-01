@@ -1054,29 +1054,28 @@ Proof.
   intros.
   revert G2 H.
   induction H0; intros.
-  - intros. apply HtTrue.
-  - intros. apply HtFalse.
-  - intros. specialize (H0 x). econstructor. simpl in H0. destruct H0.
+  - apply HtTrue.
+  - apply HtFalse.
+  - specialize (H0 x). econstructor.
+    simpl in H0. destruct H0.
     + reflexivity.
     + rewrite H. reflexivity.
-  - intros. simpl in *. econstructor.
-    + apply IHhasty1. intros. apply H. left. exact H0.
-    + apply IHhasty2. intros. apply H. right. left. exact H0.
-    + apply IHhasty3. intros. apply H. right. right. exact H0.
-  - intros. econstructor.
-    + apply IHhasty1. intros. simpl in *. apply H. left. exact H0.
-    + apply IHhasty2. intros. simpl in *. apply H. right. exact H0.
-  - intros. econstructor. specialize (IHhasty ((x, t1)::G2)).
+  - simpl in *. econstructor.
+    + apply IHhasty1. auto.
+    + apply IHhasty2. auto.
+    + apply IHhasty3. auto.
+  - econstructor.
+    + apply IHhasty1. simpl in *. auto.
+    + apply IHhasty2. simpl in *. auto.
+  - econstructor. specialize (IHhasty ((x, t1)::G2)).
     destruct IHhasty; auto.
     + intros. simpl in *. destruct (var_eq x0 x).
       * reflexivity.
-      * apply H. split. all: auto.
+      * apply H. split; auto.
     + econstructor.
       * exact h1.
       * exact h2.
 Qed.
-
-
 
 
 
