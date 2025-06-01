@@ -577,39 +577,12 @@ Qed.
  * helper lemma. If you are not sure what lemma to prove, try getting stuck in a
  * direct proof by induction of the theorem.
  *)
-Lemma subst_closed_under_abs :
-  forall e x,
-    closed (\x, e) -> closed e.
+
+Lemma subst_not_free :
+  forall e x to,
+    ~ is_free_var e x ->
+    subst x to e = e.
 Proof.
-  (* FIXME: complete this proof *)
-  (* i think this is the wrong lemma. *)
-Admitted.
-
-Lemma subst_not_free_in_abs :
-  forall e x y to,
-    x <> y ->
-    ~ is_free_var (\x, e) y ->
-    (\ x, subst y to e) = (\ x, e).
-Proof.
-  intros.
-  simpl.
-  destruct (var_eq y x).
-  - subst. contradiction H0. simpl. split.
-    exact H. intuition.
-  - induction e.
-    + intros. simpl. destruct (var_eq y s).
-      * intuition. simpl in *. intuition.
-        exfalso. apply H0. rewrite <- e. reflexivity.
-      * reflexivity.
-    + intros. simpl. destruct (var_eq y s).
-      * reflexivity.
-      * shelve.
-    + intros. simpl in *. intuition. 
-    
-      
-
-
-
 Admitted.
 
 Theorem subst_closed :
@@ -617,21 +590,8 @@ Theorem subst_closed :
     closed e -> subst from to e = e.
 Proof.
   intros.
-  induction e; simpl in *.
-  - destruct var_eq.
-    + specialize (H s). simpl in H. contradiction.
-    + reflexivity.
-  - destruct var_eq.
-    + reflexivity.
-    + apply subst_not_free_in_abs.
-      * auto.
-      * auto.
-(*
-     f_equal. apply IHe.
-     apply subst_closed_under_abs in H. assumption.  *)
-  - f_equal.
-    + apply IHe1. apply closed_app_invert in H. intuition.
-    + apply IHe2. apply closed_app_invert in H. intuition.
+  apply subst_not_free.
+  apply H.
 Qed.
 
 
@@ -1102,12 +1062,12 @@ Lemma weakening_empty_again :
 Proof.
   intros.
   apply context_extentionality with (G1 := []).
-  - intros. simpl. intuition. 
+  - intros. simpl. intuition.
     apply well_typed_empty_closed in H. unfold closed in H.
     specialize (H x). exfalso.
     apply H. exact H0.
   - intuition.
-Qed. 
+Qed.
 
 (*
  * PROBLEM 17 [3 points, ~15 tactics]
@@ -1125,7 +1085,7 @@ Lemma strengthening_again :
     G |- e : t.
 Proof.
   intros. eapply context_extentionality with (G1 := ((x, t2)::G)).
-  - intros. f_equal.  
+  - intros. f_equal.
 Admitted.
 
 
