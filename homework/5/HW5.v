@@ -438,7 +438,7 @@ Proof.
       * apply step_beta. apply Hv2.
       * simpl. fold T. constructor.
 Qed.
-      
+
 (*
  * PROBLEM 3 [5 points, ~5 tactics]
  *
@@ -466,7 +466,7 @@ Proof.
   eexists. eexists.
   repeat split; try constructor.
   unfold or.
-  eval_utlc.   
+  eval_utlc.
 Qed.
 
 (*
@@ -503,7 +503,7 @@ Proof.
       * simpl. eapply trc_transitive.
         -- eapply step_star_app_right. apply H0. constructor.
         -- eval_utlc.
-Qed. 
+Qed.
 
 
 (*
@@ -523,24 +523,24 @@ Lemma free_vars_subst_1 :
 Proof.
   intros.
   revert to from x H.
-  induction e.
-  - intros. simpl in H. destruct var_eq.
-    + right. split. exact H. simpl in *. subst. reflexivity.
-    + left. split. exact H. simpl in *. intuition. subst. apply n. reflexivity.
-  - intros. simpl in *. destruct H. destruct var_eq.
-    + left. split. split. exact H. exact H0. rewrite <- e0 in H. intuition.
-    + specialize (IHe to from x H0). destruct IHe. 
-      * left. split. split. exact H. destruct H1. exact H1. destruct H1. exact H2. 
-      * right. split. destruct H1. exact H1. split. auto. destruct H1. exact H2.
-  - intros. simpl in *. destruct H as [H1 | H2].
+  induction e; intros; simpl in *.
+
+  - destruct var_eq; auto.
+    simpl in *. subst. auto.
+  - destruct H. destruct var_eq.
+    + left. repeat split; auto.
+      rewrite <- e0 in H. auto.
+    + specialize (IHe to from x H0). destruct IHe.
+      all: repeat split; destruct H1; auto.
+  - destruct H as [H1 | H2].
     + specialize (IHe1 to from x H1). destruct IHe1. destruct H.
-      * left. split. left. exact H. exact H0.
-      * right. split. destruct H. exact H. destruct H. left. exact H0.
+      * repeat split; auto.
+      * right. split; destruct H; auto.
     + specialize (IHe2 to from x H2). destruct IHe2. destruct H.
-      * left. split. right. exact H. exact H0.
-      * right. split.  destruct H. exact H. destruct H. right. exact H0.
+      * repeat split; auto.
+      * right. split; destruct H; auto.
 Qed.
-       
+
 
 (*
  * PROBLEM 6 [5 points, ~9 tactics]
@@ -555,12 +555,15 @@ Qed.
  *)
 Example free_vars_subst_2_nope :
   exists from to e x,
-    ((is_free_var e x /\ x <> from) \/
-     (is_free_var to x /\ is_free_var e from)) /\
+    ((is_free_var e x /\ x <> from) \/ (is_free_var to x /\ is_free_var e from)) /\
     ~ is_free_var (subst from to e) x.
 Proof.
-  
-Admitted. (* Change to Qed when done *)
+  (* counterexample: (λx. y)[y |-> x]; FV(x) = {x} != FV(λx. y) = {y} *)
+  exists "y", "x", (\"x", "y"), "x".
+  split; simpl.
+  - right. intuition. discriminate.
+  - intuition.
+Qed.
 
 
 (*
@@ -574,14 +577,31 @@ Admitted. (* Change to Qed when done *)
  * helper lemma. If you are not sure what lemma to prove, try getting stuck in a
  * direct proof by induction of the theorem.
  *)
+Lemma subst_closed_under_abs :
+  forall e x,
+    closed (\x, e) -> closed e.
+Proof.
+  (* FIXME: complete this proof *)
+  (* i think this is the wrong lemma. *)
+Admitted.
+
 Theorem subst_closed :
   forall from to e,
-    closed e ->
-    subst from to e = e.
+    closed e -> subst from to e = e.
 Proof.
   intros.
-  (* YOUR CODE HERE *)
-Admitted. (* Change to Qed when done *)
+  induction e; simpl in *.
+  - destruct (var_eq _ _).
+    + specialize (H s). simpl in H. contradiction.
+    + reflexivity.
+  - destruct (var_eq _ _).
+    + reflexivity.
+    + f_equal. apply IHe.
+      apply subst_closed_under_abs in H. assumption.
+  - f_equal.
+    + apply IHe1. apply closed_app_invert in H. intuition.
+    + apply IHe2. apply closed_app_invert in H. intuition.
+Qed.
 
 
 (* Here is a better version of If than the one from Week07.v. This one thunks
@@ -603,13 +623,13 @@ Definition Let (x : var) (e1 e2 : expr) : expr :=
  * using "Fix".)
  *)
 Definition SumUpto : expr :=
- Fix @ (\"rec", \"n",
+  Fix @ (\"rec", \"n",
     (If (IsZero @ "n")
       (\"_", Zero)
       (\"_", Add @ "n" @ ("rec" @ (Pred @ "n")))) @ Id).
 
-    
-  
+
+
 Definition Two := Succ @ One.
 Definition Three := Succ @ Two.
 Definition Four := Succ @ Three.
@@ -626,7 +646,7 @@ Definition Five := Succ @ Four.
 Example SumUpto5 :
   SumUpto @ Five -->* numeral 15.
 Proof.
-  apply run_for_n_steps_step_star with (n := 451).
+  apply run_for_n_steps_step_star with (n := 451). (* optimization! *)
   compute.
   intuition.
 Qed.
@@ -652,8 +672,7 @@ Example can_be_both_bound_and_free :
   exists e x,
     is_free_var e x /\ is_bound_var e x.
 Proof.
-  exists (\"y", (\"x", "x") @ "x").
-  exists "x".
+  exists (\"y", (\"x", "x") @ "x"), "x".
   simpl. intuition. discriminate.
 Qed.
 
@@ -673,22 +692,25 @@ Definition safe_to_subst (e to : expr) : Prop :=
  * Hint: Pretty similar to free_vars_subst from Week07.v.
  *)
 Lemma free_vars_subst_no_capture :
-  forall e to,
+  forall from to e x,
     safe_to_subst e to ->
-    forall from x,
-        is_free_var (subst from to e) x
-      <->
-        (is_free_var e x /\ x <> from) \/
-        (is_free_var to x /\ is_free_var e from).
+    is_free_var (subst from to e) x <->
+    (is_free_var e x /\ x <> from) \/
+    (is_free_var to x /\ is_free_var e from).
 Proof.
-  intros. revert x from H.
-  induction e; intros; simpl.
-  - destruct var_eq; simpl.
-    + subst. intuition. congruence.
+  intros from to e x Hto.
+  induction e; simpl.
+  - destruct (var_eq _ _).
+    all: split; intros; intuition; try congruence.
+    left. split. auto. congruence.
+  - destruct (var_eq _ _).
     + intuition.
-      * subst. left. split. reflexivity. congruence.
-      * subst. congruence.
-Admitted.
+      * left. repeat split; intuition. congruence.
+      * congruence.
+    + intuition.
+      *
+  (* YOUR CODE HERE *)
+Admitted. (* Change to Qed when done *)
 
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
