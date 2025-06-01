@@ -1298,10 +1298,7 @@ Module STLC_pairs.
 Inductive type :=
 | Bool
 | Fun : type -> type -> type
-(* UNCOMMENT *)
-(*
 | Pair : type -> type -> type
-*)
 .
 Notation "t1 ==> t2" := (Fun t1 t2) (at level 69, right associativity).
 
@@ -1314,12 +1311,10 @@ Inductive expr : Type :=
 | Ite : expr -> expr -> expr -> expr
 | Abs : var -> expr -> expr
 | App : expr -> expr -> expr
-(* UNCOMMENT *)
-(*
 | MkPair : expr -> expr -> expr
 | Fst : expr -> expr
 | Snd : expr -> expr
-*)
+
 .
 
 Declare Scope stlc_scope.
@@ -1351,7 +1346,9 @@ Fixpoint subst (from : var) (to : expr) (e : expr) : expr :=
   | App e1 e2 => App (subst from to e1) (subst from to e2)
   | If c Then e1 Else e2 =>
     If (subst from to c) Then (subst from to e1) Else (subst from to e2)
-  (* YOUR CODE HERE *)
+  | MkPair e1 e2 => MkPair (subst from to e1) (subst from to e2)
+  | Fst p => Fst (subst from to p)
+  | Snd p => Snd (subst from to p)
   end.
 
 (* Uncomment the constructor below, which says that a pair is a value if both
@@ -1360,14 +1357,11 @@ Inductive value : expr -> Prop :=
 | value_abs : forall x e, value (\x, e)
 | value_T   : value T
 | value_F   : value F
-(* UNCOMMENT *)
-(*
 | value_pair :
   forall v1 v2,
     value v1 ->
     value v2 ->
     value (MkPair v1 v2)
-*)
 .
 Local Hint Constructors value : core.
 
