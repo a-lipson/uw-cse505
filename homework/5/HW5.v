@@ -1444,29 +1444,29 @@ Inductive step : expr -> expr -> Prop :=
 | step_false :
   forall e1 e2,
     step (If F Then e1 Else e2) e2
-| step_pair_first : 
-  forall e1 e1' e2, 
+| step_pair_first :
+  forall e1 e1' e2,
   step e1 e1' ->
   step (MkPair e1 e2) (MkPair e1' e2)
-| step_pair_second : 
-  forall v1 e2 e2', 
+| step_pair_second :
+  forall v1 e2 e2',
   value v1 ->
   step e2 e2' ->
   step (MkPair v1 e2) (MkPair v1 e2')
-| step_fst : 
+| step_fst :
   forall e e',
   step e e' ->
   step (Fst e) (Fst e')
-| step_preserve_fst : 
+| step_preserve_fst :
   forall v1 v2,
   value v1 ->
   value v2 ->
   step (Fst (MkPair v1 v2)) v1
-| step_snd : 
+| step_snd :
   forall e e',
   step e e' ->
   step (Snd e) (Snd e')
-| step_preserve_snd : 
+| step_preserve_snd :
   forall v1 v2,
   value v1 ->
   value v2 ->
@@ -1514,24 +1514,24 @@ Inductive hasty : gamma -> expr -> type -> Prop :=
 | HtFalse : forall G, G |- F : Bool
 | HtVar :   forall G x t, lookup x G = Some t -> G |- x : t
 | HtIte :   forall G c e1 e2 t,
-                    (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
-                    (G |- If c Then e1 Else e2 : t)
+  (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
+  (G |- If c Then e1 Else e2 : t)
 | HtApp :   forall G e1 e2 t1 t2,
-                    (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
-                    (G |- e1 @ e2 : t2)
+  (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
+  (G |- e1 @ e2 : t2)
 | HtAbs :   forall G x e t1 t2,
-                    ((x, t1) :: G |- e : t2) ->
-                    (G |- \x, e : (t1 ==> t2))
-| HtPair: forall G e1 e2 t1 t2, 
-            (G |- e1 : t1) -> 
-            (G |- e2 : t2) -> 
-            (G |- MkPair e1 e2 : Pair t1 t2) 
-| HtFst: forall G e t1 t2, 
-            (G |- e: Pair t1 t2) -> 
-            (G |- Fst e : t1)
-| HtSnd: forall G e t1 t2, 
-            (G |- e: Pair t1 t2) -> 
-            (G |- Snd e : t2)
+  ((x, t1) :: G |- e : t2) ->
+  (G |- \x, e : (t1 ==> t2))
+| HtPair: forall G e1 e2 t1 t2,
+  (G |- e1 : t1) ->
+  (G |- e2 : t2) ->
+  (G |- MkPair e1 e2 : Pair t1 t2)
+| HtFst: forall G e t1 t2,
+  (G |- e: Pair t1 t2) ->
+  (G |- Fst e : t1)
+| HtSnd: forall G e t1 t2,
+  (G |- e: Pair t1 t2) ->
+  (G |- Snd e : t2)
 
 where "G |- x : t" := (hasty G x t).
 Local Hint Constructors hasty : core.
@@ -1591,18 +1591,18 @@ Proof.
       * eauto.
       * destruct H. eauto.
     + destruct H1. eauto.
-  - unfold unstuck in *. destruct IHhasty1; destruct IHhasty2. 
+  - unfold unstuck in *. destruct IHhasty1; destruct IHhasty2.
     + left. constructor.
-      * exact H1. 
+      * exact H1.
       * exact H2.
     + right. destruct H2. eexists. eapply step_pair_second.
       * exact H1.
       * exact H2.
     + right. destruct H1. eexists. apply step_pair_first. exact H1.
-    + right. destruct H1. eexists. apply step_pair_first. exact H1.   
-  - unfold unstuck in *. intuition. 
+    + right. destruct H1. eexists. apply step_pair_first. exact H1.
+  - unfold unstuck in *. intuition.
     all: invc H; invc H0; eauto.
-  - unfold unstuck in *. intuition. 
+  - unfold unstuck in *. intuition.
     all: invc H; invc H0; eauto.
 Qed.
 
