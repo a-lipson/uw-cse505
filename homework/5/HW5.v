@@ -914,8 +914,16 @@ Lemma program_with_stlc :
   exists G t,
     G |- t : ((Bool ==> Bool) ==> (Bool ==> Bool ==> Bool)).
 Proof.
-  (* YOUR CODE HERE *)
-Admitted.
+  exists [].
+  exists (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
+  repeat constructor.
+  apply HtApp with (t1 := Bool).
+  - apply HtVar. simpl. reflexivity.
+  - constructor. all: repeat constructor.
+Qed.    
+             
+            
+  
 
 Definition closed (e : expr) : Prop :=
   forall x,
