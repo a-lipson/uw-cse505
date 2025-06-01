@@ -620,9 +620,7 @@ Proof.
     + reflexivity.
     + apply subst_not_free_in_abs.
       * auto.
-      * auto.
-      
-    
+      * auto.    
 (*     
      f_equal. apply IHe.
      apply subst_closed_under_abs in H. assumption.  *)
@@ -1003,11 +1001,18 @@ Lemma context_extentionality :
     G2 |- e : t.
 Proof.
   intros.
-  revert G1 G2 t H H0.
-  induction e.
-  - intros. destruct t.
-    + apply HtTrue.
-    + 
+  revert G2 H.
+  induction H0.
+  - intros. apply HtTrue.
+  - intros. apply HtFalse.
+  - intros. specialize (H0 x). econstructor. simpl in H0. destruct H0.
+    + reflexivity.
+    + rewrite H. reflexivity.
+  - intros. simpl in *. econstructor. all: shelve.
+  - 
+
+  
+ 
 Admitted.
 
 (* Extentionality is a very powerful lemma. *)
