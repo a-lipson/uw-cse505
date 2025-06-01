@@ -1772,7 +1772,33 @@ End STLC_pairs.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(*
+1. ~10 hours.
+
+2. STLC problems are fun;
+
+3. The battle rages against the Rocq proof assistant.
+   It is week 09 in this deadly conflict.
+   The skirmishes cover every inch of the thousands of lines of the homework,
+   tactics slingning to and fro, unfolding and folding over and over again.
+   Suddenly, from out of the green (the proof-checked-code green),
+   emerged the ability to name your destructed hypotheses parts,
+   and then it seemed as if the war was tipping in favor of our tragic heros.
+   Yet, the venerable Rocq proof assistant struck back, hence:
+   "have at thee, with code mixed betwixt % syntax concealment and notations"
+   This baffled our heros, who were inclined to use the notation as 'twas available,
+   yet they defaulted to match the manner within which the definitions were scribed.
+   Finally, in one last vain and grumpy effort, Rocq demanded that the application
+   of lemmas did concur with a trivial application of the assignment (x:=x).
+   With a mere utterance of, "what is we just uhh, tell it,"
+   Rocq released a earsplitting shriek and plummeted into the deepest dungeons
+   of Moria, taking several gigs of memory with it as the bricks of
+   Durin's tower toppled to block to stair, discouraging all future endeavours
+   into the realm of the Rocq proof assistant--for surely on their own,
+   without even a single lemma of support,
+   our heros would not have vanquished the selfsame foe.
+   And thus, the battle was won and the game of golf invented at the same time.
+*)
 
 
 (*
@@ -1784,3 +1810,4 @@ End STLC_pairs.
  * Please also see the README.md file to read about how we will grade this
  * homework assignment.
  *)
+
