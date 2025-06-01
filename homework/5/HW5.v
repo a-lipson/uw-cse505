@@ -583,6 +583,18 @@ Lemma subst_not_free :
     ~ is_free_var e x ->
     subst x to e = e.
 Proof.
+  induction e; simpl; intros.
+  - destruct var_eq.
+    + subst. contradiction.
+    + reflexivity.
+  - destruct var_eq.
+    + reflexivity.
+    + f_equal. apply IHe.
+      intros Hfree. apply H.
+      split; auto.
+  - f_equal.
+    + apply IHe1. auto.
+    + apply IHe2. auto.
 Admitted.
 
 Theorem subst_closed :
