@@ -514,7 +514,7 @@ Qed.
  *
  * Show that this one direction of the lemma is true.
  *
- * Hint: Proceed by induction. (On what?)
+ * Hint: Proceed by induction.
  *)
 Lemma free_vars_subst_1 :
   forall from to e x,
@@ -524,7 +524,6 @@ Proof.
   intros.
   revert to from x H.
   induction e; intros; simpl in *.
-
   - destruct var_eq; auto.
     simpl in *. subst. auto.
   - destruct H. destruct var_eq.
@@ -629,7 +628,6 @@ Definition SumUpto : expr :=
       (\"_", Add @ "n" @ ("rec" @ (Pred @ "n")))) @ Id).
 
 
-
 Definition Two := Succ @ One.
 Definition Three := Succ @ Two.
 Definition Four := Succ @ Three.
@@ -650,6 +648,7 @@ Proof.
   compute.
   intuition.
 Qed.
+
 
 (* Here are a few challenge problems about UTLC. For more core points, skip to
    the next section. *)
@@ -677,16 +676,16 @@ Proof.
 Qed.
 
 
-
 (* Here is a predicate for when it is safe to plug to into e somewhere. *)
 Definition safe_to_subst (e to : expr) : Prop :=
   forall y,
     ~ (is_free_var to y /\ is_bound_var e y).
 
+
 (*
  * CHALLENGE 11 [7 points, ~25 tactics]
  *
- * Prove that if the arguments to subst are "safe_to_subst",  then subst
+ * Prove that if the arguments to subst are "safe_to_subst", then subst
  * satisfies the full version of our free_vars_subst lemma.
  *
  * Hint: Pretty similar to free_vars_subst from Week07.v.
@@ -700,15 +699,18 @@ Lemma free_vars_subst_no_capture :
 Proof.
   intros from to e x Hto.
   induction e; simpl.
-  - destruct var_eq.
-    all: split; intros; intuition; try congruence.
+  - destruct var_eq; intuition; try congruence.
     left. split. auto. congruence.
   - destruct var_eq.
     + intuition.
       * left. repeat split; intuition. congruence.
       * congruence.
-
+    + intuition. all: admit.
+  - intuition.
+    (* + apply IHe1. *)
 Admitted. (* Change to Qed when done *)
+
+
 
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
@@ -733,11 +735,11 @@ Proof.
   exists (\"y", "x").
 
   split.
-  - apply step_beta; constructor. 
+  - apply step_beta; constructor.
   - unfold safe_to_subst. simpl. split.
-    + intros. intuition.     
-   
-  
+    + intros. intuition.
+
+
 
 
 
@@ -920,10 +922,10 @@ Proof.
   apply HtApp with (t1 := Bool).
   - apply HtVar. simpl. reflexivity.
   - constructor. all: repeat constructor.
-Qed.    
-             
-            
-  
+Qed.
+
+
+
 
 Definition closed (e : expr) : Prop :=
   forall x,
