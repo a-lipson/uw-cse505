@@ -604,7 +604,12 @@ Proof.
     + intros. simpl. destruct (var_eq y s).
       * reflexivity.
       * shelve.
-    + intros. simpl in *. intuition.
+    + intros. simpl in *. intuition. 
+    
+      
+
+
+
 Admitted.
 
 Theorem subst_closed :
@@ -1119,7 +1124,9 @@ Lemma strengthening_again :
     lookup x G = Some t1 ->
     G |- e : t.
 Proof.
-  (* YOUR CODE HERE *)
+  intros.
+  
+
 Admitted.
 
 
