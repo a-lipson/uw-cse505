@@ -781,10 +781,10 @@ Proof.
   exists (\"y", "x").
 
   split.
-  - apply step_beta; constructor. 
+  (* - apply step_beta; constructor. 
   - unfold safe_to_subst. simpl. split.
     + shelve.
-    +      
+    +       *)
    
   
 
@@ -1071,7 +1071,7 @@ Proof.
     + apply IHhasty1. intros. simpl in *. apply H. left. exact H0.
     + apply IHhasty2. intros. simpl in *. apply H. right. exact H0.
   - intros. econstructor. specialize (IHhasty ((x, t1)::G2)).
-    destruct IHhasty; auto 25.
+    destruct IHhasty; auto.
     + intros. simpl in *. destruct (var_eq x0 x).
       * reflexivity.
       * apply H. split. all: auto.
@@ -1100,8 +1100,14 @@ Lemma weakening_empty_again :
     [] |- e : t ->
     G |- e : t.
 Proof.
-  (* YOUR CODE HERE *)
-Admitted.
+  intros.
+  apply context_extentionality with (G1 := []).
+  - intros. simpl. intuition. 
+    apply well_typed_empty_closed in H. unfold closed in H.
+    specialize (H x). exfalso.
+    apply H. exact H0.
+  - intuition.
+Qed. 
 
 (*
  * PROBLEM 17 [3 points, ~15 tactics]
