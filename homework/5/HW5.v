@@ -1094,12 +1094,18 @@ Lemma strengthening_again :
     lookup x G = Some t1 ->
     G |- e : t.
 Proof.
-  intros.
-eapply context_extentionality with (G1 := (G ++ [(x, t2)])%list).
-  (* eapply context_extentionality with (G1 := ((x, t2)::G)).  *)
+  intros G x t1 t2 e t H Hlookup_x.
+  (* (G1 := ((x, t2)::G)) *)
+  eapply context_extentionality with (G1 := (G ++ [(x, t2)])%list).
   - intros y Hfree.
     rewrite lookup_app.
-Admitted.
+    destruct (lookup y G) eqn:Hlookup_y.
+    + reflexivity.
+    + simpl. destruct (var_eq y x).
+      * subst. rewrite Hlookup_x in Hlookup_y. discriminate.
+      * reflexivity.
+  - assumption.
+Qed.
 
 
 (*
@@ -1115,7 +1121,16 @@ Example ill_typed_but_safe :
     (forall G t, ~ (G |- e : t)) /\
     e -->* T.
 Proof.
-  (* YOUR CODE HERE *)
+  (* If T Then T Else (T @ T) *)
+  exists (Ite T T (\"x", "x")).
+  split.
+  - intros G t H.
+    inversion H; subst.
+    inversion H6; subst.
+    inversion H7; subst.
+  - eapply trc_front.
+    + apply step_true.
+    + apply trc_refl.
 Admitted.
 
 (* The rest of the problems in this section are challenge problems. Skip to the
