@@ -695,11 +695,12 @@ Definition safe_to_subst (e to : expr) : Prop :=
  * Hint: Pretty similar to free_vars_subst from Week07.v.
  *)
 Lemma free_vars_subst_no_capture :
-  forall from to e x,
+  forall e to,
     safe_to_subst e to ->
-    is_free_var (subst from to e) x <->
-    (is_free_var e x /\ x <> from) \/
-    (is_free_var to x /\ is_free_var e from).
+    forall from x,
+      is_free_var (subst from to e) x <->
+      (is_free_var e x /\ x <> from) \/
+      (is_free_var to x /\ is_free_var e from).
 Proof.
   intros.
   induction e; simpl.
@@ -756,15 +757,14 @@ Proof.
   exists (\"y", "y").
 
   split. all: shelve.
-  (* - apply step_app_left.  
+  (* - apply step_app_left.
+  split.
+  - apply step_app_left.  econstructor. econstructor.
   - unfold safe_to_subst. intuition. unfold is_free_var in *. unfold is_bound_var in *.
     + intuition.
-    + eapply H. split. 
+    + eapply H. split.
       * unfold is_free_var. shelve.
       * unfold is_bound_var. left. reflexivity. *)
-
-
-
 
 Admitted. (* Change to Qed when done *)
 
