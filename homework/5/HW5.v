@@ -583,6 +583,7 @@ Lemma subst_not_free :
     ~ is_free_var e x ->
     subst x to e = e.
 Proof.
+<<<<<<< HEAD
   intros.
   revert x to H.
   induction e.
@@ -597,6 +598,21 @@ Proof.
     specialize (IHe2 x to H1).
     rewrite IHe1. rewrite IHe2. reflexivity.
 Qed. 
+=======
+  induction e; simpl; intros.
+  - destruct var_eq.
+    + subst. contradiction.
+    + reflexivity.
+  - destruct var_eq.
+    + reflexivity.
+    + f_equal. apply IHe.
+      intros Hfree. apply H.
+      split; auto.
+  - f_equal.
+    + apply IHe1. auto.
+    + apply IHe2. auto.
+Admitted.
+>>>>>>> 1311e7fda1a874ddcd29f533704ebea3cafbe00b
 
 Theorem subst_closed :
   forall from to e,
