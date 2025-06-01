@@ -4,7 +4,7 @@
  | | | |  / _ \  |  \/  | | ____| \ \      / /  / _ \  |  _ \  | |/ /   | ___|
  | |_| | | | | | | |\/| | |  _|    \ \ /\ / /  | | | | | |_) | | ' /    |___ \
  |  _  | | |_| | | |  | | | |___    \ V  V /   | |_| | |  _ <  | . \     ___) |
- |_| |_|  \___/  |_|  |_| |_____|    \_/\_/     \___/  |_| \_\ |_|\_\   |____/
+|_| |_|  \___/  |_|  |_| |_____|    \_/\_/     \___/  |_| \_\ |_|\_\   |____/
 
 
 Welcome back! This homework covers (untyped) lambda calculus and simply typed
@@ -748,17 +748,15 @@ Example safe_to_subst_not_inductive :
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
-  (*
-    ((\x. ((\x. x) y)) x) (\y. x)
-    ((\x. x) y) (\y. x)
-  *)
-  exists (((\"x", (\"y", "x")) @ (\"y", "z"))).
-  exists "x".
-  exists (((\"y", (\"y", "z")))).
-  exists "x".
+  exists (\"x", "x").          (* λx.x *)
+  exists ((\"x", "x") @ "y").  (* (λx.x) @ y *)
+  exists (\"x", "x").          (* λx.x *)
+  exists "x".                  (* x *)
   split.
-  - apply step_app_left. apply step_beta. constructor.
 
+  - apply step_app_right.
+    (* + apply step_beta. admit. *)
+    (* + constructor. *)
 
 Admitted. (* Change to Qed when done *)
 
@@ -1188,17 +1186,32 @@ Lemma termination_ite :
     terminates e2 ->
     terminates (If c Then e1 Else e2).
 Proof.
-  intros.
-  unfold terminates in *.
-  destruct H2.
-  destruct H2.
-  apply preservation_star in H.
-  apply preservation_star in H0.
-  apply preservation_star in H1.
-  eexists. split.
-  - apply step_star_ite_cond. exact H2.
-
-Admitted.
+  intros c e1 e2 t Hty_c Hty_e1 Hty_e2 Hterm_c Hterm_e1 Hterm_e2.
+  destruct Hterm_c as [v [Hstep Hvalue]].
+  (* preservation *)
+  assert (Hty_v : [] |- v : Bool).
+  { eapply preservation_star. exact Hty_c. reflexivity. auto. }
+  (* canonical forms*)
+  assert (Hcanon : v = T \/ v = F).
+  { inversion Hty_v; subst; auto; inversion Hvalue. }
+  destruct Hcanon as [HT | HF]; subst.
+  - destruct Hterm_e1 as [v' [Hstep' Hvalue']].
+    exists v'.
+    split; auto.
+    eapply trc_transitive.
+    + apply step_star_ite_cond. exact Hstep.
+    + eapply trc_front.
+      * apply step_true.
+      * exact Hstep'.
+  - destruct Hterm_e2 as [v' [Hstep' Hvalue']].
+    exists v'.
+    split; auto.
+    eapply trc_transitive.
+    + apply step_star_ite_cond. exact Hstep.
+    + eapply trc_front.
+      * apply step_false.
+      * auto.
+Qed.
 
 (*
  * CHALLENGE 20 [5 points, ~2 sentences]
