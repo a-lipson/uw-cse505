@@ -748,16 +748,20 @@ Example safe_to_subst_not_inductive :
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
-  (*
-    ((\x. ((\x. x) y)) x) (\y. x)
-    ((\x. x) y) (\y. x)
-  *)
-  exists (((\"x", (\"y", "x")) @ (\"y", "z"))).
-  exists "x".
-  exists (((\"y", (\"y", "z")))).
-  exists "x".
+  exists ((\"x", (\"y", "x")) @ (\"z", "a")).
+  exists (\"y", "y").
+  exists (\"y", (\"z", "a")).
+  exists (\"y", "y").
+
   split.
-  - apply step_app_left. apply step_beta. constructor.
+  - apply step_app_left.  econstructor. econstructor. 
+  - unfold safe_to_subst. intuition. unfold is_free_var in *. unfold is_bound_var in *.
+    + intuition.
+    + eapply H. split. 
+      * unfold is_free_var. shelve.
+      * unfold is_bound_var. left. reflexivity.
+
+
 
 
 Admitted. (* Change to Qed when done *)
