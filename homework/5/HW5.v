@@ -758,8 +758,8 @@ Proof.
   exists "x".
   split.
   - apply step_app_left. apply step_beta. constructor.
-  
-        
+
+
 Admitted. (* Change to Qed when done *)
 
 
@@ -1121,7 +1121,6 @@ Example ill_typed_but_safe :
     (forall G t, ~ (G |- e : t)) /\
     e -->* T.
 Proof.
-  (* If T Then T Else (T @ T) *)
   exists (Ite T T (\"x", "x")).
   split.
   - intros G t H.
@@ -1195,12 +1194,9 @@ Proof.
   destruct H2.
   apply preservation_star in H.
   apply preservation_star in H0.
-  apply preservation_star in H1. 
+  apply preservation_star in H1.
   eexists. split.
   - apply step_star_ite_cond. exact H2.
-  -
-    
-
 
 Admitted.
 
@@ -1219,7 +1215,7 @@ Admitted.
  * Write a sentence or two explaining where a direct proof gets stuck. Be
  * specific, but also brief. Answer the question:
  *
- *    why are the hypotheses to this lemma not enough to imply its conclusion?
+ *    Why are the hypotheses to this lemma not enough to imply its conclusion?
  *
  * Optionally (for zero points), also think about what additional hypothesis you
  * would need to know in order to finish the proof.
@@ -1232,7 +1228,23 @@ Lemma termination_app :
     terminates e2 ->
     terminates (e1 @ e2).
 Proof.
-  (* YOUR COMMENT HERE *)
+  (*
+    We have:
+      (e1 : A -> B) -->* (λx, body) terminates to a lambda
+      (e2 : A) -->* v terminates to a value
+    We want:
+      (e1 @ e2) -->* (λx.body) @ v --> body[x |-> v] terminates
+
+    The proof will get stuck trying to show that
+    the lambda body terminates after substitution
+    because substitution could change the shape
+    and therefore the termination of the body.
+
+    We would need a hypothesis that substitution
+    in the lambda body preserves termination.
+
+    source: week 07 slide 101
+   *)
 Admitted.
 
 (*
@@ -1263,17 +1275,11 @@ Proof.
   induction HT; intros; subst; easy_specialize.
   - exists T. auto.
   - exists F. auto.
-  - exists x. intuition. simpl in *. discriminate. 
-  - eapply termination_ite; auto.
-    + exact HT2.
-    + exact HT3.
-  - eapply termination_app; auto.
-    + exact HT1.
-    + exact HT2.
+  - simpl in H. discriminate.
+  - apply termination_ite with (t:=t); auto.
+  - eapply termination_app with (tA:=t1) (tB:=t2); auto.
   - exists (\x, e). auto.
-Qed.  
-
-    
+Qed.
 
 End STLC.
 
