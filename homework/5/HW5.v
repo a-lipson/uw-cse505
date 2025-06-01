@@ -1249,8 +1249,20 @@ Proof.
   remember [] as G.
   revert HeqG.
   induction HT; intros; subst; easy_specialize.
-  (* YOUR CODE HERE *)
-Admitted.
+  - exists T. auto.
+  - exists F. auto.
+  - exists x. intuition. simpl in *. discriminate. 
+  - eapply termination_ite; auto.
+    + exact HT2.
+    + exact HT3.
+  - eapply termination_app; auto.
+    + exact HT1.
+    + exact HT2.
+  - exists (\x, e). auto.
+Qed.
+
+    
+
 End STLC.
 
 (*
