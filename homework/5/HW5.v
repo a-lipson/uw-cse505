@@ -1259,7 +1259,7 @@ Proof.
   induction HT; intros; subst; easy_specialize.
   - exists T. auto.
   - exists F. auto.
-  - exists x. intuition. simpl in *. discriminate.
+  - simpl in H. discriminate.
   - apply termination_ite with (t:=t); auto.
   - eapply termination_app with (tA:=t1) (tB:=t2); auto.
   - exists (\x, e). auto.
