@@ -1124,9 +1124,8 @@ Lemma strengthening_again :
     lookup x G = Some t1 ->
     G |- e : t.
 Proof.
-  intros.
-  
-
+  intros. eapply context_extentionality with (G1 := ((x, t2)::G)).
+  - intros. f_equal.  
 Admitted.
 
 
