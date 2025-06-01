@@ -4,7 +4,7 @@
  | | | |  / _ \  |  \/  | | ____| \ \      / /  / _ \  |  _ \  | |/ /   | ___|
  | |_| | | | | | | |\/| | |  _|    \ \ /\ / /  | | | | | |_) | | ' /    |___ \
  |  _  | | |_| | | |  | | | |___    \ V  V /   | |_| | |  _ <  | . \     ___) |
- |_| |_|  \___/  |_|  |_| |_____|    \_/\_/     \___/  |_| \_\ |_|\_\   |____/
+|_| |_|  \___/  |_|  |_| |_____|    \_/\_/     \___/  |_| \_\ |_|\_\   |____/
 
 
 Welcome back! This homework covers (untyped) lambda calculus and simply typed
@@ -1192,17 +1192,32 @@ Lemma termination_ite :
     terminates e2 ->
     terminates (If c Then e1 Else e2).
 Proof.
-  intros.
-  unfold terminates in *.
-  destruct H2.
-  destruct H2.
-  apply preservation_star in H.
-  apply preservation_star in H0.
-  apply preservation_star in H1.
-  eexists. split.
-  - apply step_star_ite_cond. exact H2.
-
-Admitted.
+  intros c e1 e2 t Hty_c Hty_e1 Hty_e2 Hterm_c Hterm_e1 Hterm_e2.
+  destruct Hterm_c as [v [Hstep Hvalue]].
+  (* preservation *)
+  assert (Hty_v : [] |- v : Bool).
+  { eapply preservation_star. exact Hty_c. reflexivity. auto. }
+  (* canonical forms*)
+  assert (Hcanon : v = T \/ v = F).
+  { inversion Hty_v; subst; auto; inversion Hvalue. }
+  destruct Hcanon as [HT | HF]; subst.
+  - destruct Hterm_e1 as [v' [Hstep' Hvalue']].
+    exists v'.
+    split; auto.
+    eapply trc_transitive.
+    + apply step_star_ite_cond. exact Hstep.
+    + eapply trc_front.
+      * apply step_true.
+      * exact Hstep'.
+  - destruct Hterm_e2 as [v' [Hstep' Hvalue']].
+    exists v'.
+    split; auto.
+    eapply trc_transitive.
+    + apply step_star_ite_cond. exact Hstep.
+    + eapply trc_front.
+      * apply step_false.
+      * auto.
+Qed.
 
 (*
  * CHALLENGE 20 [5 points, ~2 sentences]
@@ -1435,29 +1450,29 @@ Inductive step : expr -> expr -> Prop :=
 | step_false :
   forall e1 e2,
     step (If F Then e1 Else e2) e2
-| step_pair_first : 
-  forall e1 e1' e2, 
+| step_pair_first :
+  forall e1 e1' e2,
   step e1 e1' ->
   step (MkPair e1 e2) (MkPair e1' e2)
-| step_pair_second : 
-  forall v1 e2 e2', 
+| step_pair_second :
+  forall v1 e2 e2',
   value v1 ->
   step e2 e2' ->
   step (MkPair v1 e2) (MkPair v1 e2')
-| step_fst : 
+| step_fst :
   forall e e',
   step e e' ->
   step (Fst e) (Fst e')
-| step_preserve_fst : 
+| step_preserve_fst :
   forall v1 v2,
   value v1 ->
   value v2 ->
   step (Fst (MkPair v1 v2)) v1
-| step_snd : 
+| step_snd :
   forall e e',
   step e e' ->
   step (Snd e) (Snd e')
-| step_preserve_snd : 
+| step_preserve_snd :
   forall v1 v2,
   value v1 ->
   value v2 ->
@@ -1505,24 +1520,24 @@ Inductive hasty : gamma -> expr -> type -> Prop :=
 | HtFalse : forall G, G |- F : Bool
 | HtVar :   forall G x t, lookup x G = Some t -> G |- x : t
 | HtIte :   forall G c e1 e2 t,
-                    (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
-                    (G |- If c Then e1 Else e2 : t)
+  (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
+  (G |- If c Then e1 Else e2 : t)
 | HtApp :   forall G e1 e2 t1 t2,
-                    (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
-                    (G |- e1 @ e2 : t2)
+  (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
+  (G |- e1 @ e2 : t2)
 | HtAbs :   forall G x e t1 t2,
-                    ((x, t1) :: G |- e : t2) ->
-                    (G |- \x, e : (t1 ==> t2))
-| HtPair: forall G e1 e2 t1 t2, 
-            (G |- e1 : t1) -> 
-            (G |- e2 : t2) -> 
-            (G |- MkPair e1 e2 : Pair t1 t2) 
-| HtFst: forall G e t1 t2, 
-            (G |- e: Pair t1 t2) -> 
-            (G |- Fst e : t1)
-| HtSnd: forall G e t1 t2, 
-            (G |- e: Pair t1 t2) -> 
-            (G |- Snd e : t2)
+  ((x, t1) :: G |- e : t2) ->
+  (G |- \x, e : (t1 ==> t2))
+| HtPair: forall G e1 e2 t1 t2,
+  (G |- e1 : t1) ->
+  (G |- e2 : t2) ->
+  (G |- MkPair e1 e2 : Pair t1 t2)
+| HtFst: forall G e t1 t2,
+  (G |- e: Pair t1 t2) ->
+  (G |- Fst e : t1)
+| HtSnd: forall G e t1 t2,
+  (G |- e: Pair t1 t2) ->
+  (G |- Snd e : t2)
 
 where "G |- x : t" := (hasty G x t).
 Local Hint Constructors hasty : core.
@@ -1582,18 +1597,18 @@ Proof.
       * eauto.
       * destruct H. eauto.
     + destruct H1. eauto.
-  - unfold unstuck in *. destruct IHhasty1; destruct IHhasty2. 
+  - unfold unstuck in *. destruct IHhasty1; destruct IHhasty2.
     + left. constructor.
-      * exact H1. 
+      * exact H1.
       * exact H2.
     + right. destruct H2. eexists. eapply step_pair_second.
       * exact H1.
       * exact H2.
     + right. destruct H1. eexists. apply step_pair_first. exact H1.
-    + right. destruct H1. eexists. apply step_pair_first. exact H1.   
-  - unfold unstuck in *. intuition. 
+    + right. destruct H1. eexists. apply step_pair_first. exact H1.
+  - unfold unstuck in *. intuition.
     all: invc H; invc H0; eauto.
-  - unfold unstuck in *. intuition. 
+  - unfold unstuck in *. intuition.
     all: invc H; invc H0; eauto.
 Qed.
 
@@ -1763,7 +1778,33 @@ End STLC_pairs.
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(*
+1. ~10 hours.
+
+2. STLC problems are fun;
+
+3. The battle rages against the Rocq proof assistant.
+   It is week 09 in this deadly conflict.
+   The skirmishes cover every inch of the thousands of lines of the homework,
+   tactics slingning to and fro, unfolding and folding over and over again.
+   Suddenly, from out of the green (the proof-checked-code green),
+   emerged the ability to name your destructed hypotheses parts,
+   and then it seemed as if the war was tipping in favor of our tragic heros.
+   Yet, the venerable Rocq proof assistant struck back, hence:
+   "have at thee, with code mixed betwixt % syntax concealment and notations"
+   This baffled our heros, who were inclined to use the notation as 'twas available,
+   yet they defaulted to match the manner within which the definitions were scribed.
+   Finally, in one last vain and grumpy effort, Rocq demanded that the application
+   of lemmas did concur with a trivial application of the assignment (x:=x).
+   With a mere utterance of, "what is we just uhh, tell it,"
+   Rocq released a earsplitting shriek and plummeted into the deepest dungeons
+   of Moria, taking several gigs of memory with it as the bricks of
+   Durin's tower toppled to block to stair, discouraging all future endeavours
+   into the realm of the Rocq proof assistant--for surely on their own,
+   without even a single lemma of support,
+   our heros would not have vanquished the selfsame foe.
+   And thus, the battle was won and the game of golf invented at the same time.
+*)
 
 
 (*
@@ -1775,3 +1816,4 @@ End STLC_pairs.
  * Please also see the README.md file to read about how we will grade this
  * homework assignment.
  *)
+
