@@ -1431,7 +1431,33 @@ Inductive step : expr -> expr -> Prop :=
 | step_false :
   forall e1 e2,
     step (If F Then e1 Else e2) e2
-(* YOUR CODE HERE *)
+| step_pair_first : 
+  forall e1 e1' e2, 
+  step e1 e1' ->
+  step (MkPair e1 e2) (MkPair e1' e2)
+| step_pair_second : 
+  forall v1 e2 e2', 
+  value v1 ->
+  step e2 e2' ->
+  step (MkPair v1 e2) (MkPair v1 e2')
+| step_fst : 
+  forall e e',
+  step e e' ->
+  step (Fst e) (Fst e')
+| step_preserve_fst : 
+  forall v1 v2,
+  value v1 ->
+  value v2 ->
+  step (Fst (MkPair v1 v2)) v1
+| step_snd : 
+  forall e e',
+  step e e' ->
+  step (Snd e) (Snd e')
+| step_preserve_snd : 
+  forall v1 v2,
+  value v1 ->
+  value v2 ->
+  step (Snd (MkPair v1 v2)) v2
 .
 Local Hint Constructors step : core.
 
