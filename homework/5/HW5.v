@@ -742,24 +742,26 @@ Qed.
  * Give an example of a program that is safe to subst, but steps to a program
  * that is not safe.
  *)
+
+
 Example safe_to_subst_not_inductive :
   exists e1 e2 e3 e4,
     e1 @ e2 --> e3 @ e4 /\
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
-  exists ((\"x", (\"y", "x")) @ (\"z", "a")).
+  exists ((\"x", (\"y", "x")) @ (\"a", "a")).
   exists (\"y", "y").
-  exists (\"y", (\"z", "a")).
+  exists (\"y", (\"y", "y")).
   exists (\"y", "y").
 
-  split.
-  - apply step_app_left.  econstructor. econstructor. 
+  split. all: shelve.
+  (* - apply step_app_left.  
   - unfold safe_to_subst. intuition. unfold is_free_var in *. unfold is_bound_var in *.
     + intuition.
     + eapply H. split. 
       * unfold is_free_var. shelve.
-      * unfold is_bound_var. left. reflexivity.
+      * unfold is_bound_var. left. reflexivity. *)
 
 
 
