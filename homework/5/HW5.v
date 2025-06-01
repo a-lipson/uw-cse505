@@ -1189,7 +1189,19 @@ Lemma termination_ite :
     terminates e2 ->
     terminates (If c Then e1 Else e2).
 Proof.
-  (* YOUR CODE HERE *)
+  intros.
+  unfold terminates in *.
+  destruct H2.
+  destruct H2.
+  apply preservation_star in H.
+  apply preservation_star in H0.
+  apply preservation_star in H1. 
+  eexists. split.
+  - apply step_star_ite_cond. exact H2.
+  -
+    
+
+
 Admitted.
 
 (*
@@ -1259,7 +1271,7 @@ Proof.
     + exact HT1.
     + exact HT2.
   - exists (\x, e). auto.
-Qed.
+Qed.  
 
     
 
