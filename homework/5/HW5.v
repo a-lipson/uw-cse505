@@ -1783,7 +1783,9 @@ End STLC_pairs.
 (*
 1. ~10 hours.
 
-2. STLC problems are fun;
+2. STLC problems are fun. We really enjoyed the problems this week since they felt
+   very "brainy" - we were constantly referencing slides and using theory for this
+   in a way that felt very different to last week!
 
 3. The battle rages against the Rocq proof assistant.
    It is week 09 in this deadly conflict.
