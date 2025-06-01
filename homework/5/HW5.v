@@ -780,16 +780,10 @@ Proof.
   exists (\"x", "y" @ "x").
   exists (\"y", "x").
 
-  split.
-  - apply step_beta; constructor. 
-  - unfold safe_to_subst. simpl. split.
-    + shelve.
-    +      
-   
-  
-
-
-
+  (* - apply step_beta; constructor. *)
+  (* - unfold safe_to_subst. simpl. split. *)
+  (*   + shelve. *)
+  (*   + *)
 Admitted. (* Change to Qed when done *)
 
 
@@ -1027,8 +1021,10 @@ Proof.
   unfold closed.
   intros x Hfree.
   apply well_typed_free_vars_in_context with (x:=x) in H. (* why did we need to specify... *)
-
-Admitted.
+  - destruct H as [t' Hlookup].
+    simpl in Hlookup. discriminate.
+  - auto.
+Qed.
 
 
 (*
@@ -1057,7 +1053,7 @@ Lemma context_extentionality :
 Proof.
   intros.
   revert G2 H.
-  induction H0.
+  induction H0; intros.
   - intros. apply HtTrue.
   - intros. apply HtFalse.
   - intros. specialize (H0 x). econstructor. simpl in H0. destruct H0.
@@ -1081,8 +1077,8 @@ Proof.
 Qed.
 
 
-  
- 
+
+
 
 (* Extentionality is a very powerful lemma. *)
 
