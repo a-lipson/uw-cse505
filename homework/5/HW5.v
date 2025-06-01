@@ -752,15 +752,14 @@ Proof.
     ((\x. ((\x. x) y)) x) (\y. x)
     ((\x. x) y) (\y. x)
   *)
-  exists (\"x", (\"x", "x" @ "y") @ "x").
-  exists (\"y", "x").
-  exists (\"x", "y" @ "x").
-  exists (\"y", "x").
-
-  (* - apply step_beta; constructor. *)
-  (* - unfold safe_to_subst. simpl. split. *)
-  (*   + shelve. *)
-  (*   + *)
+  exists (((\"x", (\"y", "x")) @ (\"y", "z"))).
+  exists "x".
+  exists (((\"y", (\"y", "z")))).
+  exists "x".
+  split.
+  - apply step_app_left. apply step_beta. constructor.
+  
+        
 Admitted. (* Change to Qed when done *)
 
 
