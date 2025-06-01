@@ -1131,7 +1131,7 @@ Proof.
   - eapply trc_front.
     + apply step_true.
     + apply trc_refl.
-Admitted.
+Qed.
 
 (* The rest of the problems in this section are challenge problems. Skip to the
    next section for more core points. *)
