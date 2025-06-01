@@ -1715,8 +1715,9 @@ Proof.
   revert t HT.
   induction Step; intros t HT; invc HT; eauto.
   - invc H3. eauto using substitution_one.
-  (* YOUR CODE HERE *)
-Admitted.
+  - invc H3. eauto using substitution_one.
+  - invc H3. eauto using substitution_one.
+Qed.
 
 Definition closed_expr_of_type (t : type) : expr -> Prop :=
   fun e =>
