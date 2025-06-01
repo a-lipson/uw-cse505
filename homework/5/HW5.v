@@ -1122,7 +1122,16 @@ Example ill_typed_but_safe :
     (forall G t, ~ (G |- e : t)) /\
     e -->* T.
 Proof.
-  (* YOUR CODE HERE *)
+  (* If T Then T Else (T @ T) *)
+  exists (Ite T T (\"x", "x")).
+  split.
+  - intros G t H.
+    inversion H; subst.
+    inversion H6; subst.
+    inversion H7; subst.
+  - eapply trc_front.
+    + apply step_true.
+    + apply trc_refl.
 Admitted.
 
 (* The rest of the problems in this section are challenge problems. Skip to the
