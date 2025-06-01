@@ -131,7 +131,8 @@ Ltac invariant_induction_boilerplate :=
     | [ |- forall _, ?P _ -> ?Q _ ] =>
       unfold_predicate P;
       unfold_predicate Q;
-      intros s Hinit;
+      intr
+      os s Hinit;
       try subst
     end
   |
@@ -143,6 +144,7 @@ Ltac invariant_induction_boilerplate :=
       intros s1 IH s2 Hstep
     end
   ].
+
 
 Ltac invc H := inversion H; subst; clear H.
 Ltac break_up_hyps :=
@@ -186,10 +188,14 @@ Infix "@" := App (left associativity, at level 68).
 Delimit Scope utlc_scope with expr.
 Bind Scope utlc_scope with expr.
 
+
 Fixpoint subst (from : var) (to : expr) (e : expr) : expr :=
   match e with
   | Var x => if var_eq from x then to else e
-  | Abs x e1 => Abs x (if var_eq from x then e1 else subst from to e1)
+  
+  | Abs x e1 => Abs x 
+  (if var_eq from x t
+  hen e1 else subst from to e1)
   | App e1 e2 => App (subst from to e1) (subst from to e2)
   end.
 
@@ -203,6 +209,7 @@ Inductive step : expr -> expr -> Prop :=
 | step_beta :
   forall x e v,
     value v ->
+    
     step (App (\x, e) v) (subst x v e)
 | step_app_left :
   forall e1 e1' e2,
@@ -312,6 +319,7 @@ Fixpoint take_one_step (e : expr) : expr :=
   match e with
   | Var _ => e
   | Abs _ _ => e
+  
   | App (Abs x e) ((Abs _ _) as v) => subst x v e
   | App (Abs x e) e2 => App (Abs x e) (take_one_step e2)
   | App e1 e2 => App (take_one_step e1) e2
@@ -342,15 +350,18 @@ Fixpoint run_for_n_steps (n : nat) (e : expr) : expr :=
   | S m => run_for_n_steps m (take_one_step e)
   end.
 
+
 Lemma free_vars_subst :
   forall from to e x,
     closed to ->
+    
     is_free_var (subst from to e) x <->
     is_free_var e x /\ x <> from.
 Proof.
   intros from to e x Hto.
   induction e; simpl.
-  - destruct (var_eq _ _); simpl.
+  - de
+  struct (var_eq _ _); simpl.
     + subst. split; intros.
       * apply Hto in H. intuition.
       * intuition. congruence.
@@ -361,15 +372,18 @@ Proof.
   - rewrite IHe1, IHe2. intuition.
 Qed.
 
+
 Theorem closed_subst :
   forall from to e,
     closed (\from, e) ->
-    closed to ->
+    closed t
+    o ->
     closed (subst from to e).
 Proof.
   unfold closed.
   simpl.
-  intros from to e He Hto x.
+  intros from to e H
+  e Hto x.
   rewrite free_vars_subst by assumption.
   firstorder.
 Qed.
@@ -384,6 +398,7 @@ Proof.
   induction Hstep; try firstorder.
   apply closed_app_invert in Hclosed.
   break_up_hyps.
+  
   eauto using closed_subst.
 Qed.
 
@@ -509,15 +524,18 @@ Qed.
 (*
  * PROBLEM 5 [10 points, ~20 tactics]
  *
- * In lecture during Week 8, we discussed a "wishful" version of the
+ * 
+ In lecture during Week 8, we discussed a "wishful" version of the
  * substitution lemma that was an if and only if.
  *
  * Show that this one direction of the lemma is true.
  *
  * Hint: Proceed by induction. (On what?)
  *)
+ 
 Lemma free_vars_subst_1 :
-  forall from to e x,
+  forall from to 
+  e x,
     is_free_var (subst from to e) x ->
     (is_free_var e x /\ x <> from) \/ (is_free_var to x /\ is_free_var e from).
 Proof.
@@ -525,7 +543,8 @@ Proof.
   revert to from x H.
   induction e; intros; simpl in *.
 
-  - destruct var_eq; auto.
+  - destruct var
+  _eq; auto.
     simpl in *. subst. auto.
   - destruct H. destruct var_eq.
     + left. repeat split; auto.
@@ -553,9 +572,11 @@ Qed.
  *
  * Your example is an example of what we call "variable capture".
  *)
+ 
 Example free_vars_subst_2_nope :
   exists from to e x,
-    ((is_free_var e x /\ x <> from) \/ (is_free_var to x /\ is_free_var e from)) /\
+    ((is_free_var e
+     x /\ x <> from) \/ (is_free_var to x /\ is_free_var e from)) /\
     ~ is_free_var (subst from to e) x.
 Proof.
   (* counterexample: (λx. y)[y |-> x]; FV(x) = {x} != FV(λx. y) = {y} *)
@@ -569,6 +590,7 @@ Qed.
 (*
  * PROBLEM 7 [15 points, ~15 tactics]
  *
+ 
  * Prove that if e is closed, then calling subst on e is a no-op.
  *
  * Hint: Note that here we are talking about *e* being closed, not "to".
@@ -577,6 +599,7 @@ Qed.
  * helper lemma. If you are not sure what lemma to prove, try getting stuck in a
  * direct proof by induction of the theorem.
  *)
+ 
 Lemma subst_closed_under_abs :
   forall e x,
     closed (\x, e) -> closed e.
@@ -585,15 +608,18 @@ Proof.
   (* i think this is the wrong lemma. *)
 Admitted.
 
+
 Lemma subst_not_free_in_abs :
   forall e x y to,
     x <> y ->
-    ~ is_free_var (\x, e) y ->
+    ~ is_f
+    ree_var (\x, e) y ->
     (\ x, subst y to e) = (\ x, e).
 Proof.
   intros.
   simpl.
-  destruct (var_eq y x).
+  de
+  struct (var_eq y x).
   - subst. contradiction H0. simpl. split. 
     exact H. intuition.
   - induction e.
@@ -605,10 +631,11 @@ Proof.
       * reflexivity.
       * shelve.
     + intros. simpl in *. intuition. 
-      specialize (IHe1 x y to H).
-     
+Admitted
+.
 Theorem subst_closed :
-  forall from to e,
+  forall from to
+   e,
     closed e -> subst from to e = e.
 Proof.
   intros.
@@ -617,14 +644,16 @@ Proof.
     + specialize (H s). simpl in H. contradiction.
     + reflexivity.
   - destruct (var_eq _ _).
-    + reflexivity.
+    + reflex
+    ivity.
     + apply subst_not_free_in_abs.
       * auto.
       * auto.
       
     
 (*     
-     f_equal. apply IHe.
+     f_equa
+     l. apply IHe.
      apply subst_closed_under_abs in H. assumption.  *)
   - f_equal.
     + apply IHe1. apply closed_app_invert in H. intuition.
@@ -706,7 +735,8 @@ Qed.
 
 
 
-(* Here is a predicate for when it is safe to plug to into e somewhere. *)
+(* Here is a predic
+ate for when it is safe to plug to into e somewhere. *)
 Definition safe_to_subst (e to : expr) : Prop :=
   forall y,
     ~ (is_free_var to y /\ is_bound_var e y).
@@ -714,14 +744,20 @@ Definition safe_to_subst (e to : expr) : Prop :=
 (*
  * CHALLENGE 11 [7 points, ~25 tactics]
  *
- * Prove that if the arguments to subst are "safe_to_subst",  then subst
+ 
+ * Prove that if the arguments to subst are "sa
+ fe_to_subst",  then subst
  * satisfies the full version of our free_vars_subst lemma.
  *
+ 
  * Hint: Pretty similar to free_vars_subst from Week07.v.
  *)
+ 
 Lemma free_vars_subst_no_capture :
-  forall from to e x,
-    safe_to_subst e to ->
+  forall fro
+  m to e x,
+    safe_to_subst
+     e to ->
     is_free_var (subst from to e) x <->
     (is_free_var e x /\ x <> from) \/
     (is_free_var to x /\ is_free_var e from).
@@ -741,18 +777,23 @@ Admitted. (* Change to Qed when done *)
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
  *
+ 
  * safe_to_subst gives us a condition under which our substitution function
  * avoids capture without having to do any extra work.
  *
  * Unfortunately, this condition is not always preserved by execution.
  *
+ 
  * Give an example of a program that is safe to subst, but steps to a program
  * that is not safe.
  *)
+ 
 Example safe_to_subst_not_inductive :
   exists e1 e2 e3 e4,
-    e1 @ e2 --> e3 @ e4 /\
-    safe_to_subst e1 e2 /\
+    e1 @ e2 
+    --> e3 @ e4 /\
+    safe_to_su
+    bst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
   exists (\"x", (\"x", "y" @ "x") @ "x").
@@ -761,7 +802,8 @@ Proof.
   exists (\"y", "x").
 
   split.
-  - apply step_beta; constructor. 
+  - apply step_beta
+  ; constructor. 
   - unfold safe_to_subst. simpl. split.
     + shelve.
     +      
@@ -812,14 +854,20 @@ Infix "@" := App (left associativity, at level 68).
 Delimit Scope stlc_scope with expr.
 Bind Scope stlc_scope with expr.
 
+
 Fixpoint subst (from : var) (to : expr) (e : expr) : expr :=
   match e with
   | T => T
   | F => F
   | Var x => if var_eq from x then to else e
-  | Abs x e1 => Abs x (if var_eq from x then e1 else subst from to e1)
+  
+  | Abs x e1 => Abs x 
+  (if var_eq from x t
+  hen e1 else subst from to e1)
   | App e1 e2 => App (subst from to e1) (subst from to e2)
-  | If c Then e1 Else e2 =>
+  | If c
+   Then e1 Else e2 =>
+  
     If (subst from to c) Then (subst from to e1) Else (subst from to e2)
   end.
 
@@ -833,6 +881,7 @@ Inductive step : expr -> expr -> Prop :=
 | step_beta :
   forall x e v,
     value v ->
+    
     step (App (\x, e) v) (subst x v e)
 | step_app_left :
   forall e1 e1' e2,
@@ -1179,6 +1228,7 @@ Proof.
   intros e t HT.
   remember [] as G.
   revert HeqG.
+  
   induction HT; intros; subst; easy_specialize.
   (* YOUR CODE HERE *)
 Admitted.
@@ -1241,6 +1291,7 @@ Bind Scope stlc_scope with expr.
 (*
  * PROBLEM 22 [3 points, ~4 LOC]
  *
+ 
  * Extend the substitution function with cases for the new expressions.
  *
  * Reminder: don't forget to uncomment the lines marked "UNCOMMENT" above.
@@ -1249,14 +1300,20 @@ Bind Scope stlc_scope with expr.
  * are similar to App and If.
  *
  *)
+ 
 Fixpoint subst (from : var) (to : expr) (e : expr) : expr :=
   match e with
   | T => T
   | F => F
   | Var x => if var_eq from x then to else e
-  | Abs x e1 => Abs x (if var_eq from x then e1 else subst from to e1)
+  
+  | Abs x e1 => Abs x 
+  (if var_eq from x t
+  hen e1 else subst from to e1)
   | App e1 e2 => App (subst from to e1) (subst from to e2)
-  | If c Then e1 Else e2 =>
+  | If c
+   Then e1 Else e2 =>
+  
     If (subst from to c) Then (subst from to e1) Else (subst from to e2)
   (* YOUR CODE HERE *)
   end.
@@ -1318,6 +1375,7 @@ Inductive step : expr -> expr -> Prop :=
 | step_beta :
   forall x e v,
     value v ->
+    
     step (App (\x, e) v) (subst x v e)
 | step_app_left :
   forall e1 e1' e2,
@@ -1436,6 +1494,7 @@ Proof.
   intros.
   remember [] as G.
   revert HeqG.
+  
   induction H; intros; subst; unfold unstuck; eauto; easy_specialize.
   - simpl in *. discriminate.
   - clear IHhasty2 IHhasty3.
@@ -1462,7 +1521,8 @@ Lemma weakening_middle :
 Proof.
   intros G1 G2 G3 e t Disjoint He.
   remember (G1 ++ G3)%list as G.
-  revert G1 G2 G3 HeqG Disjoint.
+  revert G1 G2 G3 HeqG D
+  isjoint.
   induction He; intros; subst; eauto.
   - econstructor.
     rewrite lookup_app in *.
@@ -1506,6 +1566,7 @@ Proof.
   intros G x t1 t2 e t He HG.
   remember (G ++ [(x, t2)])%list as G'.
   revert G t1 HeqG' HG.
+  
   induction He; intros; subst; eauto.
   - rewrite lookup_app in H.
     destruct (lookup x0 G0) eqn:?.
@@ -1517,19 +1578,23 @@ Proof.
     destruct var_eq; auto.
 Qed.
 
+
 Lemma substitution :
   forall G  e t x t1 v,
     (G ++ [(x, t1)])%list |- e : t ->
     lookup x G = None ->
-    [] |- v : t1->
+    [] |-
+     v : t1->
     G |- subst x v e : t.
 Proof.
   intros G e t x t1 v He Hlook Hv.
   remember (G ++ [(x, t1)])%list as G'.
-  revert G x t1 v Hlook Hv HeqG'.
+  revert G x t1 v Hlook Hv HeqG
+  '.
   induction He; simpl; intros; subst; eauto.
   - rewrite lookup_app in H.
-    destruct var_eq.
+    de
+    struct var_eq.
     + subst. rewrite Hlook in H.
       simpl in *. destruct var_eq; try congruence.
       invc H.
@@ -1538,7 +1603,8 @@ Proof.
       * invc H. auto.
       * simpl in *. destruct var_eq; congruence.
   - constructor.
-    destruct var_eq.
+    de
+    struct var_eq.
     + subst. eapply strengthening; eauto.
       simpl.
       destruct var_eq; try congruence.
@@ -1548,12 +1614,15 @@ Proof.
       destruct var_eq; congruence.
 Qed.
 
+
 Lemma substitution_one :
   forall x t1 e t v,
     [(x, t1)] |- e : t ->
-    [] |- v : t1->
+    [] |- 
+    v : t1->
     [] |- subst x v e : t.
 Proof.
+  
   eauto using substitution.
 Qed.
 
@@ -1572,7 +1641,8 @@ Lemma preservation :
 Proof.
   intros e e' t HT Step.
   revert t HT.
-  induction Step; intros t HT; invc HT; eauto.
+  induction Step; intros 
+  t HT; invc HT; eauto.
   - invc H3. eauto using substitution_one.
   (* YOUR CODE HERE *)
 Admitted.
