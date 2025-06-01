@@ -1509,7 +1509,17 @@ Inductive hasty : gamma -> expr -> type -> Prop :=
 | HtAbs :   forall G x e t1 t2,
                     ((x, t1) :: G |- e : t2) ->
                     (G |- \x, e : (t1 ==> t2))
-(* YOUR CODE HERE *)
+| HtPair: forall G e1 e2 t1 t2, 
+            (G |- e1 : t1) -> 
+            (G |- e2 : t2) -> 
+            (G |- MkPair e1 e2 : Pair t1 t2) 
+| HtFst: forall G e t1 t2, 
+            (G |- e: Pair t1 t2) -> 
+            (G |- Fst e : t1)
+| HtSnd: forall G e t1 t2, 
+            (G |- e: Pair t1 t2) -> 
+            (G |- Snd e : t2)
+
 where "G |- x : t" := (hasty G x t).
 Local Hint Constructors hasty : core.
 
