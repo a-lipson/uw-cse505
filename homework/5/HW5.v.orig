@@ -594,17 +594,17 @@ Proof.
   intros.
   simpl.
   destruct (var_eq y x).
-  - subst. contradiction H0. simpl. split.
+  - subst. contradiction H0. simpl. split. 
     exact H. intuition.
   - induction e.
     + intros. simpl. destruct (var_eq y s).
-      * intuition. simpl in *. intuition.
-        exfalso. apply H0. rewrite <- e. reflexivity.
+      * intuition. simpl in *. intuition. 
+        exfalso. apply H0. rewrite <- e. reflexivity.  
       * reflexivity.
     + intros. simpl. destruct (var_eq y s).
       * reflexivity.
       * shelve.
-    + intros. simpl in *. intuition.
+    + intros. simpl in *. intuition. 
 Admitted.
 
 Theorem subst_closed :
@@ -620,8 +620,8 @@ Proof.
     + reflexivity.
     + apply subst_not_free_in_abs.
       * auto.
-      * auto.
-(*
+      * auto.    
+(*     
      f_equal. apply IHe.
      apply subst_closed_under_abs in H. assumption.  *)
   - f_equal.
@@ -724,15 +724,17 @@ Lemma free_vars_subst_no_capture :
     (is_free_var e x /\ x <> from) \/
     (is_free_var to x /\ is_free_var e from).
 Proof.
-  intros.
+  intros from to e x Hto.
   induction e; simpl.
-  - destruct var_eq; simpl.
-    + subst. split; intros.
-      * right. auto.
-      * intuition. congruence.
+  - destruct var_eq.
+    all: split; intros; intuition; try congruence.
+    left. split. auto. congruence.
+  - destruct var_eq.
     + intuition.
-      * left. split; auto. congruence.
+      * left. repeat split; intuition. congruence.
       * congruence.
+<<<<<<< HEAD
+=======
   - destruct var_eq; simpl.
     + intuition.
       * left. split; auto. congruence.
@@ -754,6 +756,10 @@ Proof.
     + right. apply IHe2; firstorder.
 Qed.
 
+>>>>>>> ef2cb20 (15)
+
+Admitted. (* Change to Qed when done *)
+
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
  *
@@ -771,16 +777,21 @@ Example safe_to_subst_not_inductive :
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
+<<<<<<< HEAD
+  exists (\"x", (\"x", "y" @ "x") @ "x").
+=======
   (*
     ((\x. ((\x. x) y)) x) (\y. x)
     ((\x. x) y) (\y. x)
   *)
   exists (\"x", (\"x", "x" @ "y") @ "x").
+>>>>>>> ef2cb20 (15)
   exists (\"y", "x").
   exists (\"x", "y" @ "x").
   exists (\"y", "x").
 
   split.
+<<<<<<< HEAD
   - apply step_beta; constructor. 
   - unfold safe_to_subst. simpl. split.
     + shelve.
@@ -790,6 +801,13 @@ Proof.
 
 
 
+=======
+  (* step check *)
+  - apply step_beta; constructor.
+
+  - unfold safe_to_subst. simpl. split.
+    + intros. intuition.
+>>>>>>> ef2cb20 (15)
 Admitted. (* Change to Qed when done *)
 
 
@@ -967,9 +985,19 @@ Proof.
   exists (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
   repeat constructor.
   apply HtApp with (t1 := Bool).
+<<<<<<< HEAD
+  - apply HtVar. simpl. reflexivity.
+  - constructor. all: repeat constructor.
+Qed.    
+             
+            
+=======
   - apply HtVar. reflexivity.
   - all: repeat constructor.
 Qed.
+
+
+>>>>>>> ef2cb20 (15)
 
 
 Definition closed (e : expr) : Prop :=
@@ -1063,26 +1091,12 @@ Proof.
   - intros. specialize (H0 x). econstructor. simpl in H0. destruct H0.
     + reflexivity.
     + rewrite H. reflexivity.
-  - intros. simpl in *. econstructor.
-    + apply IHhasty1. intros. apply H. left. exact H0.
-    + apply IHhasty2. intros. apply H. right. left. exact H0.
-    + apply IHhasty3. intros. apply H. right. right. exact H0.
-  - intros. econstructor.
-    + apply IHhasty1. intros. simpl in *. apply H. left. exact H0.
-    + apply IHhasty2. intros. simpl in *. apply H. right. exact H0.
-  - intros. econstructor. specialize (IHhasty ((x, t1)::G2)).
-    destruct IHhasty; auto 25.
-    + intros. simpl in *. destruct (var_eq x0 x).
-      * reflexivity.
-      * apply H. split. all: auto.
-    + econstructor.
-      * exact h1.
-      * exact h2.
-Qed.
-
+  - intros. simpl in *. econstructor. all: shelve.
+  - 
 
   
  
+Admitted.
 
 (* Extentionality is a very powerful lemma. *)
 
