@@ -700,16 +700,14 @@ Lemma free_vars_subst_no_capture :
 Proof.
   intros from to e x Hto.
   induction e; simpl.
-  - destruct (var_eq _ _).
+  - destruct var_eq.
     all: split; intros; intuition; try congruence.
     left. split. auto. congruence.
-  - destruct (var_eq _ _).
+  - destruct var_eq.
     + intuition.
       * left. repeat split; intuition. congruence.
       * congruence.
-    + intuition.
-      *
-  (* YOUR CODE HERE *)
+
 Admitted. (* Change to Qed when done *)
 
 (*
