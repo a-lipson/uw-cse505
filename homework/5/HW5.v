@@ -1008,12 +1008,26 @@ Proof.
   - intros. specialize (H0 x). econstructor. simpl in H0. destruct H0.
     + reflexivity.
     + rewrite H. reflexivity.
-  - intros. simpl in *. econstructor. all: shelve.
-  - 
+  - intros. simpl in *. econstructor.
+    + apply IHhasty1. intros. apply H. left. exact H0.
+    + apply IHhasty2. intros. apply H. right. left. exact H0.
+    + apply IHhasty3. intros. apply H. right. right. exact H0.
+  - intros. econstructor.
+    + apply IHhasty1. intros. simpl in *. apply H. left. exact H0.
+    + apply IHhasty2. intros. simpl in *. apply H. right. exact H0.
+  - intros. econstructor. specialize (IHhasty ((x, t1)::G2)).
+    destruct IHhasty; auto 25.
+    + intros. simpl in *. destruct (var_eq x0 x).
+      * reflexivity.
+      * apply H. split. all: auto.
+    + econstructor.
+      * exact h1.
+      * exact h2.
+Qed.
+
 
   
  
-Admitted.
 
 (* Extentionality is a very powerful lemma. *)
 
