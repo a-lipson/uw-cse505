@@ -514,7 +514,7 @@ Qed.
  *
  * Show that this one direction of the lemma is true.
  *
- * Hint: Proceed by induction.
+ * Hint: Proceed by induction. (On what?)
  *)
 Lemma free_vars_subst_1 :
   forall from to e x,
@@ -524,6 +524,7 @@ Proof.
   intros.
   revert to from x H.
   induction e; intros; simpl in *.
+
   - destruct var_eq; auto.
     simpl in *. subst. auto.
   - destruct H. destruct var_eq.
@@ -584,6 +585,28 @@ Proof.
   (* i think this is the wrong lemma. *)
 Admitted.
 
+Lemma subst_not_free_in_abs :
+  forall e x y to,
+    x <> y ->
+    ~ is_free_var (\x, e) y ->
+    (\ x, subst y to e) = (\ x, e).
+Proof.
+  intros.
+  simpl.
+  destruct (var_eq y x).
+  - subst. contradiction H0. simpl. split. 
+    exact H. intuition.
+  - induction e.
+    + intros. simpl. destruct (var_eq y s).
+      * intuition. simpl in *. intuition. 
+        exfalso. apply H0. rewrite <- e. reflexivity.  
+      * reflexivity.
+    + intros. simpl. destruct (var_eq y s).
+      * reflexivity.
+      * shelve.
+    + intros. simpl in *. intuition. 
+      specialize (IHe1 x y to H).
+     
 Theorem subst_closed :
   forall from to e,
     closed e -> subst from to e = e.
@@ -595,8 +618,14 @@ Proof.
     + reflexivity.
   - destruct (var_eq _ _).
     + reflexivity.
-    + f_equal. apply IHe.
-      apply subst_closed_under_abs in H. assumption.
+    + apply subst_not_free_in_abs.
+      * auto.
+      * auto.
+      
+    
+(*     
+     f_equal. apply IHe.
+     apply subst_closed_under_abs in H. assumption.  *)
   - f_equal.
     + apply IHe1. apply closed_app_invert in H. intuition.
     + apply IHe2. apply closed_app_invert in H. intuition.
@@ -628,6 +657,7 @@ Definition SumUpto : expr :=
       (\"_", Add @ "n" @ ("rec" @ (Pred @ "n")))) @ Id).
 
 
+
 Definition Two := Succ @ One.
 Definition Three := Succ @ Two.
 Definition Four := Succ @ Three.
@@ -648,7 +678,6 @@ Proof.
   compute.
   intuition.
 Qed.
-
 
 (* Here are a few challenge problems about UTLC. For more core points, skip to
    the next section. *)
@@ -676,59 +705,38 @@ Proof.
 Qed.
 
 
+
 (* Here is a predicate for when it is safe to plug to into e somewhere. *)
 Definition safe_to_subst (e to : expr) : Prop :=
   forall y,
     ~ (is_free_var to y /\ is_bound_var e y).
 
-
 (*
  * CHALLENGE 11 [7 points, ~25 tactics]
  *
- * Prove that if the arguments to subst are "safe_to_subst", then subst
+ * Prove that if the arguments to subst are "safe_to_subst",  then subst
  * satisfies the full version of our free_vars_subst lemma.
  *
  * Hint: Pretty similar to free_vars_subst from Week07.v.
  *)
 Lemma free_vars_subst_no_capture :
-  forall e to,
+  forall from to e x,
     safe_to_subst e to ->
-    forall from x,
-      is_free_var (subst from to e) x <->
-      (is_free_var e x /\ x <> from) \/
-      (is_free_var to x /\ is_free_var e from).
+    is_free_var (subst from to e) x <->
+    (is_free_var e x /\ x <> from) \/
+    (is_free_var to x /\ is_free_var e from).
 Proof.
-  intros.
+  intros from to e x Hto.
   induction e; simpl.
-  - destruct var_eq; simpl.
-    + subst. split; intros.
-      * right. auto.
-      * intuition. congruence.
+  - destruct var_eq.
+    all: split; intros; intuition; try congruence.
+    left. split. auto. congruence.
+  - destruct var_eq.
     + intuition.
-      * left. split; auto. congruence.
+      * left. repeat split; intuition. congruence.
       * congruence.
-  - destruct var_eq; simpl.
-    + intuition.
-      * left. split; auto. congruence.
-      * congruence.
-    + intuition.
-      * rewrite IHe in H2; firstorder.
-      * apply IHe; firstorder.
-      * firstorder.
-      * apply IHe; firstorder.
-  - (* firstorder using  IHe1, IHe2. *)
-    intuition.
-    + rewrite IHe1 in H1.
-      intuition. firstorder.
-    + rewrite IHe2 in H1.
-      intuition. firstorder.
-    + left. apply IHe1; firstorder.
-    + right. apply IHe2; firstorder.
-    + left. apply IHe1; firstorder.
-    + right. apply IHe2; firstorder.
-Qed.
 
-
+Admitted. (* Change to Qed when done *)
 
 (*
  * CHALLENGE 12 [5 points, ~15 tactics]
@@ -747,17 +755,18 @@ Example safe_to_subst_not_inductive :
     safe_to_subst e1 e2 /\
     ~ safe_to_subst e3 e4.
 Proof.
-  exists (\"x", (\"x", "x" @ "y") @ "x").
+  exists (\"x", (\"x", "y" @ "x") @ "x").
   exists (\"y", "x").
-  exists (\"x", "x" @ "y").
+  exists (\"x", "y" @ "x").
   exists (\"y", "x").
 
   split.
-  - apply step_beta; constructor.
+  - apply step_beta; constructor. 
   - unfold safe_to_subst. simpl. split.
-    + intros. intuition.
-
-
+    + shelve.
+    +      
+   
+  
 
 
 
@@ -932,16 +941,17 @@ Admitted.
  *)
 Lemma program_with_stlc :
   exists G t,
-    G |- t : (Bool ==> Bool) ==> (Bool ==> Bool ==> Bool).
+    G |- t : ((Bool ==> Bool) ==> (Bool ==> Bool ==> Bool)).
 Proof.
-  exists [], (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
+  exists [].
+  exists (\"f", \"a", \"b", "f" @ (If T Then "a" Else "b")).
   repeat constructor.
   apply HtApp with (t1 := Bool).
   - apply HtVar. simpl. reflexivity.
   - constructor. all: repeat constructor.
-Qed.
-
-
+Qed.    
+             
+            
 
 
 Definition closed (e : expr) : Prop :=
@@ -992,7 +1002,12 @@ Lemma context_extentionality :
     G1 |- e : t ->
     G2 |- e : t.
 Proof.
-  (* YOUR CODE HERE *)
+  intros.
+  revert G1 G2 t H H0.
+  induction e.
+  - intros. destruct t.
+    + apply HtTrue.
+    + 
 Admitted.
 
 (* Extentionality is a very powerful lemma. *)
