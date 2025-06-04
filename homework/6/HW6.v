@@ -296,7 +296,6 @@ Lemma type_uniqueness :
     [] |- e : t2 ->
     t1 = t2.
 Proof.
-  (* YOUR CODE HERE *)
 Admitted.
 
 End STLC_with_annotations.
@@ -417,7 +416,29 @@ file to turn it in.
  *       counts.
  *)
 (*
-# Paste your code here
+    Id = forall A. A -> A;       # type abbreviation
+    id = /\A. \x:A. x;           # term abbreviation
+    id Id id;                    # evaluating a term to normal form
+    test id Id id = id;          # passing test
+    id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type 
+                                # annotation, which allows inference on the RHS
+    Nat = forall A. (A -> A) -> A -> A;
+    zero : Nat = /\A. \s. \z. z;
+    succ : Nat -> Nat = \n. /\A. \s. \z. s (n A s z);
+    one = succ zero;
+    two = succ one;
+    three = succ two;
+    four = succ three;
+    test succ one = two;
+
+    add : Nat -> Nat -> Nat = \n:Nat. \m:Nat. n Nat succ m;
+    mul : Nat -> Nat -> Nat = \n:Nat. \m:Nat. n Nat (add m) zero;
+    exp : Nat -> Nat -> Nat = \n:Nat. \m:Nat. m Nat (mul n) one;
+
+    test add one two = three;
+    test mul two two = four;
+    eight = add four four;
+    test exp two three = eight;
 *)
 
 (* PROBLEM 4 [30 points, ~15 LOC]
