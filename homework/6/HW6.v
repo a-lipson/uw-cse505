@@ -469,10 +469,12 @@ mkpair : forall A B. A -> B -> Pair A B = /\A. /\B. \a:A. \b:B. /\C. \f:(A -> B-
 fst: forall A B. Pair A B -> A = /\A. /\B. \c:(Pair A B). c A (\x:A. \y:B. x);
 snd: forall A B. Pair A B -> B = /\A. /\B. \c:(Pair A B). c B (\x:A. \y:B. y);
 
-natpair : Pair Nat Nat = \x:Nat.  \y:Nat. mkpair Nat Nat x y;
+natpair : Pair Nat Nat = mkpair Nat Nat one two;
 
-test fst Nat Nat mkpair Nat Nat one two = one;
-test snd Nat Nat mkpair Nat Nat one two = two;*)
+test fst Nat Nat natpair = one; 
+test snd Nat Nat natpair = two; 
+
+*)
 
 (* PROBLEM 5 [15 points, ~10 LOC]
  *
