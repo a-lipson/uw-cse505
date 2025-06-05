@@ -492,10 +492,10 @@ file to turn it in.
 Pair A B = forall C. (A -> B -> C) -> C;
 
 mkpair : forall A B. A -> B -> Pair A B =
-   /\A. /\B. \a:A. \b:B. /\C. \f:(A -> B-> C) . f a b;
+   /\A B. \a:A. \b:B. /\C. \f:(A -> B -> C) . f a b;
 
-fst: forall A B. Pair A B -> A = /\A. /\B. \c:(Pair A B). c A (\x:A. \y:B. x);
-snd: forall A B. Pair A B -> B = /\A. /\B. \c:(Pair A B). c B (\x:A. \y:B. y);
+fst: forall A B. Pair A B -> A = /\A B. \c:(Pair A B). c A (\x:A. \y:B. x);
+snd: forall A B. Pair A B -> B = /\A B. \c:(Pair A B). c B (\x:A. \y:B. y);
 
 natpair : Pair Nat Nat = mkpair Nat Nat one two;
 
@@ -519,6 +519,18 @@ predAux : Pair Nat Nat -> Pair Nat Nat =
 
 pred: Nat -> Nat =
    \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
+
+# same as above but with extracting some types to abbreviations.
+Nat2 = Pair Nat Nat;
+mkpairNat : Nat -> Nat -> Nat2 = mkpair Nat Nat;
+fstNat : Nat2 -> Nat = fst Nat Nat;
+sndNat : Nat2 -> Nat = snd Nat Nat;
+
+predAux : Nat2 -> Nat2 =
+   \p:Nat2. mkpairNat (succ (fstNat p)) (fstNat p);
+
+pred: Nat -> Nat =
+    \n. sndNat (n Nat2 predAux (mkpairNat zero zero));
 
 seven = add four three;
 eight = add four four;
@@ -589,13 +601,17 @@ test pred zero = zero;
 (*
 a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-    /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
+   /\A. \f:(Nat -> A->A) . \p:(Pair Nat A).
+   mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
 
 setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-    /\A. \f. natrec_aux A f;
+   /\A. \f. natrec_aux A f;
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
-     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
+   /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
+   snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
+
+
 *)
 
 (* CHALLENGE 7 [10 points, ~35 LOC]
@@ -615,7 +631,7 @@ natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
  * For example, the list [1; 2; 3] would be represented by
  *
  *     /\B. \c. \n.
- *       c 1 (c 2 (c 3 n))
+ *     c 1 (c 2 (c 3 n))
  *
  * (Of course, we also need to encode the numbers.)
  *
@@ -670,7 +686,7 @@ natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
  *    test insertion_sort one_zero_two = seq three;
  *)
 (*
-# Paste your code here
+seq :
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
@@ -717,7 +733,15 @@ natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
  * starts with the left-hand side above and "computes" to the right hand side.
  * At each step, you can either expand an abbreviation, or take a step.
  *)
-(* YOUR ASCII PROOF HERE *)
+(*
+fst t1 t2 (mkpair t1 t2 v1 v2)
+fst t1 t2 ((λp. p v1 v2))
+(λp. p (λx. λy. x)) (λp. p v1 v2)
+(λp. p v1 v2) (λx. λy. x)
+(λx. λy. x) v1 v2
+(λy. v1) v2
+v1
+*)
 
 (*
             ____                  _     _                     _  _
