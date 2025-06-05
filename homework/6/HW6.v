@@ -735,6 +735,7 @@ seq :
  * At each step, you can either expand an abbreviation, or take a step.
  *)
 (*
+Proof.
 fst t1 t2 (mkpair t1 t2 v1 v2)
 fst t1 t2 ((λp. p v1 v2))
 (λp. p (λx. λy. x)) (λp. p v1 v2)
@@ -767,9 +768,8 @@ v1
 (*
 Prop. There are 4 values of the given type.
 
- Proof.
+Proof.
 The only operations available are placing the input arguments into each of the two positions of the pair.
-
 Since each position can independently be filled with either the first or second argument, then we have 2 × 2 = 4 possible functions of this type:
 λx. λy. (x, x)
 λx. λy. (x, y)
@@ -790,7 +790,15 @@ Since each position can independently be filled with either the first or second 
  *     f t1 t2 (p t1 t2 v1 v2) -->* v1
  *
  *)
-(* YOUR ANSWER HERE *)
+(*
+Note that p constructs a pair with one value up to equivalence.
+Note that f is the first projection of a pair, also with one value up to equivalence.
+
+Since p and f must work consistently across all types without inspecting values,
+then the composition f . p must behave like the standard pair construction
+followed by the first projection, which returns the first argument.
+So, f . p will always return the first argument given to p, that is v1.
+*)
 
 (* Feedback question *)
 (*
