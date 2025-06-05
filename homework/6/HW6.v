@@ -571,7 +571,25 @@ setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
      /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
+
+b) 
+factorial: Nat -> Nat = \n:Nat . natrec Nat (\x. \rec. mul (succ x) rec) one n;
+
+five = succ four;
+twenty = mul five four;
+onetwenty =  mul twenty six;
+
+test factorial five = onetwenty;
+
+c) natcase : forall A. (Nat->A)->A->Nat->A = /\A. \f:(Nat-> A) . \x:A . \n:Nat . 
+    natrec A (\k:Nat. \a:A . f k) x n;
+
+d)
+
+
+
 *)
+
 
 (* CHALLENGE 7 [10 points, ~35 LOC]
  *
