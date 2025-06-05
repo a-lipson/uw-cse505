@@ -263,7 +263,7 @@ Inductive hasty : gamma -> expr -> type -> Prop :=
                     (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
                     (G |- If c Then e1 Else e2 : t)
 | HtApp :   forall G e1 e2 t1 t2,
-                    (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
+                   (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
                     (G |- e1 @ e2 : t2)
 | HtAbs :   forall G x e t1 t2,
                     ((x, t1) :: G |- e : t2) ->
@@ -291,16 +291,30 @@ Fixpoint is_free_var (e : expr) (y : var) : Prop :=
  *       should make sure nothing unnecessary is above the line.
  *)
 
+Lemma type_uniqueness_arbitrary_context :
+  forall G e t1 t2,
+    G |- e : t1 ->
+    G |- e : t2 ->
+    t1 = t2.
+Proof.
+  intros G e.
+  generalize dependent G. (* ∀ contexts G *)
+  induction e; intros G t1 t2 H1 H2; invc H1; invc H2; auto.
+  - congruence.
+  - eapply IHe2; eauto. (* two valid choices, IHe3 also works. *)
+  - f_equal. eapply IHe; eauto.
+  - injection (IHe1 G (t0 ==> t1) (t3 ==> t2) H4 H3). auto. (* same as specialize; inversion *)
+Qed.
+
+
 Lemma type_uniqueness :
   forall e t1 t2,
     [] |- e : t1 ->
     [] |- e : t2 ->
     t1 = t2.
 Proof.
-intros.
-   
-  
-Admitted.
+eapply type_uniqueness_arbitrary_context; eauto.
+Qed.
 
 End STLC_with_annotations.
 
@@ -424,8 +438,8 @@ file to turn it in.
     id = /\A. \x:A. x;           # term abbreviation
     id Id id;                    # evaluating a term to normal form
     test id Id id = id;          # passing test
-    id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type 
-                                # annotation, which allows inference on the RHS
+    id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type
+                                 # annotation, which allows inference on the RHS
     Nat = forall A. (A -> A) -> A -> A;
     zero : Nat = /\A. \s. \z. z;
     succ : Nat -> Nat = \n. /\A. \s. \z. s (n A s z);
@@ -475,8 +489,8 @@ snd: forall A B. Pair A B -> B = /\A. /\B. \c:(Pair A B). c B (\x:A. \y:B. y);
 
 natpair : Pair Nat Nat = mkpair Nat Nat one two;
 
-test fst Nat Nat natpair = one; 
-test snd Nat Nat natpair = two; 
+test fst Nat Nat natpair = one;
+test snd Nat Nat natpair = two;
 
 *)
 
@@ -498,7 +512,7 @@ pred: Nat -> Nat = \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat ze
 seven = add four three;
 eight = add four four;
 test pred eight = seven;
-test pred zero = zero; 
+test pred zero = zero;
 *)
 
 (* CHALLENGE 6 [10 points, ~35 LOC]
@@ -562,15 +576,15 @@ test pred zero = zero;
  *    recursive case, do pattern matching on y (i.e. use "natcase").
  *)
 (*
-a) 
+a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
     /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
 
-setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) = 
+setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
     /\A. \f. natrec_aux A f;
 
-natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
-     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
+natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
+     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
 *)
 
 (* CHALLENGE 7 [10 points, ~35 LOC]
