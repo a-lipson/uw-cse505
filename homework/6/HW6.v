@@ -291,6 +291,9 @@ Fixpoint is_free_var (e : expr) (y : var) : Prop :=
  *       should make sure nothing unnecessary is above the line.
  *)
 
+(* sharing is caring, especially with regards to namespaces :> *)
+Ltac e H := eapply H; eauto.
+
 Lemma type_uniqueness_arbitrary_context :
   forall G e t1 t2,
     G |- e : t1 ->
@@ -301,10 +304,11 @@ Proof.
   generalize dependent G. (* ∀ contexts G *)
   induction e; intros G t1 t2 H1 H2; invc H1; invc H2; auto.
   - congruence.
-  - eapply IHe2; eauto. (* two valid choices, IHe3 also works. *)
-  - f_equal. eapply IHe; eauto.
+  - e IHe2. (* two valid choices, IHe3 also works. *)
+  - f_equal. e IHe.
   - injection (IHe1 G (t0 ==> t1) (t3 ==> t2) H4 H3). auto. (* same as specialize; inversion *)
 Qed.
+
 
 
 Lemma type_uniqueness :
@@ -313,7 +317,7 @@ Lemma type_uniqueness :
     [] |- e : t2 ->
     t1 = t2.
 Proof.
-eapply type_uniqueness_arbitrary_context; eauto.
+  e type_uniqueness_arbitrary_context.
 Qed.
 
 End STLC_with_annotations.
@@ -404,7 +408,7 @@ often allows you to leave off type annotations on lambdas on the RHS.
 
 (*
 
-The following problems as you to write several programs in System F. We
+The following problems ask you to write several programs in System F. We
 recommend working in the editor and then copy-pasting your final code into this
 file to turn it in.
 
@@ -430,8 +434,8 @@ file to turn it in.
  * Hint: When we report "lines of code" in our solution, don't take the numbers
  *       too literally. We tend to put a line break after an "=" in most
  *       definitions. If you follow different conventions, you might get a
- *       (very) different number of lines. As always, we don't grade on line
- *       counts.
+ *       (very) different number of lines.
+ *       As always, we don't grade on line counts.
  *)
 (*
     Id = forall A. A -> A;       # type abbreviation
@@ -440,13 +444,16 @@ file to turn it in.
     test id Id id = id;          # passing test
     id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type
                                  # annotation, which allows inference on the RHS
+
     Nat = forall A. (A -> A) -> A -> A;
     zero : Nat = /\A. \s. \z. z;
     succ : Nat -> Nat = \n. /\A. \s. \z. s (n A s z);
+
     one = succ zero;
     two = succ one;
     three = succ two;
     four = succ three;
+
     test succ one = two;
 
     add : Nat -> Nat -> Nat = \n:Nat. \m:Nat. n Nat succ m;
@@ -483,7 +490,10 @@ file to turn it in.
  *)
 (*
 Pair A B = forall C. (A -> B -> C) -> C;
-mkpair : forall A B. A -> B -> Pair A B = /\A. /\B. \a:A. \b:B. /\C. \f:(A -> B-> C) . f a b;
+
+mkpair : forall A B. A -> B -> Pair A B =
+   /\A. /\B. \a:A. \b:B. /\C. \f:(A -> B-> C) . f a b;
+
 fst: forall A B. Pair A B -> A = /\A. /\B. \c:(Pair A B). c A (\x:A. \y:B. x);
 snd: forall A B. Pair A B -> B = /\A. /\B. \c:(Pair A B). c B (\x:A. \y:B. y);
 
@@ -491,7 +501,6 @@ natpair : Pair Nat Nat = mkpair Nat Nat one two;
 
 test fst Nat Nat natpair = one;
 test snd Nat Nat natpair = two;
-
 *)
 
 (* PROBLEM 5 [15 points, ~10 LOC]
@@ -505,9 +514,11 @@ test snd Nat Nat natpair = two;
  *    Hint: The type "Pair Nat Nat" will be useful.
  *)
 (*
+predAux : Pair Nat Nat -> Pair Nat Nat =
+   \p:(Pair Nat Nat) . mkpair Nat Nat (succ (fst Nat Nat p)) (fst Nat Nat p);
 
-predAux : Pair Nat Nat -> Pair Nat Nat = \p:(Pair Nat Nat) . mkpair Nat Nat (succ (fst Nat Nat p)) (fst Nat Nat p);
-pred: Nat -> Nat = \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
+pred: Nat -> Nat =
+   \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
 
 seven = add four three;
 eight = add four four;
