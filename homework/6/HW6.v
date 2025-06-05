@@ -263,7 +263,7 @@ Inductive hasty : gamma -> expr -> type -> Prop :=
                     (G |- c : Bool) -> (G |- e1 : t) -> (G |- e2 : t) ->
                     (G |- If c Then e1 Else e2 : t)
 | HtApp :   forall G e1 e2 t1 t2,
-                    (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
+                   (G |- e1 : (t1 ==> t2)) -> (G |- e2 : t1) ->
                     (G |- e1 @ e2 : t2)
 | HtAbs :   forall G x e t1 t2,
                     ((x, t1) :: G |- e : t2) ->
@@ -291,16 +291,34 @@ Fixpoint is_free_var (e : expr) (y : var) : Prop :=
  *       should make sure nothing unnecessary is above the line.
  *)
 
+(* sharing is caring, especially with regards to namespaces :> *)
+Ltac e H := eapply H; eauto.
+
+Lemma type_uniqueness_arbitrary_context :
+  forall G e t1 t2,
+    G |- e : t1 ->
+    G |- e : t2 ->
+    t1 = t2.
+Proof.
+  intros G e.
+  generalize dependent G. (* ∀ contexts G *)
+  induction e; intros G t1 t2 H1 H2; invc H1; invc H2; auto.
+  - congruence.
+  - e IHe2. (* two valid choices, IHe3 also works. *)
+  - f_equal. e IHe.
+  - injection (IHe1 G (t0 ==> t1) (t3 ==> t2) H4 H3). auto. (* same as specialize; inversion *)
+Qed.
+
+
+
 Lemma type_uniqueness :
   forall e t1 t2,
     [] |- e : t1 ->
     [] |- e : t2 ->
     t1 = t2.
 Proof.
-intros.
-   
-  
-Admitted.
+  e type_uniqueness_arbitrary_context.
+Qed.
 
 End STLC_with_annotations.
 
@@ -390,7 +408,7 @@ often allows you to leave off type annotations on lambdas on the RHS.
 
 (*
 
-The following problems as you to write several programs in System F. We
+The following problems ask you to write several programs in System F. We
 recommend working in the editor and then copy-pasting your final code into this
 file to turn it in.
 
@@ -416,23 +434,26 @@ file to turn it in.
  * Hint: When we report "lines of code" in our solution, don't take the numbers
  *       too literally. We tend to put a line break after an "=" in most
  *       definitions. If you follow different conventions, you might get a
- *       (very) different number of lines. As always, we don't grade on line
- *       counts.
+ *       (very) different number of lines.
+ *       As always, we don't grade on line counts.
  *)
 (*
     Id = forall A. A -> A;       # type abbreviation
     id = /\A. \x:A. x;           # term abbreviation
     id Id id;                    # evaluating a term to normal form
     test id Id id = id;          # passing test
-    id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type 
-                                # annotation, which allows inference on the RHS
+    id2 : Id = /\A. \x. x;       # another term abbreviation, but with a type
+                                 # annotation, which allows inference on the RHS
+
     Nat = forall A. (A -> A) -> A -> A;
     zero : Nat = /\A. \s. \z. z;
     succ : Nat -> Nat = \n. /\A. \s. \z. s (n A s z);
+
     one = succ zero;
     two = succ one;
     three = succ two;
     four = succ three;
+
     test succ one = two;
 
     add : Nat -> Nat -> Nat = \n:Nat. \m:Nat. n Nat succ m;
@@ -469,15 +490,17 @@ file to turn it in.
  *)
 (*
 Pair A B = forall C. (A -> B -> C) -> C;
-mkpair : forall A B. A -> B -> Pair A B = /\A. /\B. \a:A. \b:B. /\C. \f:(A -> B-> C) . f a b;
-fst: forall A B. Pair A B -> A = /\A. /\B. \c:(Pair A B). c A (\x:A. \y:B. x);
-snd: forall A B. Pair A B -> B = /\A. /\B. \c:(Pair A B). c B (\x:A. \y:B. y);
+
+mkpair : forall A B. A -> B -> Pair A B =
+   /\A B. \a:A. \b:B. /\C. \f:(A -> B -> C) . f a b;
+
+fst: forall A B. Pair A B -> A = /\A B. \c:(Pair A B). c A (\x:A. \y:B. x);
+snd: forall A B. Pair A B -> B = /\A B. \c:(Pair A B). c B (\x:A. \y:B. y);
 
 natpair : Pair Nat Nat = mkpair Nat Nat one two;
 
-test fst Nat Nat natpair = one; 
-test snd Nat Nat natpair = two; 
-
+test fst Nat Nat natpair = one;
+test snd Nat Nat natpair = two;
 *)
 
 (* PROBLEM 5 [15 points, ~10 LOC]
@@ -491,14 +514,29 @@ test snd Nat Nat natpair = two;
  *    Hint: The type "Pair Nat Nat" will be useful.
  *)
 (*
+predAux : Pair Nat Nat -> Pair Nat Nat =
+   \p:(Pair Nat Nat) . mkpair Nat Nat (succ (fst Nat Nat p)) (fst Nat Nat p);
 
-predAux : Pair Nat Nat -> Pair Nat Nat = \p:(Pair Nat Nat) . mkpair Nat Nat (succ (fst Nat Nat p)) (fst Nat Nat p);
-pred: Nat -> Nat = \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
+pred: Nat -> Nat =
+   \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
+
+TODO: take a look at this + decide which one we like better!
+# same as above but with extracting some types to abbreviations.
+Nat2 = Pair Nat Nat;
+mkpairNat : Nat -> Nat -> Nat2 = mkpair Nat Nat;
+fstNat : Nat2 -> Nat = fst Nat Nat;
+sndNat : Nat2 -> Nat = snd Nat Nat;
+
+predAux : Nat2 -> Nat2 =
+   \p:Nat2. mkpairNat (succ (fstNat p)) (fstNat p);
+
+pred: Nat -> Nat =
+    \n. sndNat (n Nat2 predAux (mkpairNat zero zero));
 
 seven = add four three;
 eight = add four four;
 test pred eight = seven;
-test pred zero = zero; 
+test pred zero = zero;
 *)
 
 (* CHALLENGE 6 [10 points, ~35 LOC]
@@ -562,12 +600,18 @@ test pred zero = zero;
  *    recursive case, do pattern matching on y (i.e. use "natcase").
  *)
 (*
-a) 
+a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-    /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
+   /\A. \f:(Nat -> A->A) . \p:(Pair Nat A).
+   mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
 
-setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) = 
-    /\A. \f. natrec_aux A f;
+setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
+   /\A. \f. natrec_aux A f;
+
+natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
+   /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
+   snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
+
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
      /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
@@ -608,7 +652,7 @@ d)
  * For example, the list [1; 2; 3] would be represented by
  *
  *     /\B. \c. \n.
- *       c 1 (c 2 (c 3 n))
+ *     c 1 (c 2 (c 3 n))
  *
  * (Of course, we also need to encode the numbers.)
  *
@@ -663,7 +707,7 @@ d)
  *    test insertion_sort one_zero_two = seq three;
  *)
 (*
-# Paste your code here
+seq :
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
@@ -710,7 +754,16 @@ d)
  * starts with the left-hand side above and "computes" to the right hand side.
  * At each step, you can either expand an abbreviation, or take a step.
  *)
-(* YOUR ASCII PROOF HERE *)
+(*
+Proof.
+fst t1 t2 (mkpair t1 t2 v1 v2)
+fst t1 t2 ((λp. p v1 v2))
+(λp. p (λx. λy. x)) (λp. p v1 v2)
+(λp. p v1 v2) (λx. λy. x)
+(λx. λy. x) v1 v2
+(λy. v1) v2
+v1
+*)
 
 (*
             ____                  _     _                     _  _
@@ -732,7 +785,17 @@ d)
  * parametricity.
  *
  *)
-(* YOUR ANSWER HERE *)
+(*
+Prop. There are 4 values of the given type.
+
+Proof.
+The only operations available are placing the input arguments into each of the two positions of the pair.
+Since each position can independently be filled with either the first or second argument, then we have 2 × 2 = 4 possible functions of this type:
+λx. λy. (x, x)
+λx. λy. (x, y)
+λx. λy. (y, x)
+λx. λy. (y, y)
+*)
 
 (* CHALLENGE 11 [5 points, ~25 LOC]
  *
@@ -747,7 +810,15 @@ d)
  *     f t1 t2 (p t1 t2 v1 v2) -->* v1
  *
  *)
-(* YOUR ANSWER HERE *)
+(*
+Note that p constructs a pair with one value up to equivalence.
+Note that f is the first projection of a pair, also with one value up to equivalence.
+
+Since p and f must work consistently across all types without inspecting values,
+then the composition f . p must behave like the standard pair construction
+followed by the first projection, which returns the first argument.
+So, f . p will always return the first argument given to p, that is v1.
+*)
 
 (* Feedback question *)
 (*
@@ -763,7 +834,12 @@ d)
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(*
+   1. 4 hours?
+
+   2. Daniel-san really liked System F. lipson liked the metatheory proofs.
+
+*)
 
 
 (*
