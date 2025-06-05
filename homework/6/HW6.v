@@ -290,12 +290,16 @@ Fixpoint is_free_var (e : expr) (y : var) : Prop :=
  * Hint: Remember our "best practices" for inducting. Before inducting, you
  *       should make sure nothing unnecessary is above the line.
  *)
+
 Lemma type_uniqueness :
   forall e t1 t2,
     [] |- e : t1 ->
     [] |- e : t2 ->
     t1 = t2.
 Proof.
+intros.
+   
+  
 Admitted.
 
 End STLC_with_annotations.
@@ -487,7 +491,14 @@ test snd Nat Nat natpair = two;
  *    Hint: The type "Pair Nat Nat" will be useful.
  *)
 (*
-# Paste your code here
+
+predAux : Pair Nat Nat -> Pair Nat Nat = \p:(Pair Nat Nat) . mkpair Nat Nat (succ (fst Nat Nat p)) (fst Nat Nat p);
+pred: Nat -> Nat = \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
+
+seven = add four three;
+eight = add four four;
+test pred eight = seven;
+test pred zero = zero; 
 *)
 
 (* CHALLENGE 6 [10 points, ~35 LOC]
@@ -551,7 +562,15 @@ test snd Nat Nat natpair = two;
  *    recursive case, do pattern matching on y (i.e. use "natcase").
  *)
 (*
-# Paste your code here
+a) 
+natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
+    /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
+
+setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) = 
+    /\A. \f. natrec_aux A f;
+
+natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
+     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
 *)
 
 (* CHALLENGE 7 [10 points, ~35 LOC]
