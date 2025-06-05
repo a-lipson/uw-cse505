@@ -520,6 +520,7 @@ predAux : Pair Nat Nat -> Pair Nat Nat =
 pred: Nat -> Nat =
    \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
 
+TODO: take a look at this + decide which one we like better!
 # same as above but with extracting some types to abbreviations.
 Nat2 = Pair Nat Nat;
 mkpairNat : Nat -> Nat -> Nat2 = mkpair Nat Nat;
@@ -763,7 +764,18 @@ v1
  * parametricity.
  *
  *)
-(* YOUR ANSWER HERE *)
+(*
+Prop. There are 4 values of the given type.
+
+ Proof.
+The only operations available are placing the input arguments into each of the two positions of the pair.
+
+Since each position can independently be filled with either the first or second argument, then we have 2 × 2 = 4 possible functions of this type:
+λx. λy. (x, x)
+λx. λy. (x, y)
+λx. λy. (y, x)
+λx. λy. (y, y)
+*)
 
 (* CHALLENGE 11 [5 points, ~25 LOC]
  *
@@ -794,7 +806,12 @@ v1
  * It's fine if your answers are short if you don't have much to say!
  *)
 
-(* Your feedback here! *)
+(*
+   1. 4 hours?
+
+   2. Daniel-san really liked System F. lipson liked the metatheory proofs.
+
+*)
 
 
 (*
