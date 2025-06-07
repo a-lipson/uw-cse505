@@ -736,6 +736,26 @@ mkInsertState = mkpair bool (List Nat);
 insertStateFlag = fst bool (List Nat);
 insertStateList = snd bool (List Nat);
 
+insert_fold : Nat -> Nat -> InsertState -> InsertState =
+  \x h state. # insertion value, current head, current state
+    if (insertStateFlag state) # already inserted
+    then (mkInsertState true (cons Nat h (insertStateList state))) # pass back with insertion completed flag
+    else if (le x h) # should insert here
+    then (mkInsertState true (cons Nat x (cons Nat h (insertStateList state))))
+    else (mkInsertState false (cons Nat h (insertStateList state))); # pass back without insertion completed flag
+
+insert : Nat -> List Nat -> List Nat =
+  \x l. # assume l is sorted ascending.
+    (\result : InsertState.
+      if (insertStateFlag result)
+      then (insertStateList result) # x was inserted, so pass list
+      else (cons Nat x (insertStateList result))) # x was not inserted, so prepend it
+    (l InsertState
+       (insert_fold x) # folding function (fixed with x)
+       (mkInsertState false (nil Nat))); # accumulator
+
+test insert one (cons Nat zero (cons Nat two (nil Nat))) = seq three;
+test insert zero (nil Nat) = cons Nat zero (nil Nat);
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
