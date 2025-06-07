@@ -602,19 +602,13 @@ test pred zero = zero;
 (*
 a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-   /\A. \f:(Nat -> A->A) . \p:(Pair Nat A).
-   mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
+    /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (fst Nat A p) (snd Nat A p));
 
-setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-   /\A. \f. natrec_aux A f;
-
-natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
-   /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
-   snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
-
+setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) = 
+    /\A. \f. natrec_aux A f;
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
-     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
+     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A (n (Pair Nat A) (setup A f);  
 
 b) 
 factorial: Nat -> Nat = \n:Nat . natrec Nat (\x. \rec. mul (succ x) rec) one n;
@@ -630,7 +624,7 @@ c) natcase : forall A. (Nat->A)->A->Nat->A = /\A. \f:(Nat-> A) . \x:A . \n:Nat .
 
 d)
 
-
+le = \x:Nat. \y:Nat . is_zero (y Nat pred x);
 
 *)
 
