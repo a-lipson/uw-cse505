@@ -719,15 +719,17 @@ mkSeqState = mkpair Nat (List Nat);
 seqStateNum = fst Nat (List Nat);
 seqStateList = snd Nat (List Nat);
 
+# build list by counting down;
+# at each step, set the current number to n-1 and concat n-1 with the list.
 seq_step : SeqState -> SeqState =
   \state. # (n, l)
     mkSeqState
       (pred (seqStateNum state)) # n-1
-      (cons Nat (pred (seqStateNum state)) (seqStateList state)); # cons (n-1) l
+        (cons Nat (pred (seqStateNum state)) (seqStateList state)); # (n-1) ++ l
 
 seq : Nat -> List Nat =
   \n. seqStateList
-    (n SeqState seq_step (mkSeqState n (nil Nat)));
+    (n SeqState seq_step (mkSeqState n (nil Nat))); # perform seq_step n times with (n, []) base case
 
 test seq three = cons Nat zero (cons Nat one (cons Nat two (nil Nat)));
 test seq zero = nil Nat;
@@ -864,6 +866,9 @@ So, f . p will always return the first argument given to p, that is v1.
    1. 4 hours?
 
    2. Daniel-san really liked System F. lipson liked the metatheory proofs.
+   We had the following realizations:
+   - calling a natural number as a function is like performing induction, we need a step and a base case.
+   - calling lists as a function is like folding with an accumulator.
 
 *)
 
