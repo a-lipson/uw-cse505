@@ -520,22 +520,21 @@ predAux : Pair Nat Nat -> Pair Nat Nat =
 pred: Nat -> Nat =
    \n . snd Nat Nat (n (Pair Nat Nat) predAux (mkpair Nat Nat zero zero));
 
-TODO: take a look at this + decide which one we like better!
-# same as above but with extracting some types to abbreviations.
-Nat2 = Pair Nat Nat;
-mkpairNat : Nat -> Nat -> Nat2 = mkpair Nat Nat;
-fstNat : Nat2 -> Nat = fst Nat Nat;
-sndNat : Nat2 -> Nat = snd Nat Nat;
 
-predAux : Nat2 -> Nat2 =
-   \p:Nat2. mkpairNat (succ (fstNat p)) (fstNat p);
+# same idea as above, using types to increase clarity.
+PredState = Pair Nat Nat;
+mkPredState : Nat -> Nat -> PredState = mkpair Nat Nat;
+predStateCurr : PredState -> Nat = fst Nat Nat;
+predStatePrev : PredState -> Nat = snd Nat Nat;
 
-pred: Nat -> Nat =
-    \n. sndNat (n Nat2 predAux (mkpairNat zero zero));
+# state : (current, previous)
+pred : Nat -> Nat = \n. predStatePrev
+   (n PredState
+     (\p. mkPredState (succ (predStateCurr p)) (predStateCurr p))
+     (mkPredState zero zero));
 
-seven = add four three;
-eight = add four four;
-test pred eight = seven;
+test pred two = one;
+test pred one = zero;
 test pred zero = zero;
 *)
 
@@ -600,18 +599,19 @@ test pred zero = zero;
  *    recursive case, do pattern matching on y (i.e. use "natcase").
  *)
 (*
-a)
+(a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
     /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (fst Nat A p) (snd Nat A p));
 
-setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) = 
+setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
     /\A. \f. natrec_aux A f;
 
-natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
-     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A (n (Pair Nat A) (setup A f);  
+natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
+    /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A (n (Pair Nat A) (setup A f);
 
-b) 
-factorial: Nat -> Nat = \n:Nat . natrec Nat (\x. \rec. mul (succ x) rec) one n;
+(b)
+factorial: Nat -> Nat =
+  \n:Nat. natrec Nat (\x. \rec. mul (succ x) rec) one n;
 
 five = succ four;
 twenty = mul five four;
@@ -619,13 +619,20 @@ onetwenty =  mul twenty six;
 
 test factorial five = onetwenty;
 
-c) natcase : forall A. (Nat->A)->A->Nat->A = /\A. \f:(Nat-> A) . \x:A . \n:Nat . 
-    natrec A (\k:Nat. \a:A . f k) x n;
+(c)
+natcase : forall A. (Nat->A)->A->Nat->A =
+  /\A. \f:(Nat-> A). \x:A. \n:Nat.
+    natrec A (\k:Nat. \a:A. f k) x n;
 
-d)
+(d)
+iszero : Nat -> bool = \n. n bool (\x. false) true;
+# use the fact that there are no negative numbers, zero is floor count
+le : Nat -> Nat = \n m. is_zero (m Nat pred n); # effectedly iszero (n - m)
 
-le = \x:Nat. \y:Nat . is_zero (y Nat pred x);
-
+test le zero two = true;
+test le one two = true;
+test le zero zero = true;
+test le two one = false;
 *)
 
 
@@ -701,7 +708,31 @@ le = \x:Nat. \y:Nat . is_zero (y Nat pred x);
  *    test insertion_sort one_zero_two = seq three;
  *)
 (*
-seq :
+
+(a)
+SeqState = Pair Nat (List Nat);
+mkSeqState = mkpair Nat (List Nat);
+seqStateNum = fst Nat (List Nat);
+seqStateList = snd Nat (List Nat);
+
+# build list by counting down;
+# at each step, set the current number to n-1 and concat n-1 with the list.
+seq_step : SeqState -> SeqState =
+  \state. # (n, l)
+    mkSeqState
+      (pred (seqStateNum state)) # n-1
+        (cons Nat (pred (seqStateNum state)) (seqStateList state)); # (n-1) ++ l
+
+seq : Nat -> List Nat =
+  \n. seqStateList
+    (n SeqState seq_step (mkSeqState n (nil Nat))); # perform seq_step n times with (n, []) base case
+
+test seq three = cons Nat zero (cons Nat one (cons Nat two (nil Nat)));
+test seq zero = nil Nat;
+
+(b)
+
+
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
@@ -832,6 +863,9 @@ So, f . p will always return the first argument given to p, that is v1.
    1. 4 hours?
 
    2. Daniel-san really liked System F. lipson liked the metatheory proofs.
+   We had the following realizations:
+   - calling a natural number as a function is like performing induction, we need a step and a base case.
+   - calling lists as a function is like folding with an accumulator.
 
 *)
 
