@@ -522,20 +522,20 @@ pred: Nat -> Nat =
 
 TODO: take a look at this + decide which one we like better!
 # same as above but with extracting some types to abbreviations.
-Nat2 = Pair Nat Nat;
-mkpairNat : Nat -> Nat -> Nat2 = mkpair Nat Nat;
-fstNat : Nat2 -> Nat = fst Nat Nat;
-sndNat : Nat2 -> Nat = snd Nat Nat;
 
-predAux : Nat2 -> Nat2 =
-   \p:Nat2. mkpairNat (succ (fstNat p)) (fstNat p);
+PredState = Pair Nat Nat;
+mkPredState : Nat -> Nat -> PredState = mkpair Nat Nat;
+predStateCurr : PredState -> Nat = fst Nat Nat;
+predStatePrev : PredState -> Nat = snd Nat Nat;
 
-pred: Nat -> Nat =
-    \n. sndNat (n Nat2 predAux (mkpairNat zero zero));
+# state : (current, previous)
+pred : Nat -> Nat = \n. predStatePrev
+   (n PredState
+     (\p. mkPredState (succ (predStateCurr p)) (predStateCurr p))
+     (mkPredState zero zero));
 
-seven = add four three;
-eight = add four four;
-test pred eight = seven;
+test pred two = one;
+test pred one = zero;
 test pred zero = zero;
 *)
 
@@ -707,7 +707,27 @@ d)
  *    test insertion_sort one_zero_two = seq three;
  *)
 (*
-seq :
+
+(a)
+SeqState = Pair Nat (List Nat);
+mkSeqState = mkpair Nat (List Nat);
+seqStateNum = fst Nat (List Nat);
+seqStateList = snd Nat (List Nat);
+
+seq_step : SeqState -> SeqState =
+  \state. # (n, l)
+    mkSeqState
+      (pred (seqStateNum state)) # n-1
+      (cons Nat (pred (seqStateNum state)) (seqStateList state)); # cons (n-1) l
+
+seq : Nat -> List Nat =
+  \n. seqStateList
+    (n SeqState seq_step (mkSeqState n (nil Nat)));
+
+test seq three = cons Nat zero (cons Nat one (cons Nat two (nil Nat)));
+
+(b)
+
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
