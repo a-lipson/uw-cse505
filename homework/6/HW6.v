@@ -630,6 +630,7 @@ natcase : forall A. (Nat->A)->A->Nat->A =
 (d)
 iszero : Nat -> bool = \n. n bool (\x. false) true;
 sub : Nat -> Nat -> Nat = \n m. m Nat pred n;
+# use the fact that there are no negative numbers
 le : Nat -> Nat -> bool = \n m. iszero (sub n m);
 
 test le zero two = true;
