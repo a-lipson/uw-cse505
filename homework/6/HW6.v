@@ -600,24 +600,21 @@ test pred zero = zero;
  *    recursive case, do pattern matching on y (i.e. use "natcase").
  *)
 (*
-a)
+(a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-   /\A. \f:(Nat -> A->A) . \p:(Pair Nat A).
-   mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
+  /\A. \f:(Nat -> A->A) . \p:(Pair Nat A).
+    mkpair Nat A (succ (fst Nat A p)) (f (succ (fst Nat A p)) (snd Nat A p));
 
 setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-   /\A. \f. natrec_aux A f;
+  /\A. \f. natrec_aux A f;
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
-   /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
-   snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
+  /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
+    snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));
 
-
-natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A = 
-     /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A ((pred n) (Pair Nat A) (setup A f) (mkpair Nat A zero (f zero x)));  
-
-b) 
-factorial: Nat -> Nat = \n:Nat . natrec Nat (\x. \rec. mul (succ x) rec) one n;
+(b)
+factorial: Nat -> Nat =
+  \n:Nat. natrec Nat (\x. \rec. mul (succ x) rec) one n;
 
 five = succ four;
 twenty = mul five four;
@@ -625,10 +622,12 @@ onetwenty =  mul twenty six;
 
 test factorial five = onetwenty;
 
-c) natcase : forall A. (Nat->A)->A->Nat->A = /\A. \f:(Nat-> A) . \x:A . \n:Nat . 
-    natrec A (\k:Nat. \a:A . f k) x n;
+(c)
+natcase : forall A. (Nat->A)->A->Nat->A =
+  /\A. \f:(Nat-> A). \x:A. \n:Nat.
+    natrec A (\k:Nat. \a:A. f k) x n;
 
-d)
+(d)
 
 
 
