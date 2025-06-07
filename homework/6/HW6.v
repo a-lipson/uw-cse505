@@ -731,7 +731,10 @@ test seq three = cons Nat zero (cons Nat one (cons Nat two (nil Nat)));
 test seq zero = nil Nat;
 
 (b)
-
+InsertState = Pair bool (List Nat);
+mkInsertState = mkpair bool (List Nat);
+insertStateFlag = fst bool (List Nat);
+insertStateList = snd bool (List Nat);
 
 *)
 
