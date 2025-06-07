@@ -628,9 +628,14 @@ natcase : forall A. (Nat->A)->A->Nat->A =
     natrec A (\k:Nat. \a:A. f k) x n;
 
 (d)
+iszero : Nat -> bool = \n. n bool (\x. false) true;
+sub : Nat -> Nat -> Nat = \n m. m Nat pred n;
+le : Nat -> Nat -> bool = \n m. iszero (sub n m);
 
-
-
+test le zero two = true;
+test le one two = true;
+test le zero zero = true;
+test le two one = false;
 *)
 
 
@@ -724,6 +729,7 @@ seq : Nat -> List Nat =
     (n SeqState seq_step (mkSeqState n (nil Nat)));
 
 test seq three = cons Nat zero (cons Nat one (cons Nat two (nil Nat)));
+test seq zero = nil Nat;
 
 (b)
 
