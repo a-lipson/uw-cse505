@@ -756,6 +756,13 @@ insert : Nat -> List Nat -> List Nat =
 
 test insert one (cons Nat zero (cons Nat two (nil Nat))) = seq three;
 test insert zero (nil Nat) = cons Nat zero (nil Nat);
+
+(c)
+insertion_sort : List Nat -> List Nat =
+  \l. l (List Nat) insert (nil Nat); # insert secretly had a foldabale signature all along.
+
+one_zero_two = cons Nat one (cons Nat zero (cons Nat two (nil Nat)));
+test insertion_sort one_zero_two = seq three;
 *)
 
 (* CHALLENGE 8 [5 points, ~15 LOC]
@@ -887,8 +894,13 @@ So, f . p will always return the first argument given to p, that is v1.
 
    2. Daniel-san really liked System F. lipson liked the metatheory proofs.
    We had the following realizations:
-   - calling a natural number as a function is like performing induction, we need a step and a base case.
-   - calling lists as a function is like folding with an accumulator.
+   - Calling a natural number as a function is like performing induction, we need a step and a base case.
+     What is a step function but something of type A -> A?
+   - Calling lists as a function is like folding with an accumulator.
+     What is a fold function if not something of type A -> B -> B?
+
+   It was actually quite clever that all we need to do in order to produce insertion sort
+   from insertion was just fold insert on a list!
 
 *)
 
