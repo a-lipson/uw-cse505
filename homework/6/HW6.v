@@ -601,13 +601,15 @@ test pred zero = zero;
 (*
 (a)
 natrec_aux: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-    /\ A . \f:(Nat -> A->A) . \p:(Pair Nat A) . mkpair Nat A (succ (fst Nat A p)) (f (fst Nat A p) (snd Nat A p));
+  /\ A  \f:(Nat -> A->A). \p:(Pair Nat A).
+    mkpair Nat A (succ (fst Nat A p)) (f (fst Nat A p) (snd Nat A p));
 
-setup: forall A . (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
-    /\A. \f. natrec_aux A f;
+setup: forall A. (Nat -> A -> A) -> (Pair Nat A) -> (Pair Nat A) =
+  /\A. \f. natrec_aux A f;
 
 natrec: forall A. (Nat -> A -> A) -> A -> Nat -> A =
-    /\A. \f:(Nat -> A -> A) . \x:A . \n:Nat . snd Nat A (n (Pair Nat A) (setup A f);
+  /\A. \f:(Nat -> A -> A). \x:A. \n:Nat.
+    snd Nat A (n (Pair Nat A) (setup A f);
 
 (b)
 factorial: Nat -> Nat =
@@ -620,7 +622,7 @@ onetwenty =  mul twenty six;
 test factorial five = onetwenty;
 
 (c)
-natcase : forall A. (Nat->A)->A->Nat->A =
+natcase : forall A. (Nat->A) -> A -> Nat -> A =
   /\A. \f:(Nat-> A). \x:A. \n:Nat.
     natrec A (\k:Nat. \a:A. f k) x n;
 
@@ -714,9 +716,9 @@ test le two one = false;
 (*
 
 (a)
-SeqState = Pair Nat (List Nat);
+SeqState   = Pair Nat (List Nat);
 mkSeqState = mkpair Nat (List Nat);
-seqStateNum = fst Nat (List Nat);
+seqStateNum  = fst Nat (List Nat);
 seqStateList = snd Nat (List Nat);
 
 # build list by counting down;
@@ -725,7 +727,7 @@ seq_step : SeqState -> SeqState =
   \state. # (n, l)
     mkSeqState
       (pred (seqStateNum state)) # n-1
-        (cons Nat (pred (seqStateNum state)) (seqStateList state)); # (n-1) ++ l
+      (cons Nat (pred (seqStateNum state)) (seqStateList state)); # (n-1) ++ l
 
 seq : Nat -> List Nat =
   \n. seqStateList
@@ -924,6 +926,9 @@ So, f . p will always return the first argument given to p, that is v1.
 
    It was actually quite clever that all we need to do in order to produce insertion sort
    from insertion was just fold insert on a list!
+   Similarly, we obtained append simply by folding with cons.
+
+   3. This homework was indeed fun and diffenent!
 
 *)
 
