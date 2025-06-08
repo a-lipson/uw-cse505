@@ -629,6 +629,10 @@ iszero : Nat -> bool = \n. n bool (\x. false) true;
 # use the fact that there are no negative numbers, zero is floor count
 le : Nat -> Nat = \n m. is_zero (m Nat pred n); # effectedly iszero (n - m)
 
+# alternatively:
+# sub : Nat -> Nat -> Nat = \n m. m Nat pred n;
+# le : Nat -> Nat -> bool = \n m. iszero (sub n m);
+
 test le zero two = true;
 test le one two = true;
 test le zero zero = true;
@@ -781,7 +785,22 @@ test insertion_sort one_zero_two = seq three;
  *    Hint: Proceed by structural recursion.
  *)
 (*
-# Paste your code here
+(a)
+append : forall A. List A -> List A -> List A =
+  /\A. \l1 l2. l1 (List A) (cons A) l2; # append is just folding with cons.
+
+test append Nat (seq three) (nil Nat) = seq three;
+
+(b)
+singleton : forall A. A -> List A =
+  /\A. \x. cons A x (nil A)
+
+reverse : forall A. List A -> List A =
+  /\A. \l. l (List A)
+    (\x acc. append A (singleton A x) acc) # append accumulator behind current element singleton.
+    (nil A); # accumulate fold on empty list.
+
+test reverse Nat (reverse Nat (seq four)) = seq four;
 *)
 
 (*
