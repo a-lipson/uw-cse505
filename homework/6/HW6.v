@@ -800,6 +800,10 @@ reverse : forall A. List A -> List A =
     (\x acc. append A (singleton A x) acc) # append accumulator behind current element singleton.
     (nil A); # accumulate fold on empty list.
 
+# more simply,
+reverse : forall A. List A -> List A =
+  /\A. \l. l (List A) (\x acc. cons A x acc) (nil A);
+
 test reverse Nat (reverse Nat (seq four)) = seq four;
 *)
 
